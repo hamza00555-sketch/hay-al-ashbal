@@ -1,0 +1,119 @@
+.page {
+  min-height: 100dvh;
+  background: linear-gradient(160deg, #1a2f1a 0%, #2d4a1e 60%, #1a2f1a 100%);
+  padding: 20px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.9rem;
+  align-self: flex-start;
+}
+
+.heading {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #FFD700;
+  text-align: center;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.input {
+  background: #0e1e0e;
+  border: 1.5px solid #2a4a2a;
+  border-radius: 10px;
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 1rem;
+  width: 100%;
+  text-align: right;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.diffGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.diffCard {
+  background: #0e1e0e;
+  border: 2px solid #1a3a1a;
+  border-radius: 12px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.diffCard:hover {
+  background: #152515;
+}
+
+.activeDiff {
+  background: #152515;
+}
+
+.diffEmoji {
+  font-size: 1.8rem;
+}
+
+.diffName {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.diffStats {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.65rem;
+  color: #999;
+  text-align: center;
+}
+
+.bonus {
+  color: #FFD700 !important;
+  font-weight: 600;
+}
+
+.startBtn {
+  background: #FFD700;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 1.15rem;
+  font-weight: 900;
+  width: 100%;
+  margin-top: auto;
+}
+
+.startBtn:active {
+  opacity: 0.9;
+}

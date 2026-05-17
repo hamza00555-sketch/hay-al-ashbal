@@ -1,0 +1,84 @@
+.wrap {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 220;
+  width: min(90vw, 360px);
+}
+
+.card {
+  background: #0c1c0c;
+  border: 2px solid #4CAF50;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 20px rgba(76,175,80,0.3);
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.progress {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+}
+
+.activeDot {
+  background: #4CAF50;
+  box-shadow: 0 0 6px #4CAF50;
+}
+
+.doneDot {
+  background: rgba(76,175,80,0.5);
+}
+
+.text {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #ddd;
+  margin-bottom: 12px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nextBtn {
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  width: 100%;
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: #4CAF50;
+  text-align: center;
+}
+
+.skipBtn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #666;
+  padding: 6px;
+  font-size: 0.75rem;
+  width: 100%;
+}

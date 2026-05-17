@@ -1,0 +1,175 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: flex-end;
+}
+
+.panel {
+  width: 100%;
+  max-height: 70vh;
+  background: #0e1e0e;
+  border-radius: 16px 16px 0 0;
+  border-top: 2px solid #2a4a2a;
+  padding: 16px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.1rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.bigEmoji {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.info h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.desc {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #ccc;
+  padding: 4px 0;
+  border-bottom: 1px solid #1a3a1a;
+}
+
+.stat strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.primaryBtn {
+  flex: 1;
+  background: #2d7a2d;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.secondaryBtn {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.dangerBtn {
+  flex: 1;
+  background: rgba(244, 67, 54, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ghostBtn {
+  flex: 1;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #888;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+}
+
+.form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.formHint {
+  font-size: 0.72rem;
+  color: #888;
+}
+
+.input {
+  background: #152515;
+  border: 1px solid #2a4a2a;
+  border-radius: 8px;
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  width: 100%;
+  text-align: right;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+}
+
+.saleNote {
+  font-size: 0.75rem;
+  color: #aaa;
+  text-align: center;
+  width: 100%;
+}

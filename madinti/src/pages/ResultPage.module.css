@@ -1,0 +1,92 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  gap: 16px;
+  text-align: center;
+}
+
+.won {
+  background: linear-gradient(160deg, #1a2f1a 0%, #2d4a1e 60%, #3d3a0e 100%);
+}
+
+.lost {
+  background: linear-gradient(160deg, #1a0e0e 0%, #2f1a1a 60%, #1a0e0e 100%);
+}
+
+.icon {
+  font-size: clamp(4rem, 16vw, 7rem);
+  animation: bounce 1s ease infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+.title {
+  font-size: clamp(1.4rem, 5vw, 2.2rem);
+  font-weight: 900;
+  color: #FFD700;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #ccc;
+  max-width: 320px;
+}
+
+.stats {
+  background: rgba(0,0,0,0.3);
+  border-radius: 14px;
+  padding: 14px 20px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: #ccc;
+}
+
+.statRow strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  margin-top: 8px;
+}
+
+.primaryBtn {
+  background: #FFD700;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.secondaryBtn {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}

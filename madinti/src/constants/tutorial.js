@@ -1,0 +1,52 @@
+export const TUTORIAL_STEPS = [
+  {
+    id: 'welcome',
+    textAr: 'مرحباً بك في مدينتي! 🏙️ ستبني مدينة من الصفر. اتبع هذه الخطوات البسيطة لتبدأ.',
+    target: null,
+    action: null,
+    continueMode: 'button',
+  },
+  {
+    id: 'hud_intro',
+    textAr: 'هذا الشريط العلوي يُظهر رصيدك 💰 وعدد السكان 👥 ورضاهم عن المدينة.',
+    target: 'hud',
+    action: null,
+    continueMode: 'button',
+  },
+  {
+    id: 'build_house',
+    textAr: '🏠 ابنِ بيتاً أولاً! اضغط على زر "بناء" ثم اختر "بيت" وانقر على أي خلية فارغة في الخريطة.',
+    target: 'buildBtn',
+    action: { type: 'buildBuilding', typeId: 'house' },
+    continueMode: 'action',
+  },
+  {
+    id: 'rent_house',
+    textAr: '💰 الآن أجّر البيت! انقر على البيت الذي بنيته واختر "تأجير" لتحصل على دخل شهري ثابت.',
+    target: null,
+    action: { type: 'rentBuilding' },
+    continueMode: 'action',
+  },
+  {
+    id: 'build_park',
+    textAr: '🌳 ابنِ حديقة بجانب البيت! الحدائق ترفع رضا السكان المجاورين وتجذب المزيد.',
+    target: 'buildBtn',
+    action: { type: 'buildBuilding', typeId: 'park' },
+    continueMode: 'action',
+  },
+  {
+    id: 'advance_month',
+    textAr: '📅 الآن تقدّم للشهر التالي! اضغط "التالي ▶" في الأعلى لترى دخلك وتشاهد السكان يدخلون.',
+    target: 'nextMonthBtn',
+    action: { type: 'advanceMonth' },
+    continueMode: 'action',
+  },
+  {
+    id: 'done',
+    textAr: '🎉 أحسنت! الآن تعرف الأساسيات. ابنِ مدينتك بحرية وحقّق الهدف المطلوب!',
+    target: null,
+    action: null,
+    continueMode: 'button',
+    isLast: true,
+  },
+];

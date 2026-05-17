@@ -1,0 +1,102 @@
+.hud {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 100;
+  background: rgba(10, 20, 10, 0.92);
+  backdrop-filter: blur(8px);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.statIcon {
+  font-size: 1rem;
+}
+
+.statVal {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+.statUnit {
+  font-size: 0.7rem;
+  color: #aaa;
+}
+
+.center {
+  flex: 1;
+  text-align: center;
+}
+
+.month {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.bottomRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controls {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.nextBtn {
+  background: #2d7a2d;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nextBtn:active {
+  opacity: 0.8;
+}
+
+.autoBtn {
+  background: rgba(255,255,255,0.1);
+  color: #ccc;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.autoActive {
+  background: #1a5c1a;
+  color: #7fff7f;
+  border-color: #4CAF50;
+}
+
+.menuBtn {
+  background: rgba(255,255,255,0.1);
+  color: #ccc;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 1rem;
+}

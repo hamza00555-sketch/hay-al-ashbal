@@ -1,0 +1,64 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 250;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 20px;
+}
+
+.modal {
+  width: calc(100% - 32px);
+  margin: 0 16px;
+  max-width: 420px;
+  background: #0e1e0e;
+  border: 1.5px solid #3a5a3a;
+  border-radius: 16px;
+  padding: 16px;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.character {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+.bubble {
+  background: #152515;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #ddd;
+}
+
+.okBtn {
+  width: 100%;
+  background: #2d7a2d;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
