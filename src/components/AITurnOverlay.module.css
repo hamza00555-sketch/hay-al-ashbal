@@ -1,0 +1,103 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+  pointer-events: none;
+  padding: 20px;
+}
+
+.banner {
+  background: rgba(10, 25, 50, 0.92);
+  border: 1px solid rgba(100, 180, 255, 0.3);
+  border-radius: 18px;
+  padding: 20px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-width: 200px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0 }
+  to   { transform: scale(1);   opacity: 1 }
+}
+
+.name {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.thinking {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.3rem;
+  color: #60b8ff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #60b8ff;
+  animation: bounce 1s infinite;
+}
+.dots span:nth-child(2) { animation-delay: 0.18s; }
+.dots span:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4 }
+  40%            { transform: translateY(-6px); opacity: 1 }
+}
+
+.action {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.playRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.playInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plays {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.cardName {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.logText {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  max-width: 140px;
+  line-height: 1.4;
+}

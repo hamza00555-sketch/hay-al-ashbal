@@ -51,5 +51,6 @@ export function computeAIMove(state) {
   const targetId = pickTarget(state);
   const guessId = cardToPlay.id === 1 ? bestGuess(state) : null;
 
-  return resolveCard(state, cardToPlay, cardSource, targetId, guessId);
+  const nextState = resolveCard(state, cardToPlay, cardSource, targetId, guessId);
+  return { state: nextState, playedCard: cardToPlay };
 }
