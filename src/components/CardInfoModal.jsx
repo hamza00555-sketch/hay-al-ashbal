@@ -12,7 +12,14 @@ export default function CardInfoModal({ card, onClose }) {
         <div className={styles.info} style={{ borderColor: card.color }}>
           <div className={styles.header}>
             <span className={styles.icon}>{card.icon}</span>
-            <span className={styles.name}>{card.name}</span>
+            <div className={styles.names}>
+              <span className={styles.childName}>{card.name}</span>
+              {card.role && (
+                <span className={styles.role} style={{ color: card.color }}>
+                  {card.role}
+                </span>
+              )}
+            </div>
             <span className={styles.power} style={{ background: card.color }}>
               {card.power}
             </span>

@@ -61,7 +61,13 @@ export function CardFace({ card, size = 'normal', dimmed = false, selected = fal
       ].join(' ')}
       onClick={onClick}
     >
-      <img src={`/cards/${card.image ?? card.id}.png`} alt={card.name} className={styles.cardImg} draggable={false} />
+      <img
+        src={`/cards/${card.image ?? card.id}.png`}
+        alt={card.name}
+        className={styles.cardImg}
+        draggable={false}
+        onError={e => { e.currentTarget.src = `/cards/${card.id}.png`; }}
+      />
     </div>
   );
 }
@@ -82,7 +88,13 @@ export function FlipCard({ card, size = 'normal', onDone }) {
           <img src="/cards/back.png" alt="" className={styles.cardImg} draggable={false} />
         </div>
         <div className={styles.flipBack}>
-          <img src={`/cards/${card.image ?? card.id}.png`} alt={card.name} className={styles.cardImg} draggable={false} />
+          <img
+        src={`/cards/${card.image ?? card.id}.png`}
+        alt={card.name}
+        className={styles.cardImg}
+        draggable={false}
+        onError={e => { e.currentTarget.src = `/cards/${card.id}.png`; }}
+      />
         </div>
       </div>
     </div>
