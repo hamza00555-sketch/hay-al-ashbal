@@ -1,4 +1,4 @@
-import { CardFace } from './Card';
+import { CardBack } from './Card';
 import styles from './AITurnOverlay.module.css';
 
 export default function AITurnOverlay({ phase, aiName, card, logText, onDismiss }) {
@@ -25,9 +25,12 @@ export default function AITurnOverlay({ phase, aiName, card, logText, onDismiss 
         {phase === 'playing' && card && (
           <>
             <div className={styles.playRow}>
-              <CardFace card={card} size="large" />
+              {/* card stays face-down — player never sees AI's card */}
+              <div className={styles.playedCardWrap}>
+                <CardBack size="normal" />
+              </div>
               <div className={styles.playInfo}>
-                <span className={styles.plays}>لعب</span>
+                <span className={styles.plays}>لعب كرت</span>
                 <span className={styles.cardName}>{card.name}</span>
                 <span className={styles.ability}>{card.ability}</span>
                 {logText && <span className={styles.logText}>{logText}</span>}

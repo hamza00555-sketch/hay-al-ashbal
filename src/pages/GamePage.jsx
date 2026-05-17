@@ -338,29 +338,40 @@ export default function GamePage({ config, onGameOver }) {
         )}
 
         <div className={styles.hand}>
-          <CardSlot
-            label="كرتك"
-            card={currentPlayer.hand[0]}
-            source="hand"
-            focused={focusedSource === 'hand'}
-            dimmed={gs.phase === 'PLAY' && !legalPlays.includes('hand')}
-            playable={gs.phase === 'PLAY' && isMyTurn}
-            onCardClick={handleCardClick}
-            onInfoClick={handleInfoClick}
-          />
-          {gs.drawnCard && (
-            <CardSlot
-              label="المسحوب"
-              card={gs.drawnCard}
-              source="drawn"
-              focused={focusedSource === 'drawn'}
-              dimmed={!legalPlays.includes('drawn')}
-              playable={gs.phase === 'PLAY' && isMyTurn}
-              flipping={drawnFlipping}
-              onFlipDone={() => setDrawnFlipping(false)}
-              onCardClick={handleCardClick}
-              onInfoClick={handleInfoClick}
-            />
+          {isMyTurn ? (
+            <>
+              <CardSlot
+                label="كرتك"
+                card={currentPlayer.hand[0]}
+                source="hand"
+                focused={focusedSource === 'hand'}
+                dimmed={gs.phase === 'PLAY' && !legalPlays.includes('hand')}
+                playable={gs.phase === 'PLAY'}
+                onCardClick={handleCardClick}
+                onInfoClick={handleInfoClick}
+              />
+              {gs.drawnCard && (
+                <CardSlot
+                  label="المسحوب"
+                  card={gs.drawnCard}
+                  source="drawn"
+                  focused={focusedSource === 'drawn'}
+                  dimmed={!legalPlays.includes('drawn')}
+                  playable={gs.phase === 'PLAY'}
+                  flipping={drawnFlipping}
+                  onFlipDone={() => setDrawnFlipping(false)}
+                  onCardClick={handleCardClick}
+                  onInfoClick={handleInfoClick}
+                />
+              )}
+            </>
+          ) : (
+            /* AI turn — show covered cards only */
+            <div className={styles.aiHandCover}>
+              <CardBack size="large" />
+              {/* show second covered card if AI is in play phase */}
+              {aiPhase === 'playing' && <CardBack size="large" />}
+            </div>
           )}
         </div>
 
