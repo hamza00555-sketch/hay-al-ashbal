@@ -38,9 +38,10 @@ export default function GamePage({ config, onGameOver }) {
   const [drawnFlipping, setDrawnFlipping] = useState(false);
   const prevDrawnRef = useRef(null);
 
-  const [aiPhase, setAiPhase]         = useState(null);
+  const [aiPhase, setAiPhase]           = useState(null);
   const [aiPlayedCard, setAiPlayedCard] = useState(null);
-  const [aiLogText, setAiLogText]     = useState('');
+  const [aiLogText, setAiLogText]       = useState('');
+  const [aiPendingState, setAiPendingState] = useState(null);
 
   const [musicOn, setMusicOn] = useState(false);
 
@@ -87,19 +88,13 @@ export default function GamePage({ config, onGameOver }) {
           const lastLog = afterResolve.gameLog[afterResolve.gameLog.length - 1];
           setAiPlayedCard(playedCard);
           setAiLogText(lastLog?.text ?? '');
+          setAiPendingState(afterResolve);
           setAiPhase('playing');
           SFX.cardPlay();
-
-          const t3 = setTimeout(() => {
-            setAiPhase(null);
-            setAiPlayedCard(null);
-            setAiLogText('');
-            setGs(afterResolve);
-          }, 1100);
-          return () => clearTimeout(t3);
-        }, 600);
+          // no auto-advance — user must tap "تابع"
+        }, 1200);
         return () => clearTimeout(t2);
-      }, 700);
+      }, 1600);
       return () => clearTimeout(t1);
     }
 
@@ -152,6 +147,16 @@ export default function GamePage({ config, onGameOver }) {
   const handlePeekDone = useCallback(() => {
     setGs(advanceTurn({ ...gs, phase: 'DONE', peekCard: null, peekTargetName: null }));
   }, [gs]);
+
+  const handleAiDismiss = useCallback(() => {
+    if (!aiPendingState) return;
+    SFX.buttonClick();
+    setAiPhase(null);
+    setAiPlayedCard(null);
+    setAiLogText('');
+    setGs(aiPendingState);
+    setAiPendingState(null);
+  }, [aiPendingState]);
 
   const toggleMusic = (e) => {
     e.stopPropagation();
@@ -261,6 +266,7 @@ export default function GamePage({ config, onGameOver }) {
         aiName={gs.players.find(p => p.isAI)?.name ?? 'AI'}
         card={aiPlayedCard}
         logText={aiLogText}
+        onDismiss={handleAiDismiss}
       />
 
       {infoCard && (

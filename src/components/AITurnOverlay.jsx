@@ -1,12 +1,12 @@
 import { CardFace } from './Card';
 import styles from './AITurnOverlay.module.css';
 
-export default function AITurnOverlay({ phase, aiName, card, logText }) {
+export default function AITurnOverlay({ phase, aiName, card, logText, onDismiss }) {
   if (!phase) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.banner}>
+    <div className={styles.overlay} onClick={phase === 'playing' ? onDismiss : undefined}>
+      <div className={styles.banner} onClick={e => e.stopPropagation()}>
         <span className={styles.name}>{aiName}</span>
 
         {phase === 'thinking' && (
@@ -19,18 +19,24 @@ export default function AITurnOverlay({ phase, aiName, card, logText }) {
         )}
 
         {phase === 'drawing' && (
-          <span className={styles.action}>يسحب كرتاً...</span>
+          <span className={styles.action}>يسحب كرتاً من الحزمة...</span>
         )}
 
         {phase === 'playing' && card && (
-          <div className={styles.playRow}>
-            <CardFace card={card} size="normal" />
-            <div className={styles.playInfo}>
-              <span className={styles.plays}>يلعب</span>
-              <span className={styles.cardName}>{card.name}</span>
-              {logText && <span className={styles.logText}>{logText}</span>}
+          <>
+            <div className={styles.playRow}>
+              <CardFace card={card} size="large" />
+              <div className={styles.playInfo}>
+                <span className={styles.plays}>لعب</span>
+                <span className={styles.cardName}>{card.name}</span>
+                <span className={styles.ability}>{card.ability}</span>
+                {logText && <span className={styles.logText}>{logText}</span>}
+              </div>
             </div>
-          </div>
+            <button className={styles.continueBtn} onClick={onDismiss}>
+              تابع ←
+            </button>
+          </>
         )}
       </div>
     </div>
