@@ -1,0 +1,38 @@
+.cardWrap {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  transition: transform 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
+
+.cardWrap.normal { width: 110px; height: 165px; }
+.cardWrap.large  { width: 140px; height: 210px; }
+.cardWrap.small  { width: 78px;  height: 117px; }
+
+.cardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+.clickable:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.65);
+}
+
+.selected {
+  transform: translateY(-14px) !important;
+  box-shadow: 0 0 0 3px #FFD700, 0 14px 36px rgba(0,0,0,0.7) !important;
+}
+
+.dimmed {
+  opacity: 0.4;
+  filter: grayscale(0.5);
+}

@@ -1,0 +1,60 @@
+.row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 4px;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.3s;
+}
+
+.eliminated {
+  opacity: 0.3;
+}
+
+.cardWrap {
+  position: relative;
+}
+
+.dead {
+  width: 78px;
+  height: 117px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 2px dashed rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.shield {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 6px rgba(144,202,249,0.8));
+}
+
+.name {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.8);
+  max-width: 80px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.discardCount {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.35);
+}

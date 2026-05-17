@@ -1,0 +1,54 @@
+.cover {
+  position: fixed;
+  inset: 0;
+  background: #0e2440;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+}
+
+.eyeOff {
+  font-size: 3.5rem;
+}
+
+.pass {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.55);
+  margin: 0;
+}
+
+.name {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+}
+
+.revealBtn {
+  margin-top: 16px;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 14px;
+  color: #fff;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 14px 36px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.revealBtn:hover {
+  background: rgba(255,255,255,0.15);
+}
