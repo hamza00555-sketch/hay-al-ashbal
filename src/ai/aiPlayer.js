@@ -1,4 +1,4 @@
-import { CARDS } from '../constants/cards';
+import { UNIQUE_CARDS } from '../constants/cards';
 import { getActivePlayers, mustPlayBustan, resolveCard } from '../engine/gameEngine';
 
 function getValidTargets(state, excludeSelf = true) {
@@ -18,9 +18,9 @@ function pickTarget(state) {
 function bestGuess(state) {
   const ai = state.players[state.currentPlayerIndex];
   const knownIds = new Set([ai.hand[0]?.id, state.drawnCard?.id]);
-  const remaining = CARDS
+  const remaining = UNIQUE_CARDS
     .filter(c => c.id !== 1)
-    .sort((a, b) => b.count - a.count);
+    .sort((a, b) => b.power - a.power);
   return remaining.find(c => !knownIds.has(c.id))?.id ?? 2;
 }
 

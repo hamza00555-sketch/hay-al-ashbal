@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CARDS } from '../constants/cards';
+import { UNIQUE_CARDS } from '../constants/cards';
 import { CardFace } from './Card';
 import styles from './ActionModal.module.css';
 
@@ -39,7 +39,7 @@ function TargetModal({ prompt, players, currentPlayerId, onResolve, allowSelf = 
 }
 
 function GuessModal({ players, currentPlayerId, onResolve }) {
-  const guessableCards = CARDS.filter(c => c.id !== 1);
+  const guessableCards = UNIQUE_CARDS.filter(c => c.id !== 1);
   const targets = players.filter(p => !p.isEliminated && !p.isProtected && p.id !== currentPlayerId);
   const [targetId, setTargetId] = useState(targets[0]?.id ?? null);
 
