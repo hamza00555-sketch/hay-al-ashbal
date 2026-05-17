@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
+  "buildCommand": "cd madinti && npm install && npm run build",
+  "outputDirectory": "madinti/dist",
+  "installCommand": "echo skip-root-install",
   "framework": "vite"
 }
