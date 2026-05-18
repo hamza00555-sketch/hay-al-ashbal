@@ -16,12 +16,12 @@ export function buildNarrative({
   const beats = [];
 
   if (isAI) {
-    beats.push(beat('AI_THINKING', { name: actorName }, 900));
+    beats.push(beat('AI_THINKING', { name: actorName }, 1600));
   }
 
-  beats.push(beat('CARD_ANTICIPATE', { card, actorName }, 500));
+  // Card reveal: auto-advance after 1.8s so user can see the card
+  beats.push(beat('CARD_ANTICIPATE', { card, actorName }, 1800));
 
-  // Find any newly eliminated players
   const newlyEliminated = nextGs.players.filter(p => {
     const prev = prevGs.players.find(x => x.id === p.id);
     return p.isEliminated && prev && !prev.isEliminated;
@@ -30,23 +30,20 @@ export function buildNarrative({
   switch (card.id) {
     case 1: { // GUESS
       const hit = newlyEliminated.some(p => p.id === targetId);
-      beats.push(beat('CARD_IMPACT', {
-        card, actorName, targetName, hit, isAI,
-      }, isAI ? 1200 : 0));
+      // Always require confirm so user can read the result
+      beats.push(beat('CARD_IMPACT', { card, actorName, targetName, hit, isAI }, 0));
       newlyEliminated.forEach(p =>
-        beats.push(beat('ELIMINATION', { playerName: p.name }, 1500))
+        beats.push(beat('ELIMINATION', { playerName: p.name }, 0))
       );
       break;
     }
-    case 2: { // PEEK — human path handled by PEEK_REVEAL screen
-      if (isAI) {
-        beats.push(beat('CARD_IMPACT', { card, actorName, targetName }, 1000));
-      }
+    case 2: { // PEEK
+      beats.push(beat('CARD_IMPACT', { card, actorName, targetName, isAI }, 0));
       break;
     }
     case 3: { // COMPARE
-      const actorAfter  = nextGs.players.find(p => p.id === actorId);
-      const actorCard   = actorAfter?.hand[0];   // card they kept (what was compared)
+      const actorAfter = nextGs.players.find(p => p.id === actorId);
+      const actorCard  = actorAfter?.hand[0];
       beats.push(beat('COMPARE_REVEAL', {
         actorName,
         actorCard,
@@ -55,12 +52,12 @@ export function buildNarrative({
         eliminatedName: newlyEliminated[0]?.name ?? null,
       }, 0));
       newlyEliminated.forEach(p =>
-        beats.push(beat('ELIMINATION', { playerName: p.name }, 1500))
+        beats.push(beat('ELIMINATION', { playerName: p.name }, 0))
       );
       break;
     }
     case 4: { // PROTECT
-      beats.push(beat('PROTECTION_FLASH', { actorName }, 800));
+      beats.push(beat('PROTECTION_FLASH', { actorName }, 0));
       break;
     }
     case 5: { // FORCE_DISCARD
@@ -72,20 +69,20 @@ export function buildNarrative({
         wasEliminated,
       }, 0));
       newlyEliminated.forEach(p =>
-        beats.push(beat('ELIMINATION', { playerName: p.name }, 1500))
+        beats.push(beat('ELIMINATION', { playerName: p.name }, 0))
       );
       break;
     }
     case 6: { // SWAP
-      beats.push(beat('SWAP_VISUAL', { actorName, targetName }, 900));
+      beats.push(beat('SWAP_VISUAL', { actorName, targetName }, 0));
       break;
     }
-    case 7: { // BUSTAN
-      beats.push(beat('CARD_IMPACT', { card, actorName }, 400));
+    case 7: { // BUSTAN — forced discard
+      beats.push(beat('CARD_IMPACT', { card, actorName, isAI }, 0));
       break;
     }
-    case 8: { // STAR — auto-eliminated when forced to discard
-      beats.push(beat('ELIMINATION', { playerName: actorName }, 1500));
+    case 8: { // STAR — auto-eliminated
+      beats.push(beat('ELIMINATION', { playerName: actorName }, 0));
       break;
     }
   }
