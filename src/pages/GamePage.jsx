@@ -185,6 +185,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   const [infoCard, setInfoCard]           = useState(null);
   const [flyState, setFlyState]           = useState(null);
   const [drawnFlipping, setDrawnFlipping] = useState(false);
+  const [isDrawing, setIsDrawing]         = useState(false);
 
   // ── Narrative queue ──────────────────────────────────────────
   const [currentBeat, setCurrentBeat] = useState(null);
@@ -331,7 +332,11 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
 
     if (gs.phase === 'DRAW' && !currentPlayer.isAI) {
       SFX.cardDraw();
-      const t = setTimeout(() => setGs(doDrawCard), 300);
+      setIsDrawing(true);
+      const t = setTimeout(() => {
+        setIsDrawing(false);
+        setGs(doDrawCard);
+      }, 700);
       return () => clearTimeout(t);
     }
   }, [gs.phase, gs.currentPlayerIndex]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -464,6 +469,17 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
 
   const isMyTurn = currentPlayer.id === humanPlayer?.id;
 
+  const phaseLabel = (() => {
+    if (gs.phase === 'DRAW')     return isMyTurn ? 'يسحب الكرت...' : 'يسحب...';
+    if (gs.phase === 'AI_TURN')  return 'يفكر...';
+    if (gs.phase === 'PLAY') {
+      if (!isMyTurn)             return 'يختار...';
+      if (focusedSource)         return 'اضغط مجدداً للعب';
+      return 'اختر كرتاً للعب';
+    }
+    return '';
+  })();
+
   return (
     <div className={styles.board} onClick={() => focusedSource && setFocusedSource(null)}>
 
@@ -520,11 +536,12 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       {/* ── Arena: deck + discard + log ── */}
       <div className={styles.arena}>
         <div className={styles.deckRow}>
-          <div ref={deckRef} className={styles.deckStack}>
+          <div ref={deckRef} className={[styles.deckStack, isDrawing ? styles.deckDrawing : ''].join(' ')}>
             {gs.deck.length > 0
               ? <CardBack />
               : <div className={styles.emptyDeck}>نفد!</div>}
             <span className={styles.deckCount}>{gs.deck.length} كرت</span>
+            {isDrawing && <span className={styles.drawHint}>يسحب...</span>}
           </div>
           <DiscardPile cards={gs.globalDiscard ?? []} />
         </div>
@@ -545,29 +562,29 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
         className={`${styles.humanZone} ${isMyTurn && !isLocked ? styles.myTurn : ''}`}
         onClick={e => e.stopPropagation()}
       >
-        {/* Human portrait row */}
-        {humanPlayer && (
-          <div className={styles.humanPortraitRow}>
-            <div className={styles.humanPortraitWrap}>
-              <Portrait
-                profile={humanPlayer.profile}
-                size="human"
-                isActive={isMyTurn}
-                isEliminated={humanPlayer.isEliminated}
-              />
-            </div>
-            <div className={styles.humanNameBlock}>
-              <span className={styles.humanCharName}>{humanPlayer.name}</span>
-              {isMyTurn
-                ? <span className={styles.myTurnBadge}>دورك ▼</span>
-                : <span className={styles.waitBadge}>دور: <strong>{currentPlayer.name}</strong></span>
-              }
-              {humanPlayer.isProtected && (
-                <span className={styles.protectedBadge}>🛡️ محمي</span>
-              )}
-            </div>
+        {/* ── Turn HUD ── */}
+        <div className={[
+          styles.turnHUD,
+          isMyTurn ? styles.turnHUDMine : styles.turnHUDAI,
+        ].join(' ')}>
+          <Portrait
+            profile={currentPlayer.profile}
+            size="seat"
+            isActive
+            isEliminated={false}
+          />
+          <div className={styles.turnHUDInfo}>
+            <span className={styles.turnHUDName}>
+              {isMyTurn ? `${humanPlayer?.name} — دورك` : `دور ${currentPlayer.name}`}
+            </span>
+            {phaseLabel ? (
+              <span className={styles.turnHUDPhase}>{phaseLabel}</span>
+            ) : null}
           </div>
-        )}
+          {humanPlayer?.isProtected && (
+            <span className={styles.protectedBadge}>🛡️ محمي</span>
+          )}
+        </div>
 
         {bustanForced && (
           <div className={styles.ruleWarning}>يجب عليك رمي صاحب البستان!</div>
