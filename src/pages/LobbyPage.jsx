@@ -8,9 +8,16 @@ const MODES = [
 
 const AI_NAMES = ['خالد', 'سارة', 'علي'];
 
+const DIFFICULTIES = [
+  { id: 'easy',   label: 'سهل',   desc: 'للمبتدئين' },
+  { id: 'medium', label: 'متوسط', desc: 'يحسب الكروت' },
+  { id: 'hard',   label: 'صعب',   desc: 'استراتيجي' },
+];
+
 export default function LobbyPage({ onBack, onStartGame }) {
   const [mode, setMode] = useState('passplay');
   const [aiCount, setAiCount] = useState(2);
+  const [difficulty, setDifficulty] = useState('medium');
   const [tokensToWin, setTokensToWin] = useState(3);
   const [players, setPlayers] = useState([
     { name: 'اللاعب 1' },
@@ -48,7 +55,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
   function startGame() {
     let finalPlayers;
     if (mode === 'vsai') {
-      const aiPlayers = AI_NAMES.slice(0, aiCount).map(name => ({ name, isAI: true }));
+      const aiPlayers = AI_NAMES.slice(0, aiCount).map(name => ({ name, isAI: true, difficulty }));
       finalPlayers = [
         { name: players[0].name.trim() || 'اللاعب', isAI: false },
         ...aiPlayers,
@@ -140,6 +147,22 @@ export default function LobbyPage({ onBack, onStartGame }) {
                   <span className={styles.countSub}>
                     {n === 1 ? AI_NAMES[0] : n === 2 ? `${AI_NAMES[0]}، ${AI_NAMES[1]}` : AI_NAMES.join('، ')}
                   </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.section}>
+            <p className={styles.label}>مستوى الصعوبة</p>
+            <div className={styles.countRow}>
+              {DIFFICULTIES.map(d => (
+                <button
+                  key={d.id}
+                  className={`${styles.countBtn} ${difficulty === d.id ? styles.countActive : ''}`}
+                  onClick={() => setDifficulty(d.id)}
+                >
+                  <span className={styles.diffLabel}>{d.label}</span>
+                  <span className={styles.countSub}>{d.desc}</span>
                 </button>
               ))}
             </div>

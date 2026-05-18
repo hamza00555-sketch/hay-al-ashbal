@@ -44,9 +44,16 @@ export function CardBack({ size = 'normal' }) {
   );
 }
 
-export function CardFace({ card, size = 'normal', dimmed = false, selected = false, focused = false, onClick }) {
+function getTier(power) {
+  if (power >= 7) return 'gold';
+  if (power >= 4) return 'silver';
+  return 'bronze';
+}
+
+export function CardFace({ card, size = 'normal', dimmed = false, selected = false, focused = false, onClick, playable = false }) {
   const ref = useRef(null);
   useTilt(ref, !!onClick && !dimmed);
+  const tier = getTier(card.power);
 
   return (
     <div
@@ -54,10 +61,12 @@ export function CardFace({ card, size = 'normal', dimmed = false, selected = fal
       className={[
         styles.cardWrap,
         styles[size],
-        dimmed   ? styles.dimmed    : '',
-        selected ? styles.selected  : '',
-        focused  ? styles.focused   : '',
-        onClick  ? styles.clickable : '',
+        styles[`tier_${tier}`],
+        dimmed              ? styles.dimmed    : '',
+        selected            ? styles.selected  : '',
+        focused             ? styles.focused   : '',
+        onClick             ? styles.clickable : '',
+        playable && !dimmed && !focused ? styles.playable : '',
       ].join(' ')}
       onClick={onClick}
     >

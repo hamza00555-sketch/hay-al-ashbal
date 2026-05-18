@@ -154,3 +154,7 @@ export function stopMusic() {
 }
 
 export function isMusicPlaying() { return musicPlaying; }
+
+export function haptic(pattern = [10]) {
+  navigator.vibrate?.(pattern);
+}

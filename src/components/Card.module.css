@@ -38,6 +38,38 @@
   filter: grayscale(0.5);
 }
 
+/* ── Power tiers ─────────────────────────────────────────────── */
+.tier_bronze {
+  border: 1.5px solid rgba(205,127,50,0.45);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 8px rgba(205,127,50,0.12);
+}
+
+.tier_silver {
+  border: 1.5px solid rgba(192,192,192,0.5);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 10px rgba(192,192,192,0.18);
+}
+
+.tier_gold {
+  border: 1.5px solid rgba(255,215,0,0.65);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.28);
+  animation: goldShimmer 3s ease-in-out infinite;
+}
+
+@keyframes goldShimmer {
+  0%, 100% { box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.28); }
+  50%       { box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 24px rgba(255,215,0,0.55); }
+}
+
+/* ── Playable pulse ──────────────────────────────────────────── */
+.playable {
+  animation: playablePulse 1.8s ease-in-out infinite !important;
+}
+
+@keyframes playablePulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255,215,0,0.4), 0 0 10px rgba(255,215,0,0.2); }
+  50%       { box-shadow: 0 0 0 2px rgba(255,215,0,0.75), 0 0 18px rgba(255,215,0,0.5); }
+}
+
 /* ── Flip card ───────────────────────────────────────────────── */
 .flipOuter {
   perspective: 800px;

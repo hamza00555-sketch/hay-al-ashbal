@@ -17,6 +17,7 @@ export function createInitialState(players) {
     id: index,
     name: p.name,
     isAI: p.isAI || false,
+    difficulty: p.difficulty ?? 'easy',
     hand: [deck.pop()],
     isEliminated: false,
     isProtected: false,

@@ -17,7 +17,8 @@ import GameLog from '../components/GameLog';
 import CardInfoModal from '../components/CardInfoModal';
 import NarrativeOverlay from '../components/NarrativeOverlay';
 import DiscardPile from '../components/DiscardPile';
-import { SFX, startMusic, stopMusic } from '../utils/sounds';
+import GuideDrawer from '../components/GuideDrawer';
+import { SFX, startMusic, stopMusic, haptic } from '../utils/sounds';
 import styles from './GamePage.module.css';
 
 const ACTION_TYPE = {
@@ -42,13 +43,14 @@ function assignSeats(players, humanId) {
 }
 
 // ── Seat component ───────────────────────────────────────────────
-function Seat({ player, position, isActive }) {
+function Seat({ player, position, isActive, eliminating }) {
   return (
     <div className={[
       styles.seat,
       styles[`seat_${position}`],
-      isActive            ? styles.seatActive : '',
-      player.isEliminated ? styles.seatDead   : '',
+      isActive            ? styles.seatActive      : '',
+      player.isEliminated ? styles.seatDead        : '',
+      eliminating         ? styles.seatEliminating : '',
     ].join(' ')}>
 
       {isActive && !player.isEliminated && (
@@ -162,7 +164,10 @@ export default function GamePage({ config, onGameOver }) {
   const drawnCardRef  = useRef(null);
   const deckRef       = useRef(null);
 
-  const [musicOn, setMusicOn] = useState(false);
+  const [musicOn,     setMusicOn]     = useState(false);
+  const [showGuide,   setShowGuide]   = useState(false);
+  const [elimIds,     setElimIds]     = useState(new Set());
+  const prevPlayersRef = useRef(null);
 
   const currentPlayer = getCurrentPlayer(gs);
   const hasAI         = gs.players.some(p => p.isAI);
@@ -206,6 +211,23 @@ export default function GamePage({ config, onGameOver }) {
 
   // Cleanup timer on unmount
   useEffect(() => () => clearTimeout(narrativeTimer.current), []);
+
+  // Track newly eliminated players for animation + haptic
+  useEffect(() => {
+    const prev = prevPlayersRef.current;
+    prevPlayersRef.current = gs.players;
+    if (!prev) return;
+    const newElim = gs.players.filter(p => {
+      const was = prev.find(x => x.id === p.id);
+      return p.isEliminated && was && !was.isEliminated;
+    });
+    if (newElim.length > 0) {
+      haptic([30, 20, 30]);
+      setElimIds(new Set(newElim.map(p => p.id)));
+      const t = setTimeout(() => setElimIds(new Set()), 900);
+      return () => clearTimeout(t);
+    }
+  }, [gs.players]);
 
   // ── TurnBanner: flash when current player changes ────────────
   useEffect(() => {
@@ -278,6 +300,7 @@ export default function GamePage({ config, onGameOver }) {
       const card       = source === 'hand' ? currentPlayer.hand[0] : gs.drawnCard;
       const actionType = ACTION_TYPE[card.id];
       SFX.cardPlay();
+      haptic([10]);
 
       const fromRef  = source === 'hand' ? handCardRef : drawnCardRef;
       const fromRect = fromRef.current?.getBoundingClientRect();
@@ -310,6 +333,7 @@ export default function GamePage({ config, onGameOver }) {
       }
     } else {
       SFX.cardSelect();
+      haptic([6]);
       setFocusedSource(source);
     }
   }, [gs, legalPlays, currentPlayer, focusedSource, isLocked]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -401,6 +425,7 @@ export default function GamePage({ config, onGameOver }) {
       <button className={styles.musicBtn} onClick={toggleMusic}>
         {musicOn ? '🔊' : '🔇'}
       </button>
+      <button className={styles.guideBtn} onClick={() => setShowGuide(true)}>?</button>
 
       {/* ── TurnBanner ── */}
       {turnBanner && !currentBeat && (
@@ -415,14 +440,14 @@ export default function GamePage({ config, onGameOver }) {
       {/* ── Top seat ── */}
       <div className={`${styles.topZone} ${!seats.top ? styles.empty : ''}`}>
         {seats.top && (
-          <Seat player={seats.top} position="top" isActive={seats.top.id === activeId} />
+          <Seat player={seats.top} position="top" isActive={seats.top.id === activeId} eliminating={elimIds.has(seats.top.id)} />
         )}
       </div>
 
       {/* ── Left seat ── */}
       <div className={styles.leftZone}>
         {seats.left && (
-          <Seat player={seats.left} position="left" isActive={seats.left.id === activeId} />
+          <Seat player={seats.left} position="left" isActive={seats.left.id === activeId} eliminating={elimIds.has(seats.left.id)} />
         )}
       </div>
 
@@ -445,7 +470,7 @@ export default function GamePage({ config, onGameOver }) {
       {/* ── Right seat ── */}
       <div className={styles.rightZone}>
         {seats.right && (
-          <Seat player={seats.right} position="right" isActive={seats.right.id === activeId} />
+          <Seat player={seats.right} position="right" isActive={seats.right.id === activeId} eliminating={elimIds.has(seats.right.id)} />
         )}
       </div>
 
@@ -547,6 +572,8 @@ export default function GamePage({ config, onGameOver }) {
       {infoCard && (
         <CardInfoModal card={infoCard} onClose={() => setInfoCard(null)} />
       )}
+
+      <GuideDrawer open={showGuide} onClose={() => setShowGuide(false)} />
     </div>
   );
 }
@@ -570,6 +597,7 @@ function CardSlot({ label, card, source, focused, dimmed, playable,
             size="large"
             focused={focused}
             dimmed={dimmed}
+            playable={playable && !focused}
             onClick={playable ? () => onCardClick(source) : undefined}
           />
         )}
