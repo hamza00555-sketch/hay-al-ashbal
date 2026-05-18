@@ -68,34 +68,56 @@
   text-align: center;
 }
 
+.eyebrow {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+  text-align: center;
+}
+
 .row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
   padding: 12px 16px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .row:last-child { border-bottom: none; }
-.row.winner {
-  background: rgba(255,215,0,0.06);
-}
-.row.eliminated {
-  opacity: 0.5;
-}
+.row.winner { background: rgba(255,215,0,0.06); }
 
 .playerName {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.95rem;
   color: #fff;
+  min-width: 60px;
+}
+.row.winner .playerName { color: #FFD700; }
+
+.dots {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+  flex-wrap: wrap;
 }
 
-.status {
-  font-family: 'Zanjabeel', sans-serif;
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.6);
+.dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,215,0,0.3);
+  background: transparent;
 }
-.row.winner .status {
-  color: #FFD700;
+
+.dotFilled {
+  background: #FFD700;
+  border-color: #FFD700;
+  box-shadow: 0 0 5px rgba(255,215,0,0.5);
+}
+
+.tokenCount {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
 }
 
 .buttons {

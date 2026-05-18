@@ -141,6 +141,44 @@
   border-color: rgba(255,255,255,0.4);
 }
 
+.countRow {
+  display: flex;
+  gap: 10px;
+}
+
+.countBtn {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 14px 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.countBtn.countActive {
+  border-color: #FFD700;
+  background: rgba(255,215,0,0.08);
+}
+
+.countNum {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.countSub {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+}
+
 .footer {
   position: fixed;
   bottom: 0;

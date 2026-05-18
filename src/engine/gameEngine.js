@@ -34,6 +34,7 @@ export function createInitialState(players) {
     winner: null,
     peekCard: null,
     peekTargetName: null,
+    globalDiscard: [],
   };
 }
 
@@ -143,6 +144,7 @@ export function resolveCard(state, playedCard, cardSource, targetPlayerId, guess
       };
     }),
     drawnCard: null,
+    globalDiscard: [...(state.globalDiscard ?? []), playedCard],
   };
 
   switch (playedCard.id) {

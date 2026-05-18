@@ -1,16 +1,17 @@
 import { CardFace } from '../components/Card';
 import styles from './ResultPage.module.css';
 
-export default function ResultPage({ result, onPlayAgain, onMenu }) {
+export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, onMenu }) {
   const { winner, players } = result;
   const isDraw = !winner;
 
   return (
     <div className={styles.page}>
       <div className={styles.content}>
-        <div className={styles.fireworks}>🎉</div>
+        <div className={styles.fireworks}>🏆</div>
+        <p className={styles.eyebrow}>{isDraw ? 'تعادل في المباراة!' : 'فائز المباراة'}</p>
         <h1 className={styles.title}>
-          {isDraw ? 'تعادل!' : `فاز ${winner.name}!`}
+          {isDraw ? 'تعادل!' : `${winner.name}!`}
         </h1>
 
         {winner?.hand?.[0] && (
@@ -21,20 +22,29 @@ export default function ResultPage({ result, onPlayAgain, onMenu }) {
         )}
 
         <div className={styles.standings}>
-          <p className={styles.standingsTitle}>نتائج الجولة</p>
-          {players.map(p => (
-            <div key={p.id} className={`${styles.row} ${p.id === winner?.id ? styles.winner : ''} ${p.isEliminated ? styles.eliminated : ''}`}>
-              <span className={styles.playerName}>{p.name}</span>
-              <span className={styles.status}>
-                {p.id === winner?.id ? '🏆 فائز' : p.isEliminated ? '💀 مُقصى' : `${p.hand[0]?.power ?? '?'} نقطة`}
-              </span>
-            </div>
-          ))}
+          <p className={styles.standingsTitle}>الأوسمة النهائية</p>
+          {players.map(p => {
+            const count = tokens[p.id] ?? 0;
+            return (
+              <div key={p.id} className={`${styles.row} ${p.id === winner?.id ? styles.winner : ''}`}>
+                <span className={styles.playerName}>{p.name}</span>
+                <div className={styles.dots}>
+                  {Array.from({ length: tokensToWin }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={[styles.dot, i < count ? styles.dotFilled : ''].join(' ')}
+                    />
+                  ))}
+                </div>
+                <span className={styles.tokenCount}>{count}/{tokensToWin}</span>
+              </div>
+            );
+          })}
         </div>
 
         <div className={styles.buttons}>
-          <button className={styles.playAgain} onClick={onPlayAgain}>
-            جولة جديدة
+          <button className={styles.playAgain} onClick={onNewMatch}>
+            مباراة جديدة
           </button>
           <button className={styles.menu} onClick={onMenu}>
             القائمة الرئيسية

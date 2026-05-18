@@ -9,13 +9,14 @@ import {
   mustPlayBustan,
 } from '../engine/gameEngine';
 import { computeAIMove } from '../ai/aiPlayer';
+import { buildNarrative } from '../engine/narrativeBuilder';
 import { CardFace, CardBack, FlipCard } from '../components/Card';
 import ActionModal from '../components/ActionModal';
 import HandCover from '../components/HandCover';
 import GameLog from '../components/GameLog';
 import CardInfoModal from '../components/CardInfoModal';
-import AITurnOverlay from '../components/AITurnOverlay';
-import GuessResultOverlay from '../components/GuessResultOverlay';
+import NarrativeOverlay from '../components/NarrativeOverlay';
+import DiscardPile from '../components/DiscardPile';
 import { SFX, startMusic, stopMusic } from '../utils/sounds';
 import styles from './GamePage.module.css';
 
@@ -77,7 +78,7 @@ function Seat({ player, position, isActive }) {
   );
 }
 
-// ── Flying card: Yu-Gi-Oh! parabolic arc with glow ───────────────
+// ── Flying card: parabolic arc with glow ────────────────────────
 function FlyingCard({ card, fromRect, toRect, onDone }) {
   const ref   = useRef(null);
   const cbRef = useRef(onDone);
@@ -100,19 +101,15 @@ function FlyingCard({ card, fromRect, toRect, onDone }) {
     function frame(ts) {
       if (!startTs) startTs = ts;
       const t = Math.min((ts - startTs) / DURATION, 1);
-
-      // Parabolic arc: card rises then descends
       const x  = sx + (ex - sx) * t;
       const y  = sy + (ey - sy) * t + Math.sin(t * Math.PI) * -110;
       const sc = 1  + Math.sin(t * Math.PI) * 0.22;
       const rz = Math.sin(t * Math.PI) * -12;
       const gl = Math.sin(t * Math.PI) * 52;
       const op = t > 0.80 ? 1 - (t - 0.80) / 0.20 : 1;
-
       el.style.transform = `translate(${x - sx}px,${y - sy}px) scale(${sc}) rotateZ(${rz}deg)`;
       el.style.filter    = `drop-shadow(0 0 ${gl}px rgba(70,180,255,.9)) drop-shadow(0 0 ${gl * .55}px rgba(255,220,60,.55))`;
       el.style.opacity   = op;
-
       if (t < 1) { raf = requestAnimationFrame(frame); }
       else       { cbRef.current?.(); }
     }
@@ -147,23 +144,25 @@ export default function GamePage({ config, onGameOver }) {
   const [showAction, setShowAction]       = useState(false);
   const [pendingPlay, setPendingPlay]     = useState(null);
   const [infoCard, setInfoCard]           = useState(null);
-  const [guessResult, setGuessResult]     = useState(null);
   const [flyState, setFlyState]           = useState(null);
-
   const [drawnFlipping, setDrawnFlipping] = useState(false);
-  const prevDrawnRef = useRef(null);
 
-  const [aiPhase, setAiPhase]               = useState(null);
-  const [aiPlayedCard, setAiPlayedCard]     = useState(null);
-  const [aiLogText, setAiLogText]           = useState('');
-  const [aiPendingState, setAiPendingState] = useState(null);
+  // ── Narrative queue ──────────────────────────────────────────
+  const [currentBeat, setCurrentBeat] = useState(null);
+  const [pendingGs,   setPendingGs]   = useState(null);
+  const beatQueueRef  = useRef([]);
+  const narrativeTimer = useRef(null);
+
+  // TurnBanner
+  const [turnBanner, setTurnBanner]   = useState(null);
+  const prevPlayerIdxRef = useRef(-1);
+
+  const prevDrawnRef  = useRef(null);
+  const handCardRef   = useRef(null);
+  const drawnCardRef  = useRef(null);
+  const deckRef       = useRef(null);
 
   const [musicOn, setMusicOn] = useState(false);
-
-  // Refs for fly animation
-  const handCardRef  = useRef(null);
-  const drawnCardRef = useRef(null);
-  const deckRef      = useRef(null);
 
   const currentPlayer = getCurrentPlayer(gs);
   const hasAI         = gs.players.some(p => p.isAI);
@@ -175,7 +174,53 @@ export default function GamePage({ config, onGameOver }) {
   const seats    = assignSeats(gs.players, humanPlayer?.id ?? gs.players[0]?.id);
   const activeId = gs.players[gs.currentPlayerIndex]?.id;
 
-  // Flip animation when drawnCard first appears
+  // isLocked: narrative playing OR fly animation in progress
+  const isLocked = !!currentBeat || !!flyState;
+
+  // ── Narrative queue driver ───────────────────────────────────
+  function kickQueue() {
+    clearTimeout(narrativeTimer.current);
+    const q = beatQueueRef.current;
+    if (q.length === 0) {
+      setCurrentBeat(null);
+      setPendingGs(prev => {
+        if (prev) setGs(prev);
+        return null;
+      });
+      return;
+    }
+    const [next, ...rest] = q;
+    beatQueueRef.current = rest;
+    setCurrentBeat(next);
+    if (next.durationMs > 0) {
+      narrativeTimer.current = setTimeout(kickQueue, next.durationMs);
+    }
+  }
+
+  function pushNarrative(beats, nextState) {
+    clearTimeout(narrativeTimer.current);
+    beatQueueRef.current = beats;
+    setPendingGs(nextState);
+    kickQueue();
+  }
+
+  // Cleanup timer on unmount
+  useEffect(() => () => clearTimeout(narrativeTimer.current), []);
+
+  // ── TurnBanner: flash when current player changes ────────────
+  useEffect(() => {
+    if (gs.currentPlayerIndex === prevPlayerIdxRef.current) return;
+    if (gs.phase === 'GAME_OVER') return;
+    prevPlayerIdxRef.current = gs.currentPlayerIndex;
+    const cp = gs.players[gs.currentPlayerIndex];
+    if (cp && !cp.isEliminated) {
+      setTurnBanner(cp.isAI ? `دور ${cp.name}` : 'دورك!');
+      const t = setTimeout(() => setTurnBanner(null), 2200);
+      return () => clearTimeout(t);
+    }
+  }, [gs.currentPlayerIndex, gs.phase]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Flip animation on draw ───────────────────────────────────
   useEffect(() => {
     if (gs.drawnCard && gs.drawnCard !== prevDrawnRef.current) {
       prevDrawnRef.current = gs.drawnCard;
@@ -188,14 +233,7 @@ export default function GamePage({ config, onGameOver }) {
     }
   }, [gs.drawnCard]);
 
-  // Auto-dismiss guess result after 2.8s
-  useEffect(() => {
-    if (!guessResult) return;
-    const t = setTimeout(() => setGuessResult(null), 2800);
-    return () => clearTimeout(t);
-  }, [guessResult]);
-
-  // Main phase driver
+  // ── Main phase driver ────────────────────────────────────────
   useEffect(() => {
     if (gs.phase === 'GAME_OVER') {
       SFX.win();
@@ -205,24 +243,23 @@ export default function GamePage({ config, onGameOver }) {
     }
 
     if (gs.phase === 'AI_TURN') {
-      setAiPhase('thinking');
       SFX.aiThink();
-      const t1 = setTimeout(() => {
-        const afterDraw = doDrawCard(gs);
-        setAiPhase('drawing');
-        SFX.cardDraw();
-        const t2 = setTimeout(() => {
-          const { state: afterResolve, playedCard } = computeAIMove(afterDraw);
-          const lastLog = afterResolve.gameLog[afterResolve.gameLog.length - 1];
-          setAiPlayedCard(playedCard);
-          setAiLogText(lastLog?.text ?? '');
-          setAiPendingState(afterResolve);
-          setAiPhase('playing');
-          SFX.cardPlay();
-        }, 1200);
-        return () => clearTimeout(t2);
-      }, 1600);
-      return () => clearTimeout(t1);
+      const afterDraw = doDrawCard(gs);
+      const { state: nextGsRaw, playedCard, targetId, targetCardBefore } = computeAIMove(afterDraw);
+      const targetPlayer = targetId != null ? gs.players.find(p => p.id === targetId) : null;
+      const beats = buildNarrative({
+        card:             playedCard,
+        actorId:          currentPlayer.id,
+        actorName:        currentPlayer.name,
+        targetId,
+        targetName:       targetPlayer?.name ?? null,
+        targetCardBefore,
+        nextGs:           nextGsRaw,
+        prevGs:           afterDraw,
+        isAI:             true,
+      });
+      pushNarrative(beats, nextGsRaw);
+      return;
     }
 
     if (gs.phase === 'DRAW' && !currentPlayer.isAI) {
@@ -232,8 +269,9 @@ export default function GamePage({ config, onGameOver }) {
     }
   }, [gs.phase, gs.currentPlayerIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Handlers ─────────────────────────────────────────────────
   const handleCardClick = useCallback((source) => {
-    if (flyState) return; // animation in progress
+    if (isLocked) return;
     if (!legalPlays.includes(source)) return;
 
     if (focusedSource === source) {
@@ -247,7 +285,17 @@ export default function GamePage({ config, onGameOver }) {
 
       const doPlay = () => {
         if (!actionType) {
-          setGs(prev => resolveCard(prev, card, source, null, null));
+          const prevGsSnap = gs;
+          const nextGsRaw  = resolveCard(gs, card, source, null, null);
+          const beats = buildNarrative({
+            card,
+            actorId:   currentPlayer.id,
+            actorName: currentPlayer.name,
+            nextGs:    nextGsRaw,
+            prevGs:    prevGsSnap,
+            isAI:      false,
+          });
+          pushNarrative(beats, nextGsRaw);
         } else {
           setPendingPlay({ card, source });
           setShowAction(true);
@@ -264,7 +312,7 @@ export default function GamePage({ config, onGameOver }) {
       SFX.cardSelect();
       setFocusedSource(source);
     }
-  }, [gs, legalPlays, currentPlayer, focusedSource, flyState]);
+  }, [gs, legalPlays, currentPlayer, focusedSource, isLocked]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleInfoClick = useCallback((source, e) => {
     e.stopPropagation();
@@ -277,41 +325,43 @@ export default function GamePage({ config, onGameOver }) {
     setShowAction(false);
     if (skip || !pendingPlay) {
       setGs(advanceTurn(gs));
-    } else {
-      const isGuess    = pendingPlay.card.id === 1 && targetId != null;
-      const targetBefore = isGuess ? gs.players.find(p => p.id === targetId) : null;
-
-      const nextGs = resolveCard(
-        gs, pendingPlay.card, pendingPlay.source,
-        targetId ?? null, guessedCardId ?? null
-      );
-
-      if (isGuess && targetBefore) {
-        const targetAfter = nextGs.players.find(p => p.id === targetId);
-        const correct = !targetBefore.isEliminated && targetAfter?.isEliminated;
-        setGuessResult({ correct, targetName: targetBefore.name });
-        if (correct) SFX.eliminate();
-      }
-
-      setGs(nextGs);
+      return;
     }
+
+    const targetPlayer    = targetId != null ? gs.players.find(p => p.id === targetId) : null;
+    const targetCardBefore = targetPlayer?.hand[0] ?? null;
+
+    const nextGsRaw = resolveCard(
+      gs, pendingPlay.card, pendingPlay.source, targetId ?? null, guessedCardId ?? null
+    );
+
+    // PEEK: full-screen reveal, apply state directly (no narrative)
+    if (nextGsRaw.phase === 'PEEK_REVEAL') {
+      setGs(nextGsRaw);
+      setFocusedSource(null);
+      setPendingPlay(null);
+      return;
+    }
+
+    const beats = buildNarrative({
+      card:             pendingPlay.card,
+      actorId:          currentPlayer.id,
+      actorName:        currentPlayer.name,
+      targetId,
+      targetName:       targetPlayer?.name ?? null,
+      targetCardBefore,
+      nextGs:           nextGsRaw,
+      prevGs:           gs,
+      isAI:             false,
+    });
+    pushNarrative(beats, nextGsRaw);
     setFocusedSource(null);
     setPendingPlay(null);
-  }, [gs, pendingPlay]);
+  }, [gs, pendingPlay, currentPlayer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePeekDone = useCallback(() => {
     setGs(advanceTurn({ ...gs, phase: 'DONE', peekCard: null, peekTargetName: null }));
   }, [gs]);
-
-  const handleAiDismiss = useCallback(() => {
-    if (!aiPendingState) return;
-    SFX.buttonClick();
-    setAiPhase(null);
-    setAiPlayedCard(null);
-    setAiLogText('');
-    setGs(aiPendingState);
-    setAiPendingState(null);
-  }, [aiPendingState]);
 
   const toggleMusic = (e) => {
     e.stopPropagation();
@@ -320,6 +370,7 @@ export default function GamePage({ config, onGameOver }) {
     else { startMusic(); setMusicOn(true); }
   };
 
+  // ── Render guards ────────────────────────────────────────────
   if (gs.phase === 'GAME_OVER') return null;
 
   if (gs.phase === 'HAND_COVER') {
@@ -351,6 +402,16 @@ export default function GamePage({ config, onGameOver }) {
         {musicOn ? '🔊' : '🔇'}
       </button>
 
+      {/* ── TurnBanner ── */}
+      {turnBanner && !currentBeat && (
+        <div className={[
+          styles.turnBanner,
+          turnBanner === 'دورك!' ? styles.turnBannerMine : '',
+        ].join(' ')}>
+          {turnBanner}
+        </div>
+      )}
+
       {/* ── Top seat ── */}
       <div className={`${styles.topZone} ${!seats.top ? styles.empty : ''}`}>
         {seats.top && (
@@ -365,13 +426,16 @@ export default function GamePage({ config, onGameOver }) {
         )}
       </div>
 
-      {/* ── Arena: deck + log ── */}
+      {/* ── Arena: deck + discard + log ── */}
       <div className={styles.arena}>
-        <div ref={deckRef} className={styles.deckStack}>
-          {gs.deck.length > 0
-            ? <CardBack />
-            : <div className={styles.emptyDeck}>نفد!</div>}
-          <span className={styles.deckCount}>{gs.deck.length} كرت</span>
+        <div className={styles.deckRow}>
+          <div ref={deckRef} className={styles.deckStack}>
+            {gs.deck.length > 0
+              ? <CardBack />
+              : <div className={styles.emptyDeck}>نفد!</div>}
+            <span className={styles.deckCount}>{gs.deck.length} كرت</span>
+          </div>
+          <DiscardPile cards={gs.globalDiscard ?? []} />
         </div>
         <div className={styles.logArea}>
           <GameLog entries={gs.gameLog} />
@@ -387,7 +451,7 @@ export default function GamePage({ config, onGameOver }) {
 
       {/* ── Human zone ── */}
       <div
-        className={`${styles.humanZone} ${isMyTurn ? styles.myTurn : ''}`}
+        className={`${styles.humanZone} ${isMyTurn && !isLocked ? styles.myTurn : ''}`}
         onClick={e => e.stopPropagation()}
       >
         <div className={styles.turnLabel}>
@@ -395,7 +459,7 @@ export default function GamePage({ config, onGameOver }) {
             ? <span className={styles.myTurnBadge}>دورك ▼</span>
             : <span>دور: <strong>{currentPlayer.name}</strong></span>
           }
-          {currentPlayer.isProtected && (
+          {humanPlayer?.isProtected && (
             <span className={styles.protectedBadge}>🛡️ محمي</span>
           )}
         </div>
@@ -408,12 +472,12 @@ export default function GamePage({ config, onGameOver }) {
           {isMyTurn ? (
             <>
               <CardSlot
-                label="كرتك"
+                label="في يدك"
                 card={currentPlayer.hand[0]}
                 source="hand"
                 focused={focusedSource === 'hand'}
                 dimmed={gs.phase === 'PLAY' && !legalPlays.includes('hand')}
-                playable={gs.phase === 'PLAY'}
+                playable={gs.phase === 'PLAY' && !isLocked}
                 hidden={flyState?.source === 'hand'}
                 cardRef={handCardRef}
                 onCardClick={handleCardClick}
@@ -421,12 +485,12 @@ export default function GamePage({ config, onGameOver }) {
               />
               {gs.drawnCard && (
                 <CardSlot
-                  label="المسحوب"
+                  label="سحبته الآن"
                   card={gs.drawnCard}
                   source="drawn"
                   focused={focusedSource === 'drawn'}
                   dimmed={!legalPlays.includes('drawn')}
-                  playable={gs.phase === 'PLAY'}
+                  playable={gs.phase === 'PLAY' && !isLocked}
                   flipping={drawnFlipping}
                   onFlipDone={() => setDrawnFlipping(false)}
                   hidden={flyState?.source === 'drawn'}
@@ -439,20 +503,20 @@ export default function GamePage({ config, onGameOver }) {
           ) : (
             <div className={styles.aiHandCover}>
               <CardBack size="large" />
-              {aiPhase === 'playing' && <CardBack size="large" />}
+              {currentBeat?.type === 'CARD_ANTICIPATE' && <CardBack size="large" />}
             </div>
           )}
         </div>
 
-        {gs.phase === 'PLAY' && gs.drawnCard && isMyTurn && !focusedSource && (
+        {gs.phase === 'PLAY' && gs.drawnCard && isMyTurn && !focusedSource && !isLocked && (
           <p className={styles.hint}>اضغط كرت لتحديده، ثم مرة ثانية للعب</p>
         )}
-        {gs.phase === 'PLAY' && gs.drawnCard && isMyTurn && focusedSource && (
+        {gs.phase === 'PLAY' && gs.drawnCard && isMyTurn && focusedSource && !isLocked && (
           <p className={styles.hint}>اضغط مرة ثانية للعب • ℹ️ للمعلومات</p>
         )}
       </div>
 
-      {/* ── Flying card (Yu-Gi-Oh! arc animation) ── */}
+      {/* ── Flying card ── */}
       {flyState && (
         <FlyingCard
           key={flyState.card.uid}
@@ -467,7 +531,10 @@ export default function GamePage({ config, onGameOver }) {
         />
       )}
 
-      {/* ── Modals & overlays ── */}
+      {/* ── Narrative overlay (replaces AITurnOverlay + GuessResultOverlay) ── */}
+      <NarrativeOverlay beat={currentBeat} onConfirm={kickQueue} />
+
+      {/* ── Action modal ── */}
       {showAction && pendingPlay && (
         <ActionModal
           type={ACTION_TYPE[pendingPlay.card.id]}
@@ -476,16 +543,6 @@ export default function GamePage({ config, onGameOver }) {
           onResolve={handleActionResolve}
         />
       )}
-
-      <AITurnOverlay
-        phase={aiPhase}
-        aiName={gs.players[gs.currentPlayerIndex]?.name ?? 'AI'}
-        card={aiPlayedCard}
-        logText={aiLogText}
-        onDismiss={handleAiDismiss}
-      />
-
-      <GuessResultOverlay result={guessResult} />
 
       {infoCard && (
         <CardInfoModal card={infoCard} onClose={() => setInfoCard(null)} />

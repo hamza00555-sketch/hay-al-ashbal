@@ -6,8 +6,12 @@ const MODES = [
   { id: 'vsai', label: 'ضد AI', desc: 'ألعب وحدك ضد الذكاء الاصطناعي', icon: '🤖' },
 ];
 
+const AI_NAMES = ['خالد', 'سارة', 'علي'];
+
 export default function LobbyPage({ onBack, onStartGame }) {
   const [mode, setMode] = useState('passplay');
+  const [aiCount, setAiCount] = useState(2);
+  const [tokensToWin, setTokensToWin] = useState(3);
   const [players, setPlayers] = useState([
     { name: 'اللاعب 1' },
     { name: 'اللاعب 2' },
@@ -44,15 +48,15 @@ export default function LobbyPage({ onBack, onStartGame }) {
   function startGame() {
     let finalPlayers;
     if (mode === 'vsai') {
+      const aiPlayers = AI_NAMES.slice(0, aiCount).map(name => ({ name, isAI: true }));
       finalPlayers = [
-        { name: players[0].name, isAI: false },
-        { name: 'AI 🤖', isAI: true },
-        { name: 'AI 🤖', isAI: true },
+        { name: players[0].name.trim() || 'اللاعب', isAI: false },
+        ...aiPlayers,
       ];
     } else {
       finalPlayers = players.map(p => ({ name: p.name.trim() || 'لاعب', isAI: false }));
     }
-    onStartGame({ mode, players: finalPlayers });
+    onStartGame({ mode, players: finalPlayers, tokensToWin });
   }
 
   const canStart = mode === 'vsai' || players.length >= 2;
@@ -109,19 +113,57 @@ export default function LobbyPage({ onBack, onStartGame }) {
       )}
 
       {mode === 'vsai' && (
-        <div className={styles.section}>
-          <p className={styles.label}>اسمك</p>
-          <div className={styles.playerRow}>
-            <input
-              className={styles.input}
-              value={players[0].name}
-              onChange={e => setPlayerName(0, e.target.value)}
-              maxLength={16}
-              dir="rtl"
-            />
+        <>
+          <div className={styles.section}>
+            <p className={styles.label}>اسمك</p>
+            <div className={styles.playerRow}>
+              <input
+                className={styles.input}
+                value={players[0].name}
+                onChange={e => setPlayerName(0, e.target.value)}
+                maxLength={16}
+                dir="rtl"
+              />
+            </div>
           </div>
-        </div>
+
+          <div className={styles.section}>
+            <p className={styles.label}>عدد الخصوم</p>
+            <div className={styles.countRow}>
+              {[1, 2, 3].map(n => (
+                <button
+                  key={n}
+                  className={`${styles.countBtn} ${aiCount === n ? styles.countActive : ''}`}
+                  onClick={() => setAiCount(n)}
+                >
+                  <span className={styles.countNum}>{n}</span>
+                  <span className={styles.countSub}>
+                    {n === 1 ? AI_NAMES[0] : n === 2 ? `${AI_NAMES[0]}، ${AI_NAMES[1]}` : AI_NAMES.join('، ')}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
       )}
+
+      <div className={styles.section}>
+        <p className={styles.label}>الأوسمة للفوز</p>
+        <div className={styles.countRow}>
+          {[1, 3, 5].map(n => (
+            <button
+              key={n}
+              className={`${styles.countBtn} ${tokensToWin === n ? styles.countActive : ''}`}
+              onClick={() => setTokensToWin(n)}
+            >
+              <span className={styles.countNum}>{n}</span>
+              <span className={styles.countSub}>
+                {n === 1 ? 'جولة واحدة' : n === 3 ? 'ثلاث جولات' : 'خمس جولات'}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className={styles.footer}>
         <button

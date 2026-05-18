@@ -8,6 +8,60 @@
 @font-face { font-family: 'Zanjabeel'; src: url('/fonts/Zanjabeel-ExtraBold.otf'); font-weight: 800; }
 @font-face { font-family: 'Zanjabeel'; src: url('/fonts/Zanjabeel-Black.otf'); font-weight: 900; }
 
+/* ── Design Tokens ───────────────────────────────────────────── */
+:root {
+  /* Colors */
+  --color-bg-deep:    #0b1b2d;
+  --color-bg-mid:     #1a3a5c;
+  --color-bg-surface: rgba(255,255,255,0.06);
+  --color-border:     rgba(255,255,255,0.15);
+  --color-text:       #ffffff;
+  --color-text-dim:   rgba(255,255,255,0.45);
+  --color-text-muted: rgba(255,255,255,0.25);
+  --color-gold:       #FFD700;
+  --color-gold-dim:   rgba(255,215,0,0.35);
+  --color-blue:       #60b8ff;
+  --color-red:        rgba(255,80,80,0.8);
+  --color-green:      rgba(20,70,45,0.22);
+  --color-shield:     #90caf9;
+
+  /* Typography */
+  --font:             'Zanjabeel', sans-serif;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  /* Radii */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  18px;
+  --radius-full: 50%;
+
+  /* Shadows */
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.5);
+  --shadow-glow-gold: 0 0 0 2px var(--color-gold), 0 0 18px 4px var(--color-gold-dim);
+  --shadow-glow-blue: 0 0 0 3px var(--color-blue), 0 16px 40px rgba(0,0,0,0.75);
+
+  /* Durations */
+  --dur-fast:   150ms;
+  --dur-normal: 300ms;
+  --dur-fly:    680ms;
+  --dur-glow:   1500ms;
+
+  /* Z-index layers */
+  --z-board:    1;
+  --z-overlay:  50;
+  --z-modal:    100;
+  --z-toast:    150;
+  --z-fly:      2000;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

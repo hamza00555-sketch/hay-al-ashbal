@@ -1,0 +1,39 @@
+.pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.label {
+  font-family: var(--font, 'Zanjabeel', sans-serif);
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.3);
+}
+
+.fan {
+  position: relative;
+  width: 78px;
+  height: 117px;
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  transform-origin: bottom center;
+  transform: rotate(var(--angle, 0deg));
+  transition: transform 0.3s ease;
+}
+
+.empty {
+  font-family: var(--font, 'Zanjabeel', sans-serif);
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.18);
+  width: 78px;
+  height: 117px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed rgba(255,255,255,0.1);
+  border-radius: 10px;
+}

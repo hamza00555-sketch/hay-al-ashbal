@@ -50,7 +50,10 @@ export function computeAIMove(state) {
 
   const targetId = pickTarget(state);
   const guessId = cardToPlay.id === 1 ? bestGuess(state) : null;
+  const targetCardBefore = targetId != null
+    ? state.players.find(p => p.id === targetId)?.hand[0] ?? null
+    : null;
 
   const nextState = resolveCard(state, cardToPlay, cardSource, targetId, guessId);
-  return { state: nextState, playedCard: cardToPlay };
+  return { state: nextState, playedCard: cardToPlay, targetId, guessId, targetCardBefore };
 }
