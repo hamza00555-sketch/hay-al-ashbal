@@ -2,7 +2,8 @@
   position: relative;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(86,130,178,0.2);
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(86,130,178,0.35), 0 1px 4px rgba(0,0,0,0.12);
   flex-shrink: 0;
   will-change: transform;
   transition: box-shadow 0.15s;
@@ -21,7 +22,7 @@
 }
 
 .clickable { cursor: pointer; }
-.clickable:hover { box-shadow: 0 8px 24px rgba(86,130,178,0.3); }
+.clickable:hover { box-shadow: 0 8px 24px rgba(86,130,178,0.4), 0 2px 6px rgba(0,0,0,0.14); }
 
 .focused {
   box-shadow: 0 0 0 3px #5682B2, 0 12px 32px rgba(86,130,178,0.3) !important;
@@ -96,6 +97,7 @@
   -webkit-backface-visibility: hidden;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(86,130,178,0.2);
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(86,130,178,0.35), 0 1px 4px rgba(0,0,0,0.12);
 }
 .flipBack { transform: rotateY(180deg); }
