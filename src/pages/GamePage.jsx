@@ -76,6 +76,11 @@ function Seat({ player, position, isActive, eliminating }) {
 
       <span className={styles.seatName}>{player.name}</span>
       <span className={styles.seatDiscard}>{player.discardPile.length} رُمي</span>
+      {player.isAI && player.difficulty && player.difficulty !== 'easy' && (
+        <span className={styles.diffBadge}>
+          {{ medium: 'متوسط', hard: 'صعب' }[player.difficulty]}
+        </span>
+      )}
     </div>
   );
 }
@@ -139,7 +144,7 @@ function FlyingCard({ card, fromRect, toRect, onDone }) {
 }
 
 // ── Main GamePage ────────────────────────────────────────────────
-export default function GamePage({ config, onGameOver }) {
+export default function GamePage({ config, onGameOver, roundNumber = 1, tokensToWin = 1, tokens = {} }) {
   const [gs, setGs] = useState(() => createInitialState(config.players));
 
   const [focusedSource, setFocusedSource] = useState(null);
@@ -167,6 +172,7 @@ export default function GamePage({ config, onGameOver }) {
   const [musicOn,     setMusicOn]     = useState(false);
   const [showGuide,   setShowGuide]   = useState(false);
   const [elimIds,     setElimIds]     = useState(new Set());
+  const [winFlash,    setWinFlash]    = useState(false);
   const prevPlayersRef = useRef(null);
 
   const currentPlayer = getCurrentPlayer(gs);
@@ -259,8 +265,13 @@ export default function GamePage({ config, onGameOver }) {
   useEffect(() => {
     if (gs.phase === 'GAME_OVER') {
       SFX.win();
+      haptic([20, 10, 20, 10, 40]);
       stopMusic();
-      onGameOver({ winner: gs.winner, players: gs.players, log: gs.gameLog });
+      setWinFlash(true);
+      setTimeout(() => {
+        setWinFlash(false);
+        onGameOver({ winner: gs.winner, players: gs.players, log: gs.gameLog });
+      }, 900);
       return;
     }
 
@@ -422,10 +433,31 @@ export default function GamePage({ config, onGameOver }) {
   return (
     <div className={styles.board} onClick={() => focusedSource && setFocusedSource(null)}>
 
+      {/* Win flash overlay */}
+      {winFlash && <div className={styles.winFlash} />}
+
       <button className={styles.musicBtn} onClick={toggleMusic}>
         {musicOn ? '🔊' : '🔇'}
       </button>
       <button className={styles.guideBtn} onClick={() => setShowGuide(true)}>?</button>
+
+      {/* Round indicator */}
+      <div className={styles.roundBadge}>
+        جولة {roundNumber}
+        {tokensToWin > 1 && (
+          <span className={styles.roundTokens}>
+            {gs.players.map(p => {
+              const t = tokens[p.id] ?? 0;
+              if (t === 0) return null;
+              return (
+                <span key={p.id} className={styles.roundTokenDot} title={p.name}>
+                  {'●'.repeat(t)}
+                </span>
+              );
+            })}
+          </span>
+        )}
+      </div>
 
       {/* ── TurnBanner ── */}
       {turnBanner && !currentBeat && (

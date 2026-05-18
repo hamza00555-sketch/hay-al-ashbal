@@ -13,11 +13,13 @@ export default function App() {
   const [roundResult,  setRoundResult]  = useState(null);
   const [finalResult,  setFinalResult]  = useState(null);
   const [roundKey,     setRoundKey]     = useState(0);
+  const [roundNumber,  setRoundNumber]  = useState(1);
 
   function handleStartGame(config) {
     setGameConfig(config);
     setTokensToWin(config.tokensToWin ?? 3);
     setTokens({});
+    setRoundNumber(1);
     setRoundKey(k => k + 1);
     setScreen('game');
   }
@@ -41,6 +43,7 @@ export default function App() {
   }
 
   function handleNextRound() {
+    setRoundNumber(n => n + 1);
     setRoundKey(k => k + 1);
     setScreen('game');
   }
@@ -60,6 +63,9 @@ export default function App() {
         <GamePage
           key={roundKey}
           config={gameConfig}
+          roundNumber={roundNumber}
+          tokensToWin={tokensToWin}
+          tokens={tokens}
           onGameOver={handleGameOver}
         />
       )}

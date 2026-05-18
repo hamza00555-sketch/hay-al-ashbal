@@ -15,18 +15,15 @@
   perspective-origin: 50% 85%;
 }
 
-/* ── perspectivePane: wraps top+left+arena+right as inner grid ── */
-.perspectivePane {
-  display: contents; /* passes grid areas through to children */
-  transform: rotateX(8deg);
+/* ── 3D depth: tilt top zone + scale all opponent seats ─────── */
+.topZone {
+  transform: perspective(700px) rotateX(-5deg);
   transform-origin: 50% 100%;
-  transform-style: preserve-3d;
 }
 
-/* Depth scaling: opponents look further away */
-.seat_top .seatCardWrap  { transform: scale(0.82); }
+.seat_top .seatCardWrap  { transform: scale(0.80); }
 .seat_left .seatCardWrap,
-.seat_right .seatCardWrap { transform: scale(0.90); }
+.seat_right .seatCardWrap { transform: scale(0.88); }
 
 /* Ambient table glow */
 .board::before {
@@ -322,6 +319,66 @@
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.60rem;
   color: rgba(255,255,255,0.35);
+}
+
+.diffBadge {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.58rem;
+  color: rgba(255,140,0,0.85);
+  background: rgba(255,140,0,0.1);
+  border: 1px solid rgba(255,140,0,0.3);
+  border-radius: 5px;
+  padding: 0 5px;
+  white-space: nowrap;
+}
+
+/* ── Round badge ─────────────────────────────────────────────── */
+.roundBadge {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.45);
+  background: rgba(8,18,38,0.7);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 4px 12px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.roundTokens {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.roundTokenDot {
+  font-size: 0.55rem;
+  color: var(--color-gold, #FFD700);
+  letter-spacing: 1px;
+}
+
+/* ── Win flash overlay ───────────────────────────────────────── */
+.winFlash {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(255, 215, 0, 0.18);
+  pointer-events: none;
+  animation: winFlashAnim 0.9s ease forwards;
+}
+
+@keyframes winFlashAnim {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* ── Arena elements ──────────────────────────────────────────── */
