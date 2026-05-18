@@ -86,7 +86,9 @@ export function checkWin(state) {
     return { ...state, phase: 'GAME_OVER', winner: active[0] ?? null };
   }
   if (state.deck.length === 0) {
-    const winner = active.reduce((best, p) =>
+    const withCards = active.filter(p => p.hand.length > 0);
+    if (withCards.length === 0) return null;
+    const winner = withCards.reduce((best, p) =>
       p.hand[0].power > best.hand[0].power ? p : best
     );
     return { ...state, phase: 'GAME_OVER', winner };
@@ -223,6 +225,18 @@ export function resolveCard(state, playedCard, cardSource, targetPlayerId, guess
                 : p
             ),
           };
+        } else if (newState.hiddenCard) {
+          // Deck empty: draw the set-aside hidden card (Love Letter rule)
+          const replacement = newState.hiddenCard;
+          newState = {
+            ...newState,
+            hiddenCard: null,
+            players: newState.players.map(p =>
+              p.id === targetPlayerId
+                ? { ...p, hand: [replacement], discardPile: [...p.discardPile, discarded] }
+                : p
+            ),
+          };
         }
         newState = addLog(newState, {
           type: 'force',
@@ -264,8 +278,11 @@ export function resolveCard(state, playedCard, cardSource, targetPlayerId, guess
     }
   }
 
-  const winCheck = checkWin(newState);
-  if (winCheck) return winCheck;
+  // Only check player elimination mid-resolve (not deck-empty — that fires in advanceTurn)
+  const activeMid = getActivePlayers(newState);
+  if (activeMid.length <= 1) {
+    return { ...newState, phase: 'GAME_OVER', winner: activeMid[0] ?? null };
+  }
 
   return advanceTurn(newState);
 }
