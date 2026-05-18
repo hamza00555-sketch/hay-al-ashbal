@@ -15,7 +15,59 @@ function pickTarget(state) {
   return targets.length > 0 ? targets[0].id : null;
 }
 
-// Count which card IDs are still possible (not yet discarded, not in AI's hand)
+function pickTargetRandom(state) {
+  const targets = getValidTargets(state);
+  if (targets.length === 0) return null;
+  return targets[Math.floor(Math.random() * targets.length)].id;
+}
+
+// Medium: random target, but prefer a player we've peeked at when guessing
+function pickTargetMedium(state, cardId) {
+  const targets = getValidTargets(state);
+  if (targets.length === 0) return null;
+  const ai = state.players[state.currentPlayerIndex];
+
+  // For GUESS: strongly prefer target we have peek memory on
+  if (cardId === 1) {
+    const peeked = targets.find(t => (ai.peekMemory?.[t.id] ?? null) != null);
+    if (peeked) return peeked.id;
+  }
+
+  return targets[Math.floor(Math.random() * targets.length)].id;
+}
+
+// Hard: strategic targeting per card
+function pickTargetHard(state, cardId) {
+  const targets = getValidTargets(state);
+  if (targets.length === 0) return null;
+  const ai = state.players[state.currentPlayerIndex];
+
+  // GUESS: use peek memory target first
+  if (cardId === 1) {
+    const peeked = targets.find(t => (ai.peekMemory?.[t.id] ?? null) != null);
+    if (peeked) return peeked.id;
+  }
+
+  // COMPARE: target player with lowest estimated card power
+  // (player with highest discard-pile power sum has already played strong cards → now weaker)
+  if (cardId === 3) {
+    return targets.reduce((bestId, p) => {
+      const pScore = p.discardPile.reduce((s, c) => s + c.power, 0);
+      const bScore = bestId != null
+        ? state.players.find(x => x.id === bestId)?.discardPile.reduce((s, c) => s + c.power, 0) ?? 0
+        : -1;
+      return pScore > bScore ? p.id : bestId;
+    }, null) ?? targets[0].id;
+  }
+
+  // PEEK: target the human player to gather intel, fallback random
+  if (cardId === 2) {
+    const human = targets.find(t => !state.players.find(p => p.id === t.id)?.isAI);
+    if (human) return human.id;
+  }
+
+  return targets[Math.floor(Math.random() * targets.length)].id;
+}
 function getRemainingPossible(state) {
   const ai = state.players[state.currentPlayerIndex];
   const knownIds = [ai.hand[0]?.id, state.drawnCard?.id].filter(Boolean);
@@ -55,21 +107,6 @@ function bestGuessSmart(state) {
   return sorted[0] ? parseInt(sorted[0][0]) : 2;
 }
 
-// Hard: pick target with lowest estimated hand power (highest discard sum → likely cleared high cards)
-function pickTargetHard(state, forCompare = false) {
-  const targets = getValidTargets(state);
-  if (targets.length === 0) return null;
-  if (!forCompare) return targets[0].id;
-
-  // For COMPARE: target player with lowest estimated remaining power
-  return targets.reduce((bestId, p) => {
-    const pScore = p.discardPile.reduce((s, c) => s + c.power, 0);
-    const bScore = bestId != null
-      ? state.players.find(x => x.id === bestId)?.discardPile.reduce((s, c) => s + c.power, 0) ?? 0
-      : -1;
-    return pScore < bScore ? p.id : bestId;
-  }, null) ?? targets[0].id;
-}
 
 function chooseCard(hand, drawn) {
   const forcePlayBustan = mustPlayBustan(hand, drawn);
@@ -117,10 +154,12 @@ export function computeAIMove(state) {
   }
 
   let targetId;
-  if (difficulty === 'hard' && cardToPlay.id === 3) {
-    targetId = pickTargetHard(state, true);
+  if (difficulty === 'easy') {
+    targetId = pickTargetRandom(state);
+  } else if (difficulty === 'medium') {
+    targetId = pickTargetMedium(state, cardToPlay.id);
   } else {
-    targetId = pickTarget(state);
+    targetId = pickTargetHard(state, cardToPlay.id);
   }
 
   const guessId = cardToPlay.id === 1
