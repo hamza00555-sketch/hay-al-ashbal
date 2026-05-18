@@ -133,7 +133,7 @@ function FlyingCard({ card, fromRect, toRect, onDone }) {
     const ex = toRect.left   + toRect.width    / 2 - W / 2;
     const ey = toRect.top    + toRect.height   / 2 - H / 2;
 
-    const DURATION = 680;
+    const DURATION = 950;
     let startTs = null;
     let raf;
 
@@ -297,10 +297,10 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
 
     setTurnAnnounce({ name: cp.name, profile: cp.profile, isMe, isAI: cp.isAI });
 
-    // AI turns: auto-dismiss after 1.4s
+    // AI turns: auto-dismiss after 2.2s
     if (cp.isAI) {
       clearTimeout(announceTimer.current);
-      announceTimer.current = setTimeout(() => setTurnAnnounce(null), 1400);
+      announceTimer.current = setTimeout(() => setTurnAnnounce(null), 2200);
     }
   }, [gs.currentPlayerIndex, gs.phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -329,7 +329,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       setTimeout(() => {
         setWinFlash(false);
         onGameOver({ winner: gs.winner, players: gs.players, log: gs.gameLog });
-      }, 900);
+      }, 1400);
       return;
     }
 
@@ -359,7 +359,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       const t = setTimeout(() => {
         setIsDrawing(false);
         setGs(doDrawCard);
-      }, 700);
+      }, 1100);
       return () => clearTimeout(t);
     }
   }, [gs.phase, gs.currentPlayerIndex, turnAnnounce]); // eslint-disable-line react-hooks/exhaustive-deps

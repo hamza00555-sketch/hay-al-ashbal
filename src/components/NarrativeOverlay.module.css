@@ -22,7 +22,7 @@
   max-width: 340px;
   width: 100%;
   box-shadow: 0 16px 60px rgba(86,130,178,0.2), 0 4px 16px rgba(86,130,178,0.1);
-  animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: popIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes popIn {
@@ -174,7 +174,7 @@
 
 /* ── Card glow ── */
 .cardGlow {
-  animation: cardLift 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: cardLift 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
   filter: drop-shadow(0 0 14px rgba(255,215,0,0.5));
 }
 
@@ -273,7 +273,7 @@
 /* ── Protection ── */
 .shieldAnim {
   font-size: 2.8rem;
-  animation: shieldPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: shieldPop 1.0s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes shieldPop {
@@ -293,7 +293,7 @@
 
 .eliminationIcon {
   font-size: 3rem;
-  animation: elimShake 0.5s ease-in-out;
+  animation: elimShake 0.85s ease-in-out;
 }
 
 @keyframes elimShake {
@@ -309,7 +309,7 @@
   font-weight: 700;
   color: #FF8888;
   text-shadow: 0 0 16px rgba(255,100,100,0.6);
-  animation: textPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+  animation: textPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.28s both;
 }
 
 @keyframes textPop {
