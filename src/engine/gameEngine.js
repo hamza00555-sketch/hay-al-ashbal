@@ -22,6 +22,7 @@ export function createInitialState(players) {
     isEliminated: false,
     isProtected: false,
     discardPile: [],
+    peekMemory: {},   // { [targetPlayerId]: cardId } — private to each player
   }));
 
   return {
@@ -167,6 +168,17 @@ export function resolveCard(state, playedCard, cardSource, targetPlayerId, guess
     case 2: {
       const target = newState.players.find(p => p.id === targetPlayerId);
       const peekCard = target?.hand[0];
+      // Store in the peeker's private memory (each AI remembers independently)
+      if (peekCard != null) {
+        newState = {
+          ...newState,
+          players: newState.players.map((p, i) =>
+            i === state.currentPlayerIndex
+              ? { ...p, peekMemory: { ...p.peekMemory, [targetPlayerId]: peekCard.id } }
+              : p
+          ),
+        };
+      }
       newState = {
         ...newState,
         phase: 'PEEK_REVEAL',
@@ -238,6 +250,14 @@ export function resolveCard(state, playedCard, cardSource, targetPlayerId, guess
             ),
           };
         }
+        // Target got a new card — invalidate any AI's peek memory for this target
+        newState = {
+          ...newState,
+          players: newState.players.map(p => ({
+            ...p,
+            peekMemory: { ...p.peekMemory, [targetPlayerId]: undefined },
+          })),
+        };
         newState = addLog(newState, {
           type: 'force',
           text: `${currentPlayer.name} أجبر ${target.name} يبدل كرته ⚡`,
@@ -257,6 +277,18 @@ export function resolveCard(state, playedCard, cardSource, targetPlayerId, guess
             if (p.id === targetPlayerId) return { ...p, hand: [myCard] };
             return p;
           }),
+        };
+        // Both players got new cards — invalidate peek memory for them
+        newState = {
+          ...newState,
+          players: newState.players.map(p => ({
+            ...p,
+            peekMemory: {
+              ...p.peekMemory,
+              [currentPlayer.id]: undefined,
+              [targetPlayerId]: undefined,
+            },
+          })),
         };
         newState = addLog(newState, {
           type: 'swap',

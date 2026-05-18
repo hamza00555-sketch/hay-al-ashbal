@@ -124,7 +124,9 @@ export function computeAIMove(state) {
   }
 
   const guessId = cardToPlay.id === 1
-    ? (difficulty === 'easy' ? bestGuessEasy(state) : bestGuessSmart(state))
+    ? ((ai.peekMemory?.[targetId] ?? null) != null
+        ? ai.peekMemory[targetId]                                         // use private peek memory
+        : (difficulty === 'easy' ? bestGuessEasy(state) : bestGuessSmart(state)))
     : null;
 
   const targetCardBefore = targetId != null
