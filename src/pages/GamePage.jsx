@@ -18,7 +18,10 @@ import CardInfoModal from '../components/CardInfoModal';
 import NarrativeOverlay from '../components/NarrativeOverlay';
 import DiscardPile from '../components/DiscardPile';
 import GuideDrawer from '../components/GuideDrawer';
+import SpeechBubble from '../components/SpeechBubble';
 import { SFX, startMusic, stopMusic, haptic } from '../utils/sounds';
+import { getCharacter } from '../constants/characters';
+import { playVoice } from '../utils/voicePlayer';
 import styles from './GamePage.module.css';
 
 const ACTION_TYPE = {
@@ -42,8 +45,38 @@ function assignSeats(players, humanId) {
   return { right: opp[0], top: opp[1], left: opp[2] };
 }
 
+// ── Character portrait (with image + emoji fallback) ────────────
+function Portrait({ characterId, size = 'seat', isActive, isEliminated }) {
+  const char = getCharacter(characterId);
+  const [imgFailed, setImgFailed] = useState(false);
+  return (
+    <div
+      className={[
+        styles.portrait,
+        styles[`portrait_${size}`],
+        isActive && !isEliminated ? styles.portraitActive : '',
+        isEliminated              ? styles.portraitDead   : '',
+      ].join(' ')}
+      style={{ '--char-color': char?.color ?? '#fff', '--char-bg': char?.bgColor ?? '#111' }}
+    >
+      {!imgFailed && (
+        <img
+          src={`/characters/${characterId}/portrait.png`}
+          alt={char?.name}
+          className={styles.portraitImg}
+          onError={() => setImgFailed(true)}
+        />
+      )}
+      <span className={styles.portraitEmoji}>{char?.emoji ?? '👤'}</span>
+    </div>
+  );
+}
+
 // ── Seat component ───────────────────────────────────────────────
-function Seat({ player, position, isActive, eliminating }) {
+function Seat({ player, position, isActive, eliminating, speechLine }) {
+  const char = getCharacter(player.characterId);
+  const bubbleSide = position === 'top' ? 'bottom' : 'top';
+
   return (
     <div className={[
       styles.seat,
@@ -56,6 +89,23 @@ function Seat({ player, position, isActive, eliminating }) {
       {isActive && !player.isEliminated && (
         <div className={styles.activePing} />
       )}
+
+      {/* Portrait with speech bubble */}
+      <div className={styles.portraitRow}>
+        <Portrait
+          characterId={player.characterId}
+          size="seat"
+          isActive={isActive}
+          isEliminated={player.isEliminated}
+        />
+        {speechLine && (
+          <SpeechBubble
+            text={speechLine}
+            color={char?.color}
+            side={bubbleSide}
+          />
+        )}
+      </div>
 
       <div className={styles.seatCardWrap}>
         {player.isEliminated ? (
@@ -173,7 +223,21 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   const [showGuide,   setShowGuide]   = useState(false);
   const [elimIds,     setElimIds]     = useState(new Set());
   const [winFlash,    setWinFlash]    = useState(false);
-  const prevPlayersRef = useRef(null);
+  const prevPlayersRef  = useRef(null);
+
+  // speech bubbles: { [playerId]: string | null }
+  const [bubbles, setBubbles]         = useState({});
+  const bubbleTimers                  = useRef({});
+
+  function fireBubble(playerId, characterId, event, cardId = null) {
+    const line = playVoice(characterId, event, cardId);
+    if (!line) return;
+    clearTimeout(bubbleTimers.current[playerId]);
+    setBubbles(prev => ({ ...prev, [playerId]: line }));
+    bubbleTimers.current[playerId] = setTimeout(() => {
+      setBubbles(prev => ({ ...prev, [playerId]: null }));
+    }, 2600);
+  }
 
   const currentPlayer = getCurrentPlayer(gs);
   const hasAI         = gs.players.some(p => p.isAI);
@@ -215,10 +279,13 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
     kickQueue();
   }
 
-  // Cleanup timer on unmount
-  useEffect(() => () => clearTimeout(narrativeTimer.current), []);
+  // Cleanup timers on unmount
+  useEffect(() => () => {
+    clearTimeout(narrativeTimer.current);
+    Object.values(bubbleTimers.current).forEach(clearTimeout);
+  }, []);
 
-  // Track newly eliminated players for animation + haptic
+  // Track newly eliminated players for animation + haptic + voice
   useEffect(() => {
     const prev = prevPlayersRef.current;
     prevPlayersRef.current = gs.players;
@@ -230,10 +297,29 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
     if (newElim.length > 0) {
       haptic([30, 20, 30]);
       setElimIds(new Set(newElim.map(p => p.id)));
+      newElim.forEach(p => fireBubble(p.id, p.characterId, 'eliminated'));
       const t = setTimeout(() => setElimIds(new Set()), 900);
       return () => clearTimeout(t);
     }
-  }, [gs.players]);
+  }, [gs.players]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Voice line on CARD_ANTICIPATE beat (who played + targeted)
+  useEffect(() => {
+    if (!currentBeat) return;
+    if (currentBeat.type === 'CARD_ANTICIPATE') {
+      const actor = gs.players.find(p => p.name === currentBeat.payload.actorName);
+      if (actor) fireBubble(actor.id, actor.characterId, 'playCard', currentBeat.payload.card?.id);
+    }
+    if (currentBeat.type === 'CARD_IMPACT' || currentBeat.type === 'FORCE_RESULT'
+      || currentBeat.type === 'COMPARE_REVEAL' || currentBeat.type === 'SWAP_VISUAL') {
+      const target = gs.players.find(p => p.name === currentBeat.payload.targetName);
+      if (target && !target.isEliminated) fireBubble(target.id, target.characterId, 'targeted');
+    }
+    if (currentBeat.type === 'ELIMINATION') {
+      const elim = gs.players.find(p => p.name === currentBeat.payload.playerName);
+      if (elim) fireBubble(elim.id, elim.characterId, 'eliminated');
+    }
+  }, [currentBeat]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── TurnBanner: flash when current player changes ────────────
   useEffect(() => {
@@ -242,6 +328,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
     prevPlayerIdxRef.current = gs.currentPlayerIndex;
     const cp = gs.players[gs.currentPlayerIndex];
     if (cp && !cp.isEliminated) {
+      fireBubble(cp.id, cp.characterId, 'turnStart');
       setTurnBanner(cp.isAI ? `دور ${cp.name}` : 'دورك!');
       const t = setTimeout(() => setTurnBanner(null), 2200);
       return () => clearTimeout(t);
@@ -472,14 +559,14 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       {/* ── Top seat ── */}
       <div className={`${styles.topZone} ${!seats.top ? styles.empty : ''}`}>
         {seats.top && (
-          <Seat player={seats.top} position="top" isActive={seats.top.id === activeId} eliminating={elimIds.has(seats.top.id)} />
+          <Seat player={seats.top} position="top" isActive={seats.top.id === activeId} eliminating={elimIds.has(seats.top.id)} speechLine={bubbles[seats.top.id] ?? null} />
         )}
       </div>
 
       {/* ── Left seat ── */}
       <div className={styles.leftZone}>
         {seats.left && (
-          <Seat player={seats.left} position="left" isActive={seats.left.id === activeId} eliminating={elimIds.has(seats.left.id)} />
+          <Seat player={seats.left} position="left" isActive={seats.left.id === activeId} eliminating={elimIds.has(seats.left.id)} speechLine={bubbles[seats.left.id] ?? null} />
         )}
       </div>
 
@@ -502,7 +589,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       {/* ── Right seat ── */}
       <div className={styles.rightZone}>
         {seats.right && (
-          <Seat player={seats.right} position="right" isActive={seats.right.id === activeId} eliminating={elimIds.has(seats.right.id)} />
+          <Seat player={seats.right} position="right" isActive={seats.right.id === activeId} eliminating={elimIds.has(seats.right.id)} speechLine={bubbles[seats.right.id] ?? null} />
         )}
       </div>
 
@@ -511,15 +598,36 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
         className={`${styles.humanZone} ${isMyTurn && !isLocked ? styles.myTurn : ''}`}
         onClick={e => e.stopPropagation()}
       >
-        <div className={styles.turnLabel}>
-          {isMyTurn
-            ? <span className={styles.myTurnBadge}>دورك ▼</span>
-            : <span>دور: <strong>{currentPlayer.name}</strong></span>
-          }
-          {humanPlayer?.isProtected && (
-            <span className={styles.protectedBadge}>🛡️ محمي</span>
-          )}
-        </div>
+        {/* Human portrait row */}
+        {humanPlayer && (
+          <div className={styles.humanPortraitRow}>
+            <div className={styles.humanPortraitWrap}>
+              <Portrait
+                characterId={humanPlayer.characterId}
+                size="human"
+                isActive={isMyTurn}
+                isEliminated={humanPlayer.isEliminated}
+              />
+              {bubbles[humanPlayer.id] && (
+                <SpeechBubble
+                  text={bubbles[humanPlayer.id]}
+                  color={getCharacter(humanPlayer.characterId)?.color}
+                  side="top"
+                />
+              )}
+            </div>
+            <div className={styles.humanNameBlock}>
+              <span className={styles.humanCharName}>{humanPlayer.name}</span>
+              {isMyTurn
+                ? <span className={styles.myTurnBadge}>دورك ▼</span>
+                : <span className={styles.waitBadge}>دور: <strong>{currentPlayer.name}</strong></span>
+              }
+              {humanPlayer.isProtected && (
+                <span className={styles.protectedBadge}>🛡️ محمي</span>
+              )}
+            </div>
+          </div>
+        )}
 
         {bustanForced && (
           <div className={styles.ruleWarning}>يجب عليك رمي صاحب البستان!</div>

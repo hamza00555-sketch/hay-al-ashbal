@@ -207,6 +207,88 @@
 }
 
 /* ── Seat (shared) ───────────────────────────────────────────── */
+/* ── Character Portrait ──────────────────────────────────────── */
+.portraitRow {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.portrait {
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--char-color, #fff) 10%, var(--char-bg, #111));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid color-mix(in srgb, var(--char-color, #fff) 30%, transparent);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+
+.portrait_seat  { width: 44px; height: 44px; }
+.portrait_human { width: 52px; height: 52px; }
+
+.portraitActive {
+  border-color: var(--char-color, #ffd700);
+  box-shadow: 0 0 0 2px var(--char-color, #ffd700),
+              0 0 16px color-mix(in srgb, var(--char-color, #ffd700) 50%, transparent);
+  animation: portraitPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes portraitPulse {
+  from { box-shadow: 0 0 0 2px var(--char-color, #ffd700), 0 0 12px color-mix(in srgb, var(--char-color, #ffd700) 40%, transparent); }
+  to   { box-shadow: 0 0 0 3px var(--char-color, #ffd700), 0 0 24px color-mix(in srgb, var(--char-color, #ffd700) 65%, transparent); }
+}
+
+.portraitDead { filter: grayscale(1); opacity: 0.5; }
+
+.portraitImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.portraitEmoji { font-size: 1.4rem; line-height: 1; }
+.portrait_human .portraitEmoji { font-size: 1.7rem; }
+
+/* ── Human portrait row ──────────────────────────────────────── */
+.humanPortraitRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 6px;
+}
+
+.humanPortraitWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.humanNameBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.humanCharName {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+}
+
+.waitBadge {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
+}
+
+/* ── Seat ────────────────────────────────────────────────────── */
 .seat {
   display: flex;
   flex-direction: column;

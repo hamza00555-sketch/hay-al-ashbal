@@ -1,0 +1,62 @@
+.bubble {
+  position: absolute;
+  background: rgba(10, 20, 40, 0.92);
+  border: 1.5px solid var(--bubble-color, rgba(255,255,255,0.4));
+  border-radius: 12px;
+  color: #fff;
+  font-family: var(--font, 'Zanjabeel', sans-serif);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  padding: 5px 9px;
+  white-space: nowrap;
+  max-width: 130px;
+  white-space: normal;
+  text-align: center;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--bubble-color, #fff) 25%, transparent);
+  z-index: 50;
+  pointer-events: none;
+  animation: bubblePop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+             bubbleFadeOut 0.4s ease 2.2s forwards;
+}
+
+/* tail pointing down (bubble is above the portrait) */
+.bubble.top {
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.bubble.top::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--bubble-color, rgba(255,255,255,0.4));
+}
+
+/* tail pointing up (bubble is below the portrait) */
+.bubble.bottom {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.bubble.bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: var(--bubble-color, rgba(255,255,255,0.4));
+}
+
+@keyframes bubblePop {
+  from { transform: translateX(-50%) scale(0.6); opacity: 0; }
+  to   { transform: translateX(-50%) scale(1);   opacity: 1; }
+}
+
+@keyframes bubbleFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
