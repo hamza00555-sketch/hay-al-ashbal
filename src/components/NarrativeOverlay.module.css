@@ -296,3 +296,31 @@
 }
 .confirmBtn:hover  { background: rgba(37, 93, 153, 0.9); }
 .confirmBtn:active { transform: scale(0.97); }
+
+/* ── Skip button (smaller, for CARD_ANTICIPATE) ── */
+.skipBtn {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 10px;
+  color: rgba(255,255,255,0.45);
+  font-family: var(--font, 'Zanjabeel', sans-serif);
+  font-size: 0.82rem;
+  padding: 6px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 2px;
+}
+.skipBtn:hover { background: rgba(255,255,255,0.13); color: rgba(255,255,255,0.7); }
+
+/* ── Rule note ── */
+.ruleNote {
+  font-family: var(--font, 'Zanjabeel', sans-serif);
+  font-size: 0.72rem;
+  color: rgba(255,200,100,0.75);
+  text-align: center;
+  background: rgba(255,150,0,0.08);
+  border: 1px solid rgba(255,150,0,0.2);
+  border-radius: 8px;
+  padding: 5px 10px;
+  line-height: 1.5;
+}

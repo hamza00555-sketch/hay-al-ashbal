@@ -1,7 +1,6 @@
 import { CardFace } from './Card';
 import styles from './NarrativeOverlay.module.css';
 
-// Beats that always wait for the user to tap "حسناً"
 const CONFIRM_TYPES = new Set([
   'CARD_IMPACT',
   'COMPARE_REVEAL',
@@ -17,7 +16,8 @@ export default function NarrativeOverlay({ beat, onConfirm }) {
   const needsConfirm = CONFIRM_TYPES.has(type);
 
   return (
-    <div className={styles.overlay} onClick={needsConfirm ? undefined : onConfirm}>
+    // ❌ لا نقر على الخلفية — فقط الأزرار تُقدّم
+    <div className={styles.overlay}>
       <div className={styles.panel} onClick={e => e.stopPropagation()}>
 
         {type === 'AI_THINKING' && (
@@ -40,7 +40,7 @@ export default function NarrativeOverlay({ beat, onConfirm }) {
             </div>
             <span className={styles.cardName}>{payload.card.role ?? payload.card.name}</span>
             <span className={styles.ability}>{payload.card.ability}</span>
-            <span className={styles.tapHint}>اضغط للمتابعة</span>
+            <button className={styles.skipBtn} onClick={onConfirm}>تخطى ▸</button>
           </>
         )}
 
@@ -106,12 +106,21 @@ export default function NarrativeOverlay({ beat, onConfirm }) {
                 : <div className={styles.unknownCard}>؟</div>
               }
               <span className={styles.arrow}>←</span>
-              <div className={styles.unknownCard}>كرت جديد</div>
+              {payload.wasEliminated
+                ? <div className={styles.unknownCard}>خرج!</div>
+                : <div className={styles.unknownCard}>كرت جديد</div>
+              }
             </div>
-            {payload.wasEliminated
-              ? <span className={styles.hitText}>{payload.targetName} خرج — كان عنده النجمة! ⭐</span>
-              : <span className={styles.targetText}>بُدّل كرت {payload.targetName}</span>
-            }
+            {payload.wasEliminated ? (
+              <>
+                <span className={styles.hitText}>{payload.targetName} خرج! ⭐</span>
+                <span className={styles.ruleNote}>
+                  نجمة الحي: من رُمي كرته لأي سبب يخرج فوراً
+                </span>
+              </>
+            ) : (
+              <span className={styles.targetText}>بُدّل كرت {payload.targetName}</span>
+            )}
             <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>
           </>
         )}
