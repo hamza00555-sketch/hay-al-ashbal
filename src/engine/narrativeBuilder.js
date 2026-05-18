@@ -16,10 +16,10 @@ export function buildNarrative({
   const beats = [];
 
   if (isAI) {
-    beats.push(beat('AI_THINKING', { name: actorName, actorId }, 2400));
+    beats.push(beat('AI_THINKING', { name: actorName, actorId }, 1600));
   }
 
-  beats.push(beat('CARD_ANTICIPATE', { card, actorName, actorId }, 2800));
+  beats.push(beat('CARD_ANTICIPATE', { card, actorName, actorId }, 2000));
 
   const newlyEliminated = nextGs.players.filter(p => {
     const prev = prevGs.players.find(x => x.id === p.id);

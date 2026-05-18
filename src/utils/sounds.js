@@ -44,6 +44,16 @@ function noise(duration, gainVal, delay = 0) {
   src.stop(c.currentTime + delay + duration + 0.01);
 }
 
+function pv(freq, pct = 0.03) { return freq * (1 + (Math.random() * 2 - 1) * pct); }
+
+const _cd = {};
+function cd(name, ms, fn) {
+  if (_cd[name]) return;
+  fn();
+  _cd[name] = true;
+  setTimeout(() => { delete _cd[name]; }, ms);
+}
+
 export const SFX = {
   cardSelect() {
     playTone(520, 'sine', 0.08, 0.15);
@@ -78,7 +88,84 @@ export const SFX = {
     playTone(480, 'sine', 0.07, 0.05, 0.18);
   },
   buttonClick() {
-    playTone(600, 'sine', 0.06, 0.1);
+    cd('btn', 40, () => playTone(pv(600), 'sine', 0.06, 0.10));
+  },
+
+  panelPop() {
+    noise(0.06, 0.10);
+    playTone(pv(900), 'sine', 0.05, 0.10);
+    playTone(pv(1100), 'sine', 0.04, 0.07, 0.04);
+  },
+
+  confirmOk() {
+    playTone(pv(520), 'triangle', 0.09, 0.12);
+    playTone(pv(660), 'sine', 0.07, 0.09, 0.05);
+  },
+
+  turnHuman() {
+    playTone(440, 'triangle', 0.14, 0.14);
+    playTone(550, 'triangle', 0.12, 0.13, 0.09);
+    playTone(660, 'sine',     0.10, 0.12, 0.18);
+  },
+
+  turnAI() {
+    noise(0.09, 0.07);
+    playTone(320, 'sine', 0.09, 0.07, 0.03);
+  },
+
+  compareReveal() {
+    noise(0.07, 0.22);
+    playTone(200, 'sawtooth', 0.10, 0.20, 0.03);
+    noise(0.06, 0.18, 0.13);
+    playTone(160, 'sawtooth', 0.09, 0.16, 0.17);
+  },
+
+  protectionFlash() {
+    playTone(523, 'sine', 0.22, 0.14);
+    playTone(659, 'sine', 0.20, 0.12, 0.05);
+    playTone(784, 'sine', 0.18, 0.10, 0.10);
+    noise(0.10, 0.07, 0.06);
+  },
+
+  swapVisual() {
+    playTone(380, 'triangle', 0.14, 0.14);
+    playTone(560, 'triangle', 0.12, 0.13, 0.09);
+    playTone(480, 'sine',     0.10, 0.11, 0.18);
+    noise(0.08, 0.07, 0.08);
+  },
+
+  forceDiscard() {
+    noise(0.11, 0.22);
+    playTone(260, 'triangle', 0.13, 0.18, 0.04);
+    playTone(130, 'sawtooth', 0.10, 0.16, 0.13);
+  },
+
+  correctGuess() {
+    noise(0.05, 0.16);
+    playTone(440,  'triangle', 0.10, 0.20);
+    playTone(659,  'sine',     0.12, 0.17, 0.07);
+    playTone(880,  'sine',     0.10, 0.15, 0.14);
+    playTone(1046, 'sine',     0.08, 0.13, 0.21);
+  },
+
+  wrongGuess() {
+    playTone(440, 'triangle', 0.10, 0.09);
+    playTone(330, 'triangle', 0.09, 0.08, 0.08);
+    noise(0.06, 0.05, 0.04);
+  },
+
+  secretView() {
+    playTone(880,  'sine', 0.14, 0.07);
+    playTone(1100, 'sine', 0.12, 0.06, 0.07);
+    playTone(1320, 'sine', 0.10, 0.05, 0.14);
+    noise(0.07, 0.04, 0.04);
+  },
+
+  errorInvalid() {
+    cd('error', 300, () => {
+      playTone(200, 'sawtooth', 0.09, 0.13);
+      playTone(185, 'sawtooth', 0.07, 0.11, 0.05);
+    });
   },
 };
 

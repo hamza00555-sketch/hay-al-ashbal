@@ -133,7 +133,7 @@ function FlyingCard({ card, fromRect, toRect, onDone }) {
     const ex = toRect.left   + toRect.width    / 2 - W / 2;
     const ey = toRect.top    + toRect.height   / 2 - H / 2;
 
-    const DURATION = 950;
+    const DURATION = 780;
     let startTs = null;
     let raf;
 
@@ -240,6 +240,24 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
     }
     const [next, ...rest] = q;
     beatQueueRef.current = rest;
+    switch (next.type) {
+      case 'AI_THINKING':       SFX.panelPop();                                           break;
+      case 'CARD_ANTICIPATE':   SFX.panelPop();                                           break;
+      case 'COMPARE_REVEAL':    SFX.compareReveal();                                      break;
+      case 'FORCE_RESULT':      SFX.forceDiscard();                                       break;
+      case 'SWAP_VISUAL':       SFX.swapVisual();                                         break;
+      case 'PROTECTION_FLASH':  SFX.protectionFlash();                                    break;
+      case 'ELIMINATION':       SFX.eliminate();                                          break;
+      case 'CARD_IMPACT': {
+        SFX.panelPop();
+        const { hit, card: c } = next.payload;
+        if (hit)                SFX.correctGuess();
+        else if (c?.id === 1)   SFX.wrongGuess();
+        else if (c?.id === 2)   SFX.secretView();
+        break;
+      }
+      default: break;
+    }
     setCurrentBeat(next);
     if (next.durationMs > 0) {
       narrativeTimer.current = setTimeout(kickQueue, next.durationMs);
@@ -295,12 +313,13 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       ? true                          // Pass & Play: human always confirms
       : cp.id === humanPlayer?.id;    // vsAI: only when it's the human's turn
 
+    if (isMe) SFX.turnHuman(); else SFX.turnAI();
     setTurnAnnounce({ name: cp.name, profile: cp.profile, isMe, isAI: cp.isAI });
 
-    // AI turns: auto-dismiss after 2.2s
+    // AI turns: auto-dismiss after 1.6s
     if (cp.isAI) {
       clearTimeout(announceTimer.current);
-      announceTimer.current = setTimeout(() => setTurnAnnounce(null), 2200);
+      announceTimer.current = setTimeout(() => setTurnAnnounce(null), 1600);
     }
   }, [gs.currentPlayerIndex, gs.phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -329,7 +348,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       setTimeout(() => {
         setWinFlash(false);
         onGameOver({ winner: gs.winner, players: gs.players, log: gs.gameLog });
-      }, 1400);
+      }, 1000);
       return;
     }
 
@@ -359,7 +378,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       const t = setTimeout(() => {
         setIsDrawing(false);
         setGs(doDrawCard);
-      }, 1100);
+      }, 750);
       return () => clearTimeout(t);
     }
   }, [gs.phase, gs.currentPlayerIndex, turnAnnounce]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -367,7 +386,11 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   // ── Handlers ─────────────────────────────────────────────────
   const handleCardClick = useCallback((source) => {
     if (isLocked) return;
-    if (!legalPlays.includes(source)) return;
+    if (!legalPlays.includes(source)) {
+      SFX.errorInvalid();
+      haptic([15]);
+      return;
+    }
 
     if (focusedSource === source) {
       const card       = source === 'hand' ? currentPlayer.hand[0] : gs.drawnCard;
@@ -706,7 +729,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       )}
 
       {/* ── Narrative overlay ── */}
-      <NarrativeOverlay beat={currentBeat} onConfirm={kickQueue} players={gs.players} />
+      <NarrativeOverlay beat={currentBeat} onConfirm={() => { SFX.confirmOk(); kickQueue(); }} players={gs.players} />
 
       {/* ── Action modal ── */}
       {showAction && pendingPlay && (
