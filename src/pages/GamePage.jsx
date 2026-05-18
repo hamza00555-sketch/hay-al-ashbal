@@ -193,9 +193,14 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   const beatQueueRef  = useRef([]);
   const narrativeTimer = useRef(null);
 
-  // TurnBanner
+  // TurnBanner (brief flash)
   const [turnBanner, setTurnBanner]   = useState(null);
   const prevPlayerIdxRef = useRef(-1);
+
+  // TurnAnnounce: full-screen "دور علي" before each turn
+  const [turnAnnounce, setTurnAnnounce] = useState(null);
+  const isFirstTurnRef  = useRef(true);
+  const announceTimer   = useRef(null);
 
   const prevDrawnRef  = useRef(null);
   const handCardRef   = useRef(null);
@@ -251,6 +256,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   // Cleanup timers on unmount
   useEffect(() => () => {
     clearTimeout(narrativeTimer.current);
+    clearTimeout(announceTimer.current);
   }, []);
 
   // Track newly eliminated players for animation + haptic
@@ -270,16 +276,31 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
     }
   }, [gs.players]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── TurnBanner: flash when current player changes ────────────
+  // ── TurnAnnounce: full-screen before each turn ───────────────
   useEffect(() => {
     if (gs.currentPlayerIndex === prevPlayerIdxRef.current) return;
     if (gs.phase === 'GAME_OVER') return;
     prevPlayerIdxRef.current = gs.currentPlayerIndex;
+
     const cp = gs.players[gs.currentPlayerIndex];
-    if (cp && !cp.isEliminated) {
-      setTurnBanner(cp.isAI ? `دور ${cp.name}` : 'دورك!');
-      const t = setTimeout(() => setTurnBanner(null), 2200);
-      return () => clearTimeout(t);
+    if (!cp || cp.isEliminated) return;
+
+    // Skip announce on first turn (game just started)
+    if (isFirstTurnRef.current) {
+      isFirstTurnRef.current = false;
+      return;
+    }
+
+    const isMe = !hasAI
+      ? true                          // Pass & Play: human always confirms
+      : cp.id === humanPlayer?.id;    // vsAI: only when it's the human's turn
+
+    setTurnAnnounce({ name: cp.name, profile: cp.profile, isMe, isAI: cp.isAI });
+
+    // AI turns: auto-dismiss after 1.4s
+    if (cp.isAI) {
+      clearTimeout(announceTimer.current);
+      announceTimer.current = setTimeout(() => setTurnAnnounce(null), 1400);
     }
   }, [gs.currentPlayerIndex, gs.phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -298,6 +319,8 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
 
   // ── Main phase driver ────────────────────────────────────────
   useEffect(() => {
+    if (turnAnnounce) return; // wait until announcement is dismissed
+
     if (gs.phase === 'GAME_OVER') {
       SFX.win();
       haptic([20, 10, 20, 10, 40]);
@@ -339,7 +362,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       }, 700);
       return () => clearTimeout(t);
     }
-  }, [gs.phase, gs.currentPlayerIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [gs.phase, gs.currentPlayerIndex, turnAnnounce]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Handlers ─────────────────────────────────────────────────
   const handleCardClick = useCallback((source) => {
@@ -446,6 +469,35 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
 
   // ── Render guards ────────────────────────────────────────────
   if (gs.phase === 'GAME_OVER') return null;
+
+  // Turn announcement screen
+  if (turnAnnounce) {
+    return (
+      <div
+        className={[styles.announceOverlay, turnAnnounce.isMe ? styles.announceMine : styles.announceAI].join(' ')}
+        onClick={turnAnnounce.isMe ? () => setTurnAnnounce(null) : undefined}
+      >
+        <div className={styles.announceCard}>
+          <Portrait
+            profile={turnAnnounce.profile}
+            size="human"
+            isActive={false}
+            isEliminated={false}
+          />
+          <h2 className={styles.announceName}>
+            {turnAnnounce.isMe ? 'دورك!' : `دور ${turnAnnounce.name}`}
+          </h2>
+          {turnAnnounce.isMe ? (
+            <button className={styles.announceTapBtn} onClick={() => setTurnAnnounce(null)}>
+              ابدأ دورك ▶
+            </button>
+          ) : (
+            <p className={styles.announceWait}>يبدأ خلال ثانية...</p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (gs.phase === 'HAND_COVER') {
     return (

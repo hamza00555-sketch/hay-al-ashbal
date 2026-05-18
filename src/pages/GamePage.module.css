@@ -1,3 +1,81 @@
+/* ── Turn Announce Screen ────────────────────────────────────── */
+.announceOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 32px 24px;
+  animation: announceFadeIn 0.25s ease;
+}
+
+@keyframes announceFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.announceMine {
+  background: linear-gradient(160deg, #FFF9E6 0%, #FFF3CC 100%);
+}
+
+.announceAI {
+  background: linear-gradient(160deg, #EAF2FB 0%, #d5e8f5 100%);
+}
+
+.announceCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  animation: announceCardPop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes announceCardPop {
+  from { transform: scale(0.85) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0);        opacity: 1; }
+}
+
+.announceName {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #1F3D5A;
+  margin: 0;
+}
+
+.announceTapBtn {
+  background: #FFC83D;
+  border: none;
+  border-radius: 20px;
+  color: #1F3D5A;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 16px 40px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255,200,61,0.4);
+  transition: opacity 0.15s, transform 0.12s;
+  min-width: 200px;
+  animation: tapBtnPulse 1.4s ease-in-out infinite alternate;
+}
+.announceTapBtn:hover   { opacity: 0.92; transform: translateY(-2px); }
+.announceTapBtn:active  { transform: scale(0.97); }
+
+@keyframes tapBtnPulse {
+  from { box-shadow: 0 6px 20px rgba(255,200,61,0.3); }
+  to   { box-shadow: 0 6px 28px rgba(255,200,61,0.6); }
+}
+
+.announceWait {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.9rem;
+  color: #6B7A8A;
+  margin: 0;
+  animation: phasePulse 1s ease-in-out infinite alternate;
+}
+
 /* ── Board: CSS Grid ─────────────────────────────────────────── */
 .board {
   min-height: 100dvh;
