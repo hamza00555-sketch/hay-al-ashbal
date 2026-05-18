@@ -11,19 +11,25 @@
 /* ── Design Tokens ───────────────────────────────────────────── */
 :root {
   /* Colors */
-  --color-bg-deep:    #0b1b2d;
-  --color-bg-mid:     #1a3a5c;
-  --color-bg-surface: rgba(255,255,255,0.06);
-  --color-border:     rgba(255,255,255,0.15);
-  --color-text:       #ffffff;
-  --color-text-dim:   rgba(255,255,255,0.45);
-  --color-text-muted: rgba(255,255,255,0.25);
-  --color-gold:       #FFD700;
-  --color-gold-dim:   rgba(255,215,0,0.35);
-  --color-blue:       #60b8ff;
-  --color-red:        rgba(255,80,80,0.8);
-  --color-green:      rgba(20,70,45,0.22);
-  --color-shield:     #90caf9;
+  --color-bg-deep:    #EAF2FB;
+  --color-bg-mid:     #d0e6f7;
+  --color-bg-surface: rgba(255,255,255,0.8);
+  --color-border:     rgba(86,130,178,0.2);
+  --color-text:       #1F3D5A;
+  --color-text-dim:   #6B7A8A;
+  --color-text-muted: rgba(31,61,90,0.4);
+  --color-gold:       #FFC83D;
+  --color-gold-dim:   rgba(255,200,61,0.3);
+  --color-blue:       #5682B2;
+  --color-red:        #FF8888;
+  --color-green:      #7CCB8A;
+  --color-shield:     #5682B2;
+
+  /* New tokens */
+  --color-cream:   #FFF6E5;
+  --color-panel:   #F7FAFF;
+  --color-accent:  #FFC83D;
+  --color-primary: #5682B2;
 
   /* Typography */
   --font:             'Zanjabeel', sans-serif;
@@ -44,9 +50,9 @@
   --radius-full: 50%;
 
   /* Shadows */
-  --shadow-card: 0 4px 16px rgba(0,0,0,0.5);
+  --shadow-card: 0 4px 20px rgba(86,130,178,0.15);
   --shadow-glow-gold: 0 0 0 2px var(--color-gold), 0 0 18px 4px var(--color-gold-dim);
-  --shadow-glow-blue: 0 0 0 3px var(--color-blue), 0 16px 40px rgba(0,0,0,0.75);
+  --shadow-glow-blue: 0 0 0 3px var(--color-blue), 0 16px 40px rgba(86,130,178,0.3);
 
   /* Durations */
   --dur-fast:   150ms;
@@ -69,8 +75,8 @@
 }
 
 html, body {
-  background: #1a3a5c;
-  color: #fff;
+  background: #EAF2FB;
+  color: #1F3D5A;
   font-family: 'Zanjabeel', sans-serif;
   direction: rtl;
   overflow-x: hidden;

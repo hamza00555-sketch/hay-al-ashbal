@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(31,61,90,0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,17 +28,18 @@
   to   { transform: translateY(0);    opacity: 1 }
 }
 
-.cardArea { filter: drop-shadow(0 8px 24px rgba(0,0,0,0.6)); }
+.cardArea { filter: drop-shadow(0 8px 24px rgba(86,130,178,0.25)); }
 
 .info {
   width: 100%;
-  background: #0d2340;
-  border: 2px solid #aaa;
-  border-radius: 14px;
+  background: #F7FAFF;
+  border: 1.5px solid rgba(86,130,178,0.2);
+  border-radius: 18px;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-shadow: 0 8px 32px rgba(86,130,178,0.15);
 }
 
 .header {
@@ -60,21 +61,22 @@
   font-family: 'Zanjabeel', sans-serif;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #fff;
+  color: #1F3D5A;
 }
 
 .role {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.8rem;
   font-weight: 500;
-  opacity: 0.85;
+  opacity: 0.7;
+  color: #6B7A8A;
 }
 
 .power {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.95rem;
   font-weight: 900;
-  color: #fff;
+  color: #1F3D5A;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -82,19 +84,21 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: rgba(255,200,61,0.15);
 }
 
 .ability {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.88rem;
-  color: #ffd700;
+  color: #5682B2;
   margin: 0;
+  font-weight: 600;
 }
 
 .desc {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.82rem;
-  color: rgba(255,255,255,0.65);
+  color: #6B7A8A;
   margin: 0;
   line-height: 1.5;
 }
@@ -103,9 +107,9 @@
   position: absolute;
   top: -10px;
   left: -10px;
-  background: rgba(255,255,255,0.12);
-  border: none;
-  color: #fff;
+  background: rgba(255,255,255,0.95);
+  border: 1.5px solid rgba(86,130,178,0.2);
+  color: #1F3D5A;
   font-size: 1rem;
   width: 32px;
   height: 32px;
@@ -114,4 +118,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(86,130,178,0.1);
 }

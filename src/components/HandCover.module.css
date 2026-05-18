@@ -1,7 +1,7 @@
 .cover {
   position: fixed;
   inset: 0;
-  background: #0e2440;
+  background: linear-gradient(160deg, #EAF2FB 0%, #FFF6E5 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,37 +18,39 @@
 }
 
 .eyeOff {
-  font-size: 3.5rem;
+  font-size: 4rem;
+  filter: drop-shadow(0 4px 12px rgba(86,130,178,0.2));
 }
 
 .pass {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 1.1rem;
-  color: rgba(255,255,255,0.55);
+  color: #6B7A8A;
   margin: 0;
 }
 
 .name {
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: 900;
-  color: #fff;
+  color: #1F3D5A;
   margin: 0;
 }
 
 .revealBtn {
-  margin-top: 16px;
-  background: rgba(255,255,255,0.08);
-  border: 2px solid rgba(255,255,255,0.35);
-  border-radius: 14px;
-  color: #fff;
+  margin-top: 20px;
+  background: #FFC83D;
+  border: none;
+  border-radius: 20px;
+  color: #1F3D5A;
   font-family: 'Zanjabeel', sans-serif;
   font-size: 1.1rem;
   font-weight: 700;
-  padding: 14px 36px;
+  padding: 16px 40px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: opacity 0.15s, transform 0.12s;
+  box-shadow: 0 6px 20px rgba(255,200,61,0.4);
+  min-width: 220px;
 }
-.revealBtn:hover {
-  background: rgba(255,255,255,0.15);
-}
+.revealBtn:hover { opacity: 0.92; transform: translateY(-2px); }
+.revealBtn:active { transform: translateY(0); }

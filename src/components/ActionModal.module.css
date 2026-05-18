@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(31,61,90,0.4);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -10,9 +10,9 @@
 }
 
 .modal {
-  background: #0e2440;
-  border: 1.5px solid rgba(255,255,255,0.15);
-  border-radius: 20px 20px 0 0;
+  background: #F7FAFF;
+  border: 1.5px solid rgba(86,130,178,0.2);
+  border-radius: 24px 24px 0 0;
   padding: 24px 20px 32px;
   width: 100%;
   max-width: 480px;
@@ -20,13 +20,14 @@
   flex-direction: column;
   gap: 16px;
   align-items: center;
+  box-shadow: 0 -8px 40px rgba(86,130,178,0.15);
 }
 
 .prompt {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #fff;
+  color: #1F3D5A;
   text-align: center;
   margin: 0;
 }
@@ -34,7 +35,7 @@
 .subPrompt {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.9rem;
-  color: rgba(255,255,255,0.55);
+  color: #6B7A8A;
   margin: 0;
 }
 
@@ -46,19 +47,21 @@
 }
 
 .targetBtn {
-  background: rgba(255,255,255,0.07);
-  border: 1.5px solid rgba(255,255,255,0.2);
-  border-radius: 10px;
-  color: #fff;
+  background: rgba(255,255,255,0.9);
+  border: 1.5px solid rgba(86,130,178,0.2);
+  border-radius: 12px;
+  color: #1F3D5A;
   font-family: 'Zanjabeel', sans-serif;
   font-size: 1rem;
   padding: 10px 20px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(86,130,178,0.06);
 }
 .targetBtn:hover, .targetBtn.active {
-  background: rgba(255,255,255,0.15);
-  border-color: #fff;
+  background: #fff;
+  border-color: #5682B2;
+  box-shadow: 0 4px 14px rgba(86,130,178,0.15);
 }
 
 .cardGrid {
@@ -77,20 +80,23 @@
 }
 
 .btn {
-  background: rgba(255,255,255,0.1);
-  border: 1.5px solid rgba(255,255,255,0.3);
-  border-radius: 10px;
-  color: #fff;
+  background: #FFC83D;
+  border: none;
+  border-radius: 16px;
+  color: #1F3D5A;
   font-family: 'Zanjabeel', sans-serif;
   font-size: 1rem;
   font-weight: 700;
-  padding: 12px 32px;
+  padding: 14px 40px;
   cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255,200,61,0.3);
+  transition: opacity 0.15s;
 }
+.btn:hover { opacity: 0.92; }
 
 .noTarget {
   font-family: 'Zanjabeel', sans-serif;
-  color: rgba(255,255,255,0.5);
+  color: #6B7A8A;
   text-align: center;
   margin: 0;
 }

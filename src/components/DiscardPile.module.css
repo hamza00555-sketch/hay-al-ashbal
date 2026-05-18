@@ -8,7 +8,7 @@
 .label {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.68rem;
-  color: rgba(255,255,255,0.3);
+  color: #6B7A8A;
 }
 
 .fan {
@@ -28,12 +28,12 @@
 .empty {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.7rem;
-  color: rgba(255,255,255,0.18);
+  color: rgba(86,130,178,0.35);
   width: 78px;
   height: 117px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px dashed rgba(255,255,255,0.1);
+  border: 1.5px dashed rgba(86,130,178,0.2);
   border-radius: 10px;
 }

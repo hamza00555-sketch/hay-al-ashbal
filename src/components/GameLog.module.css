@@ -10,11 +10,12 @@
 .entry {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.5);
+  color: #6B7A8A;
   text-align: center;
   line-height: 1.4;
 }
 .entry:first-child {
-  color: rgba(255,255,255,0.85);
+  color: #1F3D5A;
   font-size: 0.82rem;
+  font-weight: 600;
 }

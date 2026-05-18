@@ -5,9 +5,9 @@
 }
 
 .avatar {
-  border: 2.5px solid var(--frame-color, #60b8ff);
+  border: 2.5px solid var(--frame-color, #5682B2);
   overflow: hidden;
-  background: #0b1b2d;
+  background: #EAF2FB;
   display: flex;
   align-items: center;
   justify-content: center;

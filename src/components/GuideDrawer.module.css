@@ -1,7 +1,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(31,61,90,0.35);
   z-index: var(--z-modal, 100);
   display: flex;
   justify-content: flex-end;
@@ -10,12 +10,13 @@
 .drawer {
   width: min(320px, 90vw);
   height: 100%;
-  background: rgba(8, 18, 38, 0.98);
-  border-left: 1px solid rgba(100,180,255,0.2);
+  background: #F7FAFF;
+  border-left: 1px solid rgba(86,130,178,0.2);
   display: flex;
   flex-direction: column;
   animation: slideIn 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+  box-shadow: -8px 0 40px rgba(86,130,178,0.15);
 }
 
 @keyframes slideIn {
@@ -28,29 +29,30 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 18px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(86,130,178,0.12);
   flex-shrink: 0;
+  background: rgba(255,255,255,0.7);
 }
 
 .title {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 1.1rem;
   font-weight: 700;
-  color: #fff;
+  color: #1F3D5A;
 }
 
 .closeBtn {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(86,130,178,0.07);
+  border: 1px solid rgba(86,130,178,0.2);
   border-radius: 50%;
-  color: rgba(255,255,255,0.6);
+  color: #5682B2;
   font-size: 0.9rem;
   width: 30px; height: 30px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s;
 }
-.closeBtn:hover { background: rgba(255,255,255,0.14); }
+.closeBtn:hover { background: rgba(86,130,178,0.14); }
 
 .list {
   overflow-y: auto;
@@ -64,7 +66,7 @@
   align-items: flex-start;
   gap: 12px;
   padding: 10px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(86,130,178,0.08);
 }
 .item:last-child { border-bottom: none; }
 
@@ -78,12 +80,12 @@
   bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(8,18,38,0.9);
-  border: 1px solid rgba(255,215,0,0.4);
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(255,200,61,0.5);
   border-radius: 8px;
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.68rem;
-  color: var(--color-gold, #FFD700);
+  color: #1F3D5A;
   padding: 1px 5px;
   white-space: nowrap;
 }
@@ -100,12 +102,12 @@
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.82rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.85);
+  color: #1F3D5A;
 }
 
 .ability {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.72rem;
-  color: rgba(255,255,255,0.5);
+  color: #6B7A8A;
   line-height: 1.55;
 }
