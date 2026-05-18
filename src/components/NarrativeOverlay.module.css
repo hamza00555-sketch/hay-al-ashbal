@@ -363,3 +363,74 @@
   padding: 5px 10px;
   line-height: 1.5;
 }
+
+/* ── Compare slide-in ── */
+.compareSlot:first-child {
+  animation: slideInFromRight 0.32s ease-out;
+}
+.compareSlot:last-child {
+  animation: slideInFromLeft 0.32s ease-out;
+}
+@keyframes slideInFromRight {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes slideInFromLeft {
+  from { transform: translateX(-40px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+/* ── Swap cards ── */
+.swapCards {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+.swapCard1 {
+  animation: swapMove1 0.72s cubic-bezier(0.4, 0, 0.2, 1) 0.05s both;
+}
+.swapCard2 {
+  animation: swapMove2 0.72s cubic-bezier(0.4, 0, 0.2, 1) 0.05s both;
+}
+@keyframes swapMove1 {
+  0%   { transform: translateX(0)    translateY(0);     }
+  45%  { transform: translateX(38px) translateY(-18px); }
+  100% { transform: translateX(56px) translateY(0);     }
+}
+@keyframes swapMove2 {
+  0%   { transform: translateX(0)     translateY(0);    }
+  45%  { transform: translateX(-38px) translateY(18px); }
+  100% { transform: translateX(-56px) translateY(0);    }
+}
+
+/* ── Protection particles ── */
+.shieldWrap {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.shieldParticles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #5682B2;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  animation: particleBurst 0.65s ease-out 0.18s forwards;
+  transform: translate(-50%, -50%) rotate(var(--ang)) translateY(0) scale(0);
+}
+@keyframes particleBurst {
+  0%   { transform: translate(-50%,-50%) rotate(var(--ang)) translateY(0px)  scale(0);   opacity: 1; }
+  60%  { transform: translate(-50%,-50%) rotate(var(--ang)) translateY(-32px) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%,-50%) rotate(var(--ang)) translateY(-42px) scale(0);   opacity: 0; }
+}

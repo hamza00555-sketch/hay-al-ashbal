@@ -1,4 +1,4 @@
-import { CardFace } from './Card';
+import { CardFace, CardBack } from './Card';
 import PlayerAvatar from './PlayerAvatar';
 import styles from './NarrativeOverlay.module.css';
 
@@ -54,6 +54,7 @@ function AvatarRow({ players, actorId, targetId }) {
 export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
   if (!beat) return null;
   const { type, payload } = beat;
+  if (type === 'HIT_PAUSE') return null;
 
   return (
     <div className={styles.overlay}>
@@ -169,8 +170,11 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
         {type === 'SWAP_VISUAL' && (
           <>
             <AvatarRow players={players} actorId={payload.actorId} targetId={payload.targetId} />
-            <span className={styles.swapArrows}>⇄</span>
-            <span className={styles.ability}>الكرتين تبدّلا!</span>
+            <div className={styles.swapCards}>
+              <div className={styles.swapCard1}><CardBack size="small" /></div>
+              <div className={styles.swapCard2}><CardBack size="small" /></div>
+            </div>
+            <span className={styles.ability}>الكرتين تبدّلا! 🔀</span>
             <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>
           </>
         )}
@@ -178,7 +182,14 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
         {type === 'PROTECTION_FLASH' && (
           <>
             <AvatarRow players={players} actorId={payload.actorId} />
-            <div className={styles.shieldAnim}>🛡️</div>
+            <div className={styles.shieldWrap}>
+              <div className={styles.shieldParticles}>
+                {[0,1,2,3,4,5,6,7].map(i => (
+                  <span key={i} className={styles.particle} style={{ '--ang': `${i * 45}deg` }} />
+                ))}
+              </div>
+              <div className={styles.shieldAnim}>🛡️</div>
+            </div>
             <span className={styles.cardName}>{payload.actorName} محمي الآن</span>
             <span className={styles.ability}>لا يمكن استهدافه حتى دوره القادم</span>
             <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>

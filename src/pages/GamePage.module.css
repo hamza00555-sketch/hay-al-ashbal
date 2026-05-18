@@ -800,3 +800,50 @@
   transition: opacity 0.15s;
 }
 .peekDone:hover { opacity: 0.9; }
+
+/* ── Card kick-back anticipation ─────────────────────────────── */
+.cardKickBack {
+  animation: kickBack 0.07s ease-out;
+}
+@keyframes kickBack {
+  0%   { transform: translateY(0);   }
+  60%  { transform: translateY(-8px) scale(1.04); }
+  100% { transform: translateY(-4px) scale(1.02); }
+}
+
+/* ── Impact flash ─────────────────────────────────────────────── */
+.impactFlash {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 200, 61, 0.28);
+  pointer-events: none;
+  z-index: 199;
+  animation: impactFlashAnim 0.15s ease-out forwards;
+}
+@keyframes impactFlashAnim {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Win confetti ─────────────────────────────────────────────── */
+.confettiWrap {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 301;
+  overflow: hidden;
+}
+.confettiPiece {
+  position: absolute;
+  width: 9px;
+  height: 13px;
+  top: -20px;
+  left: calc(var(--i) * 7.2% + 1%);
+  background: hsl(calc(var(--i) * 26deg), 80%, 58%);
+  border-radius: 2px;
+  animation: confettiFall calc(0.85s + var(--i) * 0.04s) ease-in calc(var(--i) * 0.055s) forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(0)    rotate(0deg);               opacity: 1; }
+  100% { transform: translateY(110vh) rotate(calc(var(--i) * 55deg)); opacity: 0; }
+}

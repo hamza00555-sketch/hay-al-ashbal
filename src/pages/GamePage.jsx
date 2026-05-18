@@ -186,6 +186,8 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   const [flyState, setFlyState]           = useState(null);
   const [drawnFlipping, setDrawnFlipping] = useState(false);
   const [isDrawing, setIsDrawing]         = useState(false);
+  const [kickBackSource, setKickBackSource] = useState(null);
+  const [impactFlash,    setImpactFlash]    = useState(false);
 
   // ── Narrative queue ──────────────────────────────────────────
   const [currentBeat, setCurrentBeat] = useState(null);
@@ -247,13 +249,22 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       case 'FORCE_RESULT':      SFX.forceDiscard();                                       break;
       case 'SWAP_VISUAL':       SFX.swapVisual();                                         break;
       case 'PROTECTION_FLASH':  SFX.protectionFlash();                                    break;
-      case 'ELIMINATION':       SFX.eliminate();                                          break;
+      case 'HIT_PAUSE':                                                                   break;
+      case 'ELIMINATION':
+        SFX.eliminate();
+        setImpactFlash(true);
+        setTimeout(() => setImpactFlash(false), 150);
+        break;
       case 'CARD_IMPACT': {
         SFX.panelPop();
         const { hit, card: c } = next.payload;
-        if (hit)                SFX.correctGuess();
-        else if (c?.id === 1)   SFX.wrongGuess();
-        else if (c?.id === 2)   SFX.secretView();
+        if (hit) {
+          SFX.correctGuess();
+          setImpactFlash(true);
+          setTimeout(() => setImpactFlash(false), 150);
+        }
+        else if (c?.id === 1) SFX.wrongGuess();
+        else if (c?.id === 2) SFX.secretView();
         break;
       }
       default: break;
@@ -422,11 +433,15 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
         setFocusedSource(null);
       };
 
-      if (fromRect && toRect) {
-        setFlyState({ card, source, fromRect, toRect, onDone: doPlay });
-      } else {
-        doPlay();
-      }
+      setKickBackSource(source);
+      setTimeout(() => {
+        setKickBackSource(null);
+        if (fromRect && toRect) {
+          setFlyState({ card, source, fromRect, toRect, onDone: doPlay });
+        } else {
+          doPlay();
+        }
+      }, 70);
     } else {
       SFX.cardSelect();
       haptic([6]);
@@ -558,8 +573,16 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   return (
     <div className={styles.board} onClick={() => focusedSource && setFocusedSource(null)}>
 
-      {/* Win flash overlay */}
+      {/* Win flash + confetti */}
       {winFlash && <div className={styles.winFlash} />}
+      {winFlash && (
+        <div className={styles.confettiWrap}>
+          {Array.from({ length: 14 }, (_, i) => (
+            <span key={i} className={styles.confettiPiece} style={{ '--i': i }} />
+          ))}
+        </div>
+      )}
+      {impactFlash && <div className={styles.impactFlash} />}
 
       <button className={styles.musicBtn} onClick={toggleMusic}>
         {musicOn ? '🔊' : '🔇'}
@@ -676,6 +699,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
                 dimmed={gs.phase === 'PLAY' && !legalPlays.includes('hand')}
                 playable={gs.phase === 'PLAY' && !isLocked}
                 hidden={flyState?.source === 'hand'}
+                kickingBack={kickBackSource === 'hand'}
                 cardRef={handCardRef}
                 onCardClick={handleCardClick}
                 onInfoClick={handleInfoClick}
@@ -691,6 +715,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
                   flipping={drawnFlipping}
                   onFlipDone={() => setDrawnFlipping(false)}
                   hidden={flyState?.source === 'drawn'}
+                  kickingBack={kickBackSource === 'drawn'}
                   cardRef={drawnCardRef}
                   onCardClick={handleCardClick}
                   onInfoClick={handleInfoClick}
@@ -753,12 +778,16 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
 // ── Card Slot ────────────────────────────────────────────────────
 function CardSlot({ label, card, source, focused, dimmed, playable,
                     flipping, onFlipDone, onCardClick, onInfoClick,
-                    cardRef, hidden }) {
+                    cardRef, hidden, kickingBack }) {
   return (
     <div className={styles.cardSlot}>
       <span className={styles.cardLabel}>{label}</span>
       <div
-        className={`${styles.cardWithInfo} ${hidden ? styles.cardHidden : ''}`}
+        className={[
+          styles.cardWithInfo,
+          hidden      ? styles.cardHidden   : '',
+          kickingBack ? styles.cardKickBack : '',
+        ].join(' ')}
         ref={cardRef}
       >
         {flipping ? (

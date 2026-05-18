@@ -29,10 +29,12 @@ export function buildNarrative({
   switch (card.id) {
     case 1: { // GUESS
       const hit = newlyEliminated.some(p => p.id === targetId);
+      if (hit) beats.push(beat('HIT_PAUSE', {}, 75));
       beats.push(beat('CARD_IMPACT', { card, actorName, actorId, targetName, targetId, hit, isAI }, 0));
-      newlyEliminated.forEach(p =>
-        beats.push(beat('ELIMINATION', { playerName: p.name, playerId: p.id }, 0))
-      );
+      newlyEliminated.forEach(p => {
+        beats.push(beat('HIT_PAUSE', {}, 75));
+        beats.push(beat('ELIMINATION', { playerName: p.name, playerId: p.id }, 0));
+      });
       break;
     }
     case 2: { // PEEK
@@ -47,9 +49,10 @@ export function buildNarrative({
         targetName, targetId, targetCard: targetCardBefore,
         eliminatedName: newlyEliminated[0]?.name ?? null,
       }, 0));
-      newlyEliminated.forEach(p =>
-        beats.push(beat('ELIMINATION', { playerName: p.name, playerId: p.id }, 0))
-      );
+      newlyEliminated.forEach(p => {
+        beats.push(beat('HIT_PAUSE', {}, 75));
+        beats.push(beat('ELIMINATION', { playerName: p.name, playerId: p.id }, 0));
+      });
       break;
     }
     case 4: { // PROTECT
@@ -63,9 +66,10 @@ export function buildNarrative({
         discardedCard: targetCardBefore,
         wasEliminated,
       }, 0));
-      newlyEliminated.forEach(p =>
-        beats.push(beat('ELIMINATION', { playerName: p.name, playerId: p.id }, 0))
-      );
+      newlyEliminated.forEach(p => {
+        beats.push(beat('HIT_PAUSE', {}, 75));
+        beats.push(beat('ELIMINATION', { playerName: p.name, playerId: p.id }, 0));
+      });
       break;
     }
     case 6: { // SWAP
@@ -77,6 +81,7 @@ export function buildNarrative({
       break;
     }
     case 8: { // STAR — auto-eliminated
+      beats.push(beat('HIT_PAUSE', {}, 75));
       beats.push(beat('ELIMINATION', { playerName: actorName, playerId: actorId }, 0));
       break;
     }
