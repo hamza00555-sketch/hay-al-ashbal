@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import MenuPage            from './pages/MenuPage';
-import LobbyPage           from './pages/LobbyPage';
-import CharacterSelectPage from './pages/CharacterSelectPage';
-import GamePage            from './pages/GamePage';
-import ResultPage          from './pages/ResultPage';
-import RoundOverScreen     from './pages/RoundOverScreen';
-import { assignCharacters } from './constants/characters';
+import MenuPage        from './pages/MenuPage';
+import LobbyPage       from './pages/LobbyPage';
+import GamePage        from './pages/GamePage';
+import ResultPage      from './pages/ResultPage';
+import RoundOverScreen from './pages/RoundOverScreen';
+import SettingsPage    from './pages/SettingsPage';
 
 export default function App() {
   const [screen,       setScreen]       = useState('menu');
   const [gameConfig,   setGameConfig]   = useState(null);
-  const [pendingConfig, setPendingConfig] = useState(null); // config waiting for character select
   const [tokens,       setTokens]       = useState({});
   const [tokensToWin,  setTokensToWin]  = useState(3);
   const [roundResult,  setRoundResult]  = useState(null);
@@ -19,19 +17,11 @@ export default function App() {
   const [roundNumber,  setRoundNumber]  = useState(1);
 
   function handleLobbyReady(config) {
-    setPendingConfig(config);
-    setScreen('character_select');
-  }
-
-  function handleCharacterSelect(characterId) {
-    const playersWithChars = assignCharacters(pendingConfig.players, characterId);
-    const finalConfig = { ...pendingConfig, players: playersWithChars };
-    setGameConfig(finalConfig);
-    setTokensToWin(finalConfig.tokensToWin ?? 3);
+    setGameConfig(config);
+    setTokensToWin(config.tokensToWin ?? 3);
     setTokens({});
     setRoundNumber(1);
     setRoundKey(k => k + 1);
-    setPendingConfig(null);
     setScreen('game');
   }
 
@@ -62,18 +52,18 @@ export default function App() {
   return (
     <div dir="rtl">
       {screen === 'menu' && (
-        <MenuPage onStart={() => setScreen('lobby')} />
+        <MenuPage
+          onStart={() => setScreen('lobby')}
+          onSettings={() => setScreen('settings')}
+        />
+      )}
+      {screen === 'settings' && (
+        <SettingsPage onBack={() => setScreen('menu')} />
       )}
       {screen === 'lobby' && (
         <LobbyPage
           onBack={() => setScreen('menu')}
           onStartGame={handleLobbyReady}
-        />
-      )}
-      {screen === 'character_select' && (
-        <CharacterSelectPage
-          onBack={() => setScreen('lobby')}
-          onConfirm={handleCharacterSelect}
         />
       )}
       {screen === 'game' && (

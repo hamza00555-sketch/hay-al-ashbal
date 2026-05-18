@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { loadProfile, getAIProfile } from '../utils/playerProfile';
 import styles from './LobbyPage.module.css';
 
 const MODES = [
@@ -53,15 +54,25 @@ export default function LobbyPage({ onBack, onStartGame }) {
   }
 
   function startGame() {
+    const humanProfile = loadProfile();
     let finalPlayers;
     if (mode === 'vsai') {
-      const aiPlayers = AI_NAMES.slice(0, aiCount).map(name => ({ name, isAI: true, difficulty }));
+      const aiPlayers = AI_NAMES.slice(0, aiCount).map((name, i) => ({
+        name,
+        isAI: true,
+        difficulty,
+        profile: getAIProfile(i),
+      }));
       finalPlayers = [
-        { name: players[0].name.trim() || 'اللاعب', isAI: false },
+        { name: players[0].name.trim() || 'اللاعب', isAI: false, profile: humanProfile },
         ...aiPlayers,
       ];
     } else {
-      finalPlayers = players.map(p => ({ name: p.name.trim() || 'لاعب', isAI: false }));
+      finalPlayers = players.map((p, i) => ({
+        name: p.name.trim() || 'لاعب',
+        isAI: false,
+        profile: i === 0 ? humanProfile : getAIProfile(i - 1),
+      }));
     }
     onStartGame({ mode, players: finalPlayers, tokensToWin });
   }

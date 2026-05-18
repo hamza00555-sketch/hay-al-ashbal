@@ -1,6 +1,6 @@
 import styles from './MenuPage.module.css';
 
-export default function MenuPage({ onStart }) {
+export default function MenuPage({ onStart, onSettings }) {
   return (
     <div className={styles.page}>
       <div className={styles.content}>
@@ -15,6 +15,9 @@ export default function MenuPage({ onStart }) {
         <div className={styles.buttons}>
           <button className={styles.startBtn} onClick={onStart}>
             ابدأ اللعب
+          </button>
+          <button className={styles.settingsBtn} onClick={onSettings}>
+            ⚙ الملف الشخصي
           </button>
         </div>
 

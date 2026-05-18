@@ -1,0 +1,35 @@
+.outerWrap {
+  display: inline-flex;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--frame-color, #60b8ff) 55%, transparent));
+}
+
+.avatar {
+  border: 2.5px solid var(--frame-color, #60b8ff);
+  overflow: hidden;
+  background: #0b1b2d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.size_sm { width: 38px; height: 38px; }
+.size_md { width: 52px; height: 52px; }
+.size_lg { width: 68px; height: 68px; }
+.size_xl { width: 88px; height: 88px; }
+
+.shape_circle  { border-radius: 50%; }
+.shape_rounded { border-radius: 12px; }
+.shape_hexagon {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border-radius: 0;
+  border: none;
+}
+
+.img {
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  object-position: center 20%;
+  pointer-events: none;
+}

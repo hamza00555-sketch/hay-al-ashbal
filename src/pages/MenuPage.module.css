@@ -48,6 +48,9 @@
 
 .buttons {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .startBtn {
@@ -71,6 +74,23 @@
 }
 .startBtn:active {
   transform: translateY(0);
+}
+
+.settingsBtn {
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  border-radius: 12px;
+  color: rgba(255,255,255,0.6);
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  padding: 11px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.15s, color 0.15s;
+}
+.settingsBtn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
 }
 
 .players {

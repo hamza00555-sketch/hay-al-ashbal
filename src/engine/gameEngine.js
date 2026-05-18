@@ -18,6 +18,7 @@ export function createInitialState(players) {
     name: p.name,
     isAI: p.isAI || false,
     difficulty: p.difficulty ?? 'easy',
+    profile: p.profile ?? { cardImageId: String((index % 8) + 1), frameShape: 'circle', frameColor: '#60b8ff' },
     hand: [deck.pop()],
     isEliminated: false,
     isProtected: false,
