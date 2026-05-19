@@ -109,7 +109,7 @@ function Seat({ player, position, isActive, eliminating }) {
         <span className={styles.activeBadge}>دوره ◀</span>
       )}
 
-      <span className={styles.seatName}>{player.name}</span>
+      <span className={styles.seatName} style={{ color: player.profile?.frameColor ?? '#60b8ff' }}>{player.name}</span>
       <span className={styles.seatDiscard}>{player.discardPile.length} رُمي</span>
       {player.isAI && player.difficulty && player.difficulty !== 'easy' && (
         <span className={styles.diffBadge}>
@@ -228,8 +228,10 @@ export default function GamePage({
   const [musicOn,      setMusicOn]     = useState(true);
   const [showGuide,    setShowGuide]   = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [elimIds,     setElimIds]     = useState(new Set());
-  const [winFlash,    setWinFlash]    = useState(false);
+  const [elimIds,       setElimIds]       = useState(new Set());
+  const [winFlash,      setWinFlash]      = useState(false);
+  const [showShowdown,  setShowShowdown]  = useState(false);
+  const [showdownData,  setShowdownData]  = useState(null);
   const prevPlayersRef  = useRef(null);
 
   const currentPlayer = getCurrentPlayer(gs);
@@ -448,6 +450,14 @@ export default function GamePage({
     if (turnAnnounce && !onlineWaiting) return;
 
     if (gs.phase === 'GAME_OVER') {
+      const survivors = gs.players.filter(p => !p.isEliminated);
+      if (survivors.length > 1) {
+        // Deck ran out with multiple players — show showdown reveal first
+        stopMusic();
+        setShowdownData({ survivors, winner: gs.winner });
+        setShowShowdown(true);
+        return;
+      }
       SFX.win();
       haptic([20, 10, 20, 10, 40]);
       stopMusic();
@@ -631,7 +641,60 @@ export default function GamePage({
     else { startMusic(); setMusicOn(true); }
   };
 
+  const handleShowdownDone = useCallback(() => {
+    setShowShowdown(false);
+    SFX.win();
+    haptic([20, 10, 20, 10, 40]);
+    setWinFlash(true);
+    setTimeout(() => {
+      setWinFlash(false);
+      onGameOver({ winner: gs.winner, players: gs.players, log: gs.gameLog });
+    }, 1000);
+  }, [gs.winner, gs.players, gs.gameLog, onGameOver]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Render guards ────────────────────────────────────────────
+  // Deck-exhaustion showdown modal: reveal all survivors' cards before win flash
+  if (gs.phase === 'GAME_OVER' && showShowdown && showdownData) {
+    return (
+      <div className={styles.showdownOverlay}>
+        <div className={styles.showdownModal}>
+          <h2 className={styles.showdownTitle}>انتهت الكروت! 🃏</h2>
+          <p className={styles.showdownSub}>يفوز صاحب أعلى بطاقة</p>
+          <div className={styles.showdownPlayers}>
+            {showdownData.survivors.map(p => (
+              <div
+                key={p.id}
+                className={[
+                  styles.showdownPlayer,
+                  p.id === showdownData.winner?.id ? styles.showdownWinner : '',
+                ].join(' ')}
+              >
+                <Portrait profile={p.profile} size="seat" isActive={false} isEliminated={false} />
+                <span className={styles.showdownName} style={{ color: p.profile?.frameColor ?? '#60b8ff' }}>
+                  {p.name}
+                </span>
+                {p.hand[0] && <CardFace card={p.hand[0]} size="normal" />}
+                {p.id === showdownData.winner?.id && (
+                  <span className={styles.showdownWinLabel}>🏆 فاز!</span>
+                )}
+              </div>
+            ))}
+          </div>
+          {showdownData.winner && (
+            <p className={styles.showdownReason}>
+              {'فاز '}
+              <span style={{ color: showdownData.winner.profile?.frameColor ?? '#60b8ff', fontWeight: 700 }}>
+                {showdownData.winner.name}
+              </span>
+              {` لأن معه أعلى بطاقة (قوة ${showdownData.winner.hand[0]?.power ?? '؟'})`}
+            </p>
+          )}
+          <button className={styles.showdownDone} onClick={handleShowdownDone}>حسناً</button>
+        </div>
+      </div>
+    );
+  }
+
   // Show win flash during the 1s delay before onGameOver navigates away
   if (gs.phase === 'GAME_OVER') {
     return (
@@ -823,7 +886,7 @@ export default function GamePage({
           <DiscardPile cards={gs.globalDiscard ?? []} />
         </div>
         <div className={styles.logArea}>
-          <GameLog entries={gs.gameLog} />
+          <GameLog entries={gs.gameLog} players={gs.players} />
         </div>
       </div>
 
@@ -852,7 +915,10 @@ export default function GamePage({
           />
           <div className={styles.turnHUDInfo}>
             <span className={styles.turnHUDName}>
-              {isMyTurn ? `${humanPlayer?.name} — دورك` : `دور ${currentPlayer.name}`}
+              {isMyTurn
+                ? <><span style={{ color: humanPlayer?.profile?.frameColor ?? '#60b8ff' }}>{humanPlayer?.name}</span>{' — دورك'}</>
+                : <>{'دور '}<span style={{ color: currentPlayer.profile?.frameColor ?? '#60b8ff' }}>{currentPlayer.name}</span></>
+              }
             </span>
             {phaseLabel ? (
               <span className={styles.turnHUDPhase}>{phaseLabel}</span>
