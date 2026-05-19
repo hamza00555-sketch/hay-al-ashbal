@@ -5,6 +5,8 @@ import GamePage        from './pages/GamePage';
 import ResultPage      from './pages/ResultPage';
 import RoundOverScreen from './pages/RoundOverScreen';
 import SettingsPage    from './pages/SettingsPage';
+import TutorialPage    from './pages/TutorialPage';
+import { isTutorialDone } from './tutorial/tutorialStorage';
 import { startMenuMusic, stopMenuMusic, stopMusic } from './utils/sounds';
 
 export default function App() {
@@ -80,10 +82,18 @@ export default function App() {
 
   return (
     <div dir="rtl">
+      {screen === 'tutorial' && (
+        <TutorialPage
+          onComplete={() => setScreen('lobby')}
+          onSkip={() => setScreen('menu')}
+          onRetry={() => { setScreen('menu'); setTimeout(() => setScreen('tutorial'), 50); }}
+        />
+      )}
       {screen === 'menu' && (
         <MenuPage
           onStart={() => setScreen('lobby')}
           onSettings={() => setScreen('settings')}
+          onTutorial={() => setScreen('tutorial')}
         />
       )}
       {screen === 'settings' && (

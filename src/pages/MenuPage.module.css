@@ -65,6 +65,23 @@
 .startBtn:hover { opacity: 0.92; transform: translateY(-2px); }
 .startBtn:active { transform: translateY(0); }
 
+.tutorialBtn {
+  background: rgba(96,184,255,0.12);
+  border: 1.5px solid rgba(96,184,255,0.4);
+  border-radius: 16px;
+  color: #1F3D5A;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  padding: 12px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.15s, border-color 0.15s;
+}
+.tutorialBtn:hover {
+  background: rgba(96,184,255,0.22);
+  border-color: #60b8ff;
+}
+
 .settingsBtn {
   background: rgba(255,255,255,0.8);
   border: 1.5px solid rgba(86,130,178,0.25);

@@ -1,0 +1,632 @@
+/* ── TutorialPage styles ──────────────────────────────────────── */
+
+/* Board container */
+.board {
+  position: relative;
+  min-height: 100svh;
+  max-width: 390px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #EAF4FF 0%, #F5FAFF 100%);
+  direction: rtl;
+  font-family: 'Zanjabeel', sans-serif;
+  overflow: hidden;
+}
+
+/* Inner board layout */
+.boardInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100svh;
+  padding-top: 64px;
+  gap: 0;
+}
+
+/* ── Skip button ─────────────────────────────────────────────── */
+.skipBtn {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1100;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(86, 130, 178, 0.25);
+  border-radius: 10px;
+  color: #6B7A8A;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  box-shadow: 0 2px 8px rgba(86, 130, 178, 0.1);
+}
+.skipBtn:hover { background: #fff; }
+
+/* ── Progress dots ───────────────────────────────────────────── */
+.progress {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(86, 130, 178, 0.2);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.dotDone {
+  background: #60b8ff;
+  border-color: #60b8ff;
+}
+
+.dotCurrent {
+  background: #FFC83D;
+  border-color: #FFC83D;
+  transform: scale(1.35);
+}
+
+/* ── Spotlight / overlay ─────────────────────────────────────── */
+.dimFull {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 997;
+}
+
+.spotOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 997;
+  pointer-events: none;
+}
+
+.spotHole {
+  pointer-events: none;
+}
+
+/* ── Arrow ───────────────────────────────────────────────────── */
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+.arrow {
+  position: fixed;
+  font-size: 2rem;
+  color: #FFC83D;
+  animation: arrowBounce 0.9s ease-in-out infinite;
+  z-index: 1001;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* ── Speech bubble ───────────────────────────────────────────── */
+.bubble {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  z-index: 1002;
+  background: #fff;
+  border: 2px solid #60b8ff;
+  border-radius: 20px;
+  padding: 16px 20px;
+  box-shadow: 0 8px 32px rgba(31, 61, 90, 0.18), 0 2px 8px rgba(96, 184, 255, 0.15);
+  direction: rtl;
+}
+
+.bubbleTop    { top: 60px; }
+.bubbleCenter { top: 50%; transform: translateY(-50%); }
+.bubbleBottom { bottom: 200px; }
+
+.bubbleInner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.lionAvatar {
+  font-size: 1.8rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.bubbleText {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  color: #1F3D5A;
+  margin: 0;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.tapHint {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: #60b8ff;
+  margin: 8px 0 0 0;
+  text-align: center;
+  animation: phasePulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes phasePulse {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
+}
+
+.softHint {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  color: #FFC83D;
+  margin: 8px 0 0 0;
+  text-align: center;
+}
+
+.strongHint {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.88rem;
+  color: #ff6b6b;
+  margin: 8px 0 0 0;
+  text-align: center;
+  font-weight: 700;
+  animation: phasePulse 0.7s ease-in-out infinite alternate;
+}
+
+/* ── Board sections ──────────────────────────────────────────── */
+.opponentSeat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 0 8px;
+  width: 100%;
+}
+
+.seatName {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  color: #1F3D5A;
+  font-weight: 700;
+}
+
+.arena {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+  min-height: 220px;
+}
+
+.deckStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.deckStack:hover { transform: scale(1.04); }
+
+.deckCount {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: #6B7A8A;
+}
+
+.drawHint {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: #5682B2;
+  font-weight: 700;
+  text-align: center;
+  animation: phasePulse 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes deckPulseAnim {
+  from { filter: drop-shadow(0 0 6px rgba(96, 184, 255, 0.4));  transform: scale(1); }
+  to   { filter: drop-shadow(0 0 20px rgba(96, 184, 255, 0.8)); transform: scale(1.06); }
+}
+
+.deckPulse {
+  animation: deckPulseAnim 0.65s ease-in-out infinite alternate;
+}
+
+/* ── Human zone ──────────────────────────────────────────────── */
+.humanZone {
+  width: 100%;
+  padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(86, 130, 178, 0.15);
+  box-shadow: 0 -4px 20px rgba(86, 130, 178, 0.1);
+  position: relative;
+  z-index: 1000;
+}
+
+.hand {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.cardSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+/* ── Confirm area ────────────────────────────────────────────── */
+.confirmArea {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 390px;
+  margin: 0 auto;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.97);
+  border-top: 2px solid rgba(96, 184, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(86, 130, 178, 0.15);
+}
+
+.resultMessage {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  color: #1F3D5A;
+}
+
+.confirmBtn {
+  background: #FFC83D;
+  border: none;
+  border-radius: 16px;
+  color: #1F3D5A;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 14px 40px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 200, 61, 0.35);
+  transition: opacity 0.15s, transform 0.1s;
+  animation: tapBtnPulse 1.4s ease-in-out infinite alternate;
+}
+.confirmBtn:hover  { opacity: 0.9; transform: translateY(-2px); }
+.confirmBtn:active { transform: scale(0.97); }
+
+@keyframes tapBtnPulse {
+  from { box-shadow: 0 4px 16px rgba(255, 200, 61, 0.3); }
+  to   { box-shadow: 0 4px 24px rgba(255, 200, 61, 0.6); }
+}
+
+/* ── Wrong tap shake ─────────────────────────────────────────── */
+@keyframes shakeBoard {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-5px); }
+  80%       { transform: translateX(5px); }
+}
+
+.wrongTap {
+  animation: shakeBoard 0.4s ease;
+}
+
+/* ── Rule card screen ────────────────────────────────────────── */
+.ruleScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  gap: 24px;
+  padding: 80px 24px 48px;
+}
+
+.ruleCardWrap {
+  filter: drop-shadow(0 8px 24px rgba(31, 61, 90, 0.25));
+}
+
+.ruleBubble {
+  background: #fff;
+  border: 2px solid #60b8ff;
+  border-radius: 20px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 340px;
+  width: 100%;
+  box-shadow: 0 4px 16px rgba(96, 184, 255, 0.15);
+  direction: rtl;
+}
+
+.nextBtn {
+  background: #FFC83D;
+  border: none;
+  border-radius: 16px;
+  color: #1F3D5A;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 14px 48px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 200, 61, 0.35);
+  transition: opacity 0.15s, transform 0.1s;
+}
+.nextBtn:hover  { opacity: 0.9; transform: translateY(-2px); }
+.nextBtn:active { transform: scale(0.97); }
+
+/* ── Practice mode ───────────────────────────────────────────── */
+.practiceWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100svh;
+  padding: 64px 16px 24px;
+  gap: 0;
+}
+
+.practiceBubble {
+  background: #fff;
+  border: 2px solid #60b8ff;
+  border-radius: 20px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(96, 184, 255, 0.15);
+  direction: rtl;
+  z-index: 1002;
+  position: relative;
+}
+
+.practiceBoard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+}
+
+.practiceOpponent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 16px;
+  transition: background 0.2s;
+}
+
+.practiceTarget {
+  background: rgba(255, 200, 61, 0.15);
+  border: 2px solid rgba(255, 200, 61, 0.5);
+  animation: tapBtnPulse 1.2s ease-in-out infinite alternate;
+}
+
+.practiceName {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  color: #1F3D5A;
+  font-weight: 700;
+}
+
+.practiceDeck {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 12px;
+  transition: transform 0.15s;
+}
+.practiceDeck:hover { transform: scale(1.04); }
+
+.deckLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.75rem;
+  color: #6B7A8A;
+}
+
+.emptyDeckSlot {
+  width: 78px;
+  height: 117px;
+  border-radius: 10px;
+  border: 2px dashed rgba(86, 130, 178, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(86, 130, 178, 0.5);
+  font-size: 1.2rem;
+}
+
+.tapMe {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: #FFC83D;
+  font-weight: 700;
+  text-align: center;
+  animation: phasePulse 0.7s ease-in-out infinite alternate;
+}
+
+.practiceHand {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 16px;
+  padding: 14px 20px;
+  border-top: 2px solid rgba(86, 130, 178, 0.1);
+  width: 100%;
+  max-width: 340px;
+}
+
+.practiceHandCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  position: relative;
+}
+
+.cardFocused {
+  filter: drop-shadow(0 0 12px rgba(96, 184, 255, 0.7));
+}
+
+.practiceResult {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 20px;
+  border: 2px solid rgba(96, 184, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(31, 61, 90, 0.12);
+}
+
+.practiceResultText {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  color: #1F3D5A;
+  margin: 0;
+  text-align: center;
+}
+
+/* ── Reward screen ───────────────────────────────────────────── */
+.rewardScreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: linear-gradient(160deg, #1F3D5A 0%, #2d5a8a 100%);
+  padding: 48px 28px;
+  text-align: center;
+  overflow: hidden;
+  z-index: 2000;
+}
+
+.rewardEmoji {
+  font-size: 5rem;
+  line-height: 1;
+  animation: rewardPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes rewardPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.rewardTitle {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #FFC83D;
+  margin: 0;
+  text-shadow: 0 2px 12px rgba(255, 200, 61, 0.4);
+}
+
+.rewardText {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.rewardStars {
+  font-size: 2rem;
+  letter-spacing: 8px;
+  animation: starsPop 0.6s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes starsPop {
+  from { transform: scale(0) rotate(-10deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+
+.rewardPlayBtn {
+  background: #FFC83D;
+  border: none;
+  border-radius: 20px;
+  color: #1F3D5A;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  padding: 18px 48px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  box-shadow: 0 6px 24px rgba(255, 200, 61, 0.5);
+  transition: opacity 0.15s, transform 0.12s;
+  margin-top: 8px;
+}
+.rewardPlayBtn:hover  { opacity: 0.92; transform: translateY(-2px); }
+.rewardPlayBtn:active { transform: scale(0.97); }
+
+.rewardRetryBtn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.95rem;
+  padding: 12px 32px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  transition: background 0.15s;
+}
+.rewardRetryBtn:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* ── Confetti ─────────────────────────────────────────────────── */
+.confettiWrap {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2001;
+  overflow: hidden;
+}
+
+.confettiPiece {
+  position: absolute;
+  width: 9px;
+  height: 13px;
+  top: -20px;
+  left: calc(var(--i) * 7.2% + 2%);
+  background: hsl(calc(var(--i) * 26deg), 80%, 62%);
+  border-radius: 2px;
+  animation: confettiFall calc(1.1s + var(--i) * 0.06s) ease-in calc(var(--i) * 0.08s) forwards;
+}
+
+@keyframes confettiFall {
+  0%   { transform: translateY(0)     rotate(0deg);                    opacity: 1; }
+  100% { transform: translateY(110vh) rotate(calc(var(--i) * 55deg));  opacity: 0; }
+}

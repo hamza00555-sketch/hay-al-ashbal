@@ -1,7 +1,7 @@
 import { SFX } from '../utils/sounds';
 import styles from './MenuPage.module.css';
 
-export default function MenuPage({ onStart, onSettings }) {
+export default function MenuPage({ onStart, onSettings, onTutorial }) {
   return (
     <div className={styles.page}>
       <div className={styles.content}>
@@ -16,6 +16,9 @@ export default function MenuPage({ onStart, onSettings }) {
         <div className={styles.buttons}>
           <button className={styles.startBtn} onClick={() => { SFX.confirmOk(); onStart(); }}>
             ابدأ اللعب
+          </button>
+          <button className={styles.tutorialBtn} onClick={() => { SFX.buttonClick(); onTutorial?.(); }}>
+            📖 كيف ألعب؟
           </button>
           <button className={styles.settingsBtn} onClick={() => { SFX.buttonClick(); onSettings(); }}>
             ⚙ الملف الشخصي
