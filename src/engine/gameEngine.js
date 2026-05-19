@@ -182,13 +182,17 @@ export function resolveCard(state, playedCard, cardSource, targetPlayerId, guess
           ),
         };
       }
-      newState = {
-        ...newState,
-        phase: 'PEEK_REVEAL',
-        peekCard,
-        peekTargetName: target?.name,
-      };
-      return newState;
+      // Only show PEEK_REVEAL to a human player — AI peeks silently
+      if (!currentPlayer.isAI) {
+        newState = {
+          ...newState,
+          phase: 'PEEK_REVEAL',
+          peekCard,
+          peekTargetName: target?.name,
+        };
+        return newState;
+      }
+      break; // AI peek: fall through to advanceTurn
     }
     case 3: {
       const target = newState.players.find(p => p.id === targetPlayerId);

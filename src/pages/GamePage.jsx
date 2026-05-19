@@ -209,7 +209,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   const drawnCardRef  = useRef(null);
   const deckRef       = useRef(null);
 
-  const [musicOn,     setMusicOn]     = useState(false);
+  const [musicOn,     setMusicOn]     = useState(true);
   const [showGuide,   setShowGuide]   = useState(false);
   const [elimIds,     setElimIds]     = useState(new Set());
   const [winFlash,    setWinFlash]    = useState(false);
@@ -283,9 +283,12 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   }
 
   // Cleanup timers on unmount
-  useEffect(() => () => {
-    clearTimeout(narrativeTimer.current);
-    clearTimeout(announceTimer.current);
+  useEffect(() => {
+    startMusic(); // auto-start on game load
+    return () => {
+      clearTimeout(narrativeTimer.current);
+      clearTimeout(announceTimer.current);
+    };
   }, []);
 
   // Track newly eliminated players for animation + haptic
