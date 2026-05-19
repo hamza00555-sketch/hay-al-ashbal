@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { ref as dbRef, onValue } from 'firebase/database';
+import { db } from '../services/firebase';
 import { writeGameState, listenRoom, sanitizeGs } from '../services/gameRoom';
 import {
   createInitialState,
@@ -220,6 +222,9 @@ export default function GamePage({
   const lastActionTs  = useRef(-1);
   const toastTimer    = useRef(null);
 
+  // Online: Firebase connection status
+  const [isConnected, setIsConnected] = useState(true);
+
   const [musicOn,      setMusicOn]     = useState(true);
   const [showGuide,    setShowGuide]   = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -315,6 +320,14 @@ export default function GamePage({
       clearTimeout(toastTimer.current);
     };
   }, []);
+
+  // ── Online: Firebase connection status ──────────────────────
+  useEffect(() => {
+    if (!isOnline) return;
+    const connRef = dbRef(db, '.info/connected');
+    const unsub = onValue(connRef, snap => setIsConnected(snap.val() === true));
+    return () => unsub();
+  }, [isOnline]);
 
   // ── Online: each player writes their own turns to Firebase ──
   // _author is stamped = myPlayerIdx when we make a move, so echo is skipped on receive.
@@ -730,6 +743,18 @@ export default function GamePage({
       {/* Online: action toast describing opponent's last move */}
       {actionToast && (
         <div className={styles.actionToast}>{actionToast}</div>
+      )}
+
+      {/* Online: disconnection overlay */}
+      {isOnline && !isConnected && (
+        <div className={styles.disconnectOverlay}>
+          <span className={styles.disconnectIcon}>📶</span>
+          <p className={styles.disconnectTitle}>انقطع الاتصال</p>
+          <p className={styles.disconnectSub}>يحاول إعادة الاتصال...</p>
+          <div className={styles.reconnectDots}>
+            <span /><span /><span />
+          </div>
+        </div>
       )}
 
       {/* Round indicator */}

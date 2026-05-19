@@ -78,7 +78,8 @@
 
 /* ── Board: CSS Grid ─────────────────────────────────────────── */
 .board {
-  min-height: 100dvh;
+  position: fixed;
+  inset: 0;
   display: grid;
   grid-template-columns: 110px 1fr 110px;
   grid-template-rows: auto 1fr auto;
@@ -87,7 +88,6 @@
     "left  arena  right"
     "human human  human";
   background: linear-gradient(180deg, #c8def5 0%, #EAF2FB 40%, #d8eef8 100%);
-  position: relative;
   overflow: hidden;
   perspective: 900px;
   perspective-origin: 50% 85%;
@@ -287,18 +287,29 @@
 /* ── Human zone (full width bottom) ─────────────────────────── */
 .humanZone {
   grid-area: human;
-  padding: 14px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid rgba(86,130,178,0.15);
   background: rgba(255,255,255,0.85);
   backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   position: relative;
   z-index: 1;
   box-shadow: 0 -4px 20px rgba(86,130,178,0.1);
   transition: box-shadow 0.4s;
+  /* Prevent humanZone from overflowing on short screens */
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (max-height: 680px) {
+  .humanZone {
+    padding: 6px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+    gap: 5px;
+  }
+  .arena { gap: 6px; padding: 4px 4px; }
 }
 
 .myTurn {
@@ -934,3 +945,48 @@
   0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
   40%           { transform: scale(1.2); opacity: 1;   }
 }
+
+/* ── Disconnection overlay ───────────────────────────────────── */
+.disconnectOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(10, 20, 40, 0.88);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #fff;
+  font-family: 'Zanjabeel', sans-serif;
+  text-align: center;
+  padding: 32px;
+  animation: announceFadeIn 0.3s ease;
+}
+
+.disconnectIcon { font-size: 2.4rem; }
+
+.disconnectTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.disconnectSub {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.65);
+  margin: 0;
+}
+
+.reconnectDots {
+  display: flex;
+  gap: 8px;
+}
+.reconnectDots span {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #60b8ff;
+  animation: onlineDotBounce 1.2s ease-in-out infinite;
+}
+.reconnectDots span:nth-child(2) { animation-delay: 0.2s; }
+.reconnectDots span:nth-child(3) { animation-delay: 0.4s; }
