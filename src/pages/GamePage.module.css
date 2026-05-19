@@ -82,7 +82,9 @@
   inset: 0;
   display: grid;
   grid-template-columns: 110px 1fr 110px;
-  grid-template-rows: auto 1fr auto;
+  /* humanZone gets a fixed 42dvh — never squeezed by topZone size.
+     arena gets whatever remains. topZone sizes itself to content. */
+  grid-template-rows: auto 1fr 42dvh;
   grid-template-areas:
     ".     top    ."
     "left  arena  right"
@@ -99,7 +101,13 @@
   transform-origin: 50% 100%;
 }
 
-.seat_top .seatCardWrap  { transform: scale(0.80); }
+.seat_top .seatCardWrap  {
+  transform: scale(0.80);
+  transform-origin: center top;
+  /* Collapse the unused layout space left by scale(0.80):
+     card layout height = 117px, visual = 93.6px → pull by -23px */
+  margin-bottom: -23px;
+}
 .seat_left .seatCardWrap,
 .seat_right .seatCardWrap { transform: scale(0.88); }
 

@@ -238,12 +238,16 @@ export default function GamePage({
     ? gs.players[myPlayerIdx]
     : (hasAI ? gs.players.find(p => !p.isAI) : currentPlayer);
 
-  // Responsive card size based on viewport height (evaluated once at mount)
+  // Responsive card size — humanZone = 42dvh = 0.42 * window.innerHeight.
+  // Content height: TurnHUD(60) + gap(8) + label+card + padding(24).
+  // large(210px): needs 302px → 0.42*h ≥ 302 → h ≥ 720
+  // normal(165px): needs 257px → 0.42*h ≥ 257 → h ≥ 612
+  // small(117px): needs 209px → always fits
   const handCardSize = useMemo(() => {
     const h = window.innerHeight;
-    if (h < 640) return 'small';
-    if (h < 720) return 'normal';
-    return 'large';
+    if (h >= 720) return 'large';
+    if (h >= 612) return 'normal';
+    return 'small';
   }, []);
 
   const legalPlays   = gs.drawnCard ? getLegalPlays(currentPlayer.hand[0], gs.drawnCard) : [];
