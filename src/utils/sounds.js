@@ -383,6 +383,7 @@ function scheduleLoop(startT) {
 export function startMusic() {
   if (_musicPlaying) return;
   _musicPlaying = true;
+  stopMenuMusic(); // never overlap with menu music
   try {
     const c = ctx();
     scheduleLoop(c.currentTime + 0.1);
