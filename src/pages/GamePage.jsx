@@ -234,10 +234,17 @@ export default function GamePage({
 
   const currentPlayer = getCurrentPlayer(gs);
   const hasAI         = gs.players.some(p => p.isAI);
-  // In online mode, "human" is the player at myPlayerIdx; otherwise use existing logic
   const humanPlayer   = isOnline
     ? gs.players[myPlayerIdx]
     : (hasAI ? gs.players.find(p => !p.isAI) : currentPlayer);
+
+  // Responsive card size based on viewport height (evaluated once at mount)
+  const handCardSize = useMemo(() => {
+    const h = window.innerHeight;
+    if (h < 640) return 'small';
+    if (h < 720) return 'normal';
+    return 'large';
+  }, []);
 
   const legalPlays   = gs.drawnCard ? getLegalPlays(currentPlayer.hand[0], gs.drawnCard) : [];
   const bustanForced = gs.drawnCard ? mustPlayBustan(currentPlayer.hand[0], gs.drawnCard) : false;
@@ -804,7 +811,7 @@ export default function GamePage({
         <div className={styles.deckRow}>
           <div ref={deckRef} className={[styles.deckStack, isDrawing ? styles.deckDrawing : ''].join(' ')}>
             {gs.deck.length > 0
-              ? <CardBack />
+              ? <CardBack size="small" />
               : <div className={styles.emptyDeck}>نفد!</div>}
             <span className={styles.deckCount}>{gs.deck.length} كرت</span>
             {isDrawing && <span className={styles.drawHint}>يسحب...</span>}
@@ -863,6 +870,7 @@ export default function GamePage({
                 label="في يدك"
                 card={currentPlayer.hand[0]}
                 source="hand"
+                size={handCardSize}
                 focused={focusedSource === 'hand'}
                 dimmed={gs.phase === 'PLAY' && !legalPlays.includes('hand')}
                 playable={gs.phase === 'PLAY' && !isLocked}
@@ -877,6 +885,7 @@ export default function GamePage({
                   label="سحبته الآن"
                   card={gs.drawnCard}
                   source="drawn"
+                  size={handCardSize}
                   focused={focusedSource === 'drawn'}
                   dimmed={!legalPlays.includes('drawn')}
                   playable={gs.phase === 'PLAY' && !isLocked}
@@ -892,8 +901,8 @@ export default function GamePage({
             </>
           ) : (
             <div className={styles.aiHandCover}>
-              <CardBack size="large" />
-              {currentBeat?.type === 'CARD_ANTICIPATE' && <CardBack size="large" />}
+              <CardBack size={handCardSize} />
+              {currentBeat?.type === 'CARD_ANTICIPATE' && <CardBack size={handCardSize} />}
             </div>
           )}
         </div>
@@ -946,7 +955,7 @@ export default function GamePage({
 // ── Card Slot ────────────────────────────────────────────────────
 function CardSlot({ label, card, source, focused, dimmed, playable,
                     flipping, onFlipDone, onCardClick, onInfoClick,
-                    cardRef, hidden, kickingBack }) {
+                    cardRef, hidden, kickingBack, size = 'large' }) {
   return (
     <div className={styles.cardSlot}>
       <span className={styles.cardLabel}>{label}</span>
@@ -959,11 +968,11 @@ function CardSlot({ label, card, source, focused, dimmed, playable,
         ref={cardRef}
       >
         {flipping ? (
-          <FlipCard card={card} size="large" onDone={onFlipDone} />
+          <FlipCard card={card} size={size} onDone={onFlipDone} />
         ) : (
           <CardFace
             card={card}
-            size="large"
+            size={size}
             focused={focused}
             dimmed={dimmed}
             playable={playable && !focused}
