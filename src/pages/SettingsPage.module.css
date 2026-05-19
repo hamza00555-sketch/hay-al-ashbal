@@ -141,3 +141,58 @@
   border-color: #1F3D5A;
   transform: scale(1.15);
 }
+
+/* ── Volume sliders ─────────────────────────────────────────────── */
+.volRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.volRow:last-child { margin-bottom: 0; }
+
+.volIcon { font-size: 1.1rem; flex-shrink: 0; }
+
+.volLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.85rem;
+  color: #1F3D5A;
+  min-width: 56px;
+  flex-shrink: 0;
+}
+
+.volSlider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 4px;
+  background: linear-gradient(to left, #5682B2 calc(var(--val, 100) * 1%), #d0dae8 calc(var(--val, 100) * 1%));
+  outline: none;
+  cursor: pointer;
+}
+.volSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5682B2;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+.volSlider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5682B2;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+.volPct {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: #6B7A8A;
+  min-width: 34px;
+  text-align: center;
+}

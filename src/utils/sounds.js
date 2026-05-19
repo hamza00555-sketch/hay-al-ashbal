@@ -7,6 +7,27 @@ let _dry = null;   // dry gain → compressor → destination
 let _wet = null;   // wet gain (reverb out) → compressor → destination
 let _comp = null;
 
+// ── Persistent volume state ───────────────────────────────────────
+let _musicVol = parseFloat(localStorage.getItem('v_music') ?? '1.0');
+let _sfxVol   = parseFloat(localStorage.getItem('v_sfx')   ?? '1.0');
+
+export function getMusicVol() { return _musicVol; }
+export function getSFXVol()   { return _sfxVol;   }
+
+export function setMusicVol(v) {
+  _musicVol = Math.max(0, Math.min(1, v));
+  localStorage.setItem('v_music', _musicVol);
+  if (_gameGain) _gameGain.gain.value = 0.60 * _musicVol;
+  if (_menuGain) _menuGain.gain.value = 0.55 * _musicVol;
+}
+
+export function setSFXVol(v) {
+  _sfxVol = Math.max(0, Math.min(1, v));
+  localStorage.setItem('v_sfx', _sfxVol);
+  if (_dry) _dry.gain.value = 0.78 * _sfxVol;
+  if (_wet) _wet.gain.value = 0.22 * _sfxVol;
+}
+
 function ctx() {
   if (_ctx && _ctx.state !== 'closed') {
     if (_ctx.state === 'suspended') _ctx.resume();
@@ -33,8 +54,8 @@ function ctx() {
   _rev = _ctx.createConvolver();
   _rev.buffer = ir;
 
-  _wet = _ctx.createGain(); _wet.gain.value = 0.22;
-  _dry = _ctx.createGain(); _dry.gain.value = 0.78;
+  _wet = _ctx.createGain(); _wet.gain.value = 0.22 * _sfxVol;
+  _dry = _ctx.createGain(); _dry.gain.value = 0.78 * _sfxVol;
   _rev.connect(_wet);
   _wet.connect(_comp);
   _dry.connect(_comp);
@@ -307,7 +328,7 @@ export async function startMenuMusic() {
 
     _menuGain = c.createGain();
     _menuGain.gain.setValueAtTime(0.0001, c.currentTime);
-    _menuGain.gain.linearRampToValueAtTime(0.55, c.currentTime + 1.8);
+    _menuGain.gain.linearRampToValueAtTime(0.55 * _musicVol, c.currentTime + 1.8);
     _menuGain.connect(_comp);
 
     _menuSource = c.createBufferSource();
@@ -343,7 +364,7 @@ export function startMusic() {
 
       _gameGain = c.createGain();
       _gameGain.gain.setValueAtTime(0.0001, c.currentTime);
-      _gameGain.gain.linearRampToValueAtTime(0.60, c.currentTime + 1.5);
+      _gameGain.gain.linearRampToValueAtTime(0.60 * _musicVol, c.currentTime + 1.5);
       _gameGain.connect(_comp);
 
       _gameSource = c.createBufferSource();

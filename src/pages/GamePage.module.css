@@ -1123,3 +1123,27 @@
 }
 
 .showdownDone:active { opacity: 0.7; }
+
+/* ── Skip to end button ──────────────────────────────────────────── */
+.skipEndBtn {
+  background: linear-gradient(135deg, #2d5a8e, #1a3d6a);
+  color: #fff;
+  border: 1px solid rgba(100, 160, 255, 0.4);
+  border-radius: 12px;
+  padding: 10px 24px;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  animation: announceFadeIn 0.3s ease;
+  transition: opacity 0.15s;
+  align-self: center;
+}
+.skipEndBtn:active { opacity: 0.7; }
+
+/* ── Quit setting item ───────────────────────────────────────────── */
+.settingQuit {
+  color: #e07070;
+  border-top: 1px solid rgba(255, 100, 100, 0.15);
+  margin-top: 4px;
+}

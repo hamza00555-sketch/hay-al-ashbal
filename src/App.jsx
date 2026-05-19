@@ -174,6 +174,7 @@ export default function App() {
           tokensToWin={tokensToWin}
           tokens={tokens}
           onGameOver={handleGameOver}
+          onQuit={() => setScreen('menu')}
           // Online props (null/defaults for local play)
           isOnline={!!onlineGame}
           isHost={onlineGame?.isHost ?? false}

@@ -180,7 +180,7 @@ function FlyingCard({ card, fromRect, toRect, onDone }) {
 
 // ── Main GamePage ────────────────────────────────────────────────
 export default function GamePage({
-  config, onGameOver, roundNumber = 1, tokensToWin = 1, tokens = {},
+  config, onGameOver, onQuit, roundNumber = 1, tokensToWin = 1, tokens = {},
   // Online mode props
   isOnline = false, isHost = false, myPlayerIdx = 0, roomCode = null,
   initialGs = null,
@@ -652,6 +652,24 @@ export default function GamePage({
     }, 1000);
   }, [gs.winner, gs.players, gs.gameLog, onGameOver]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleSkipToEnd = useCallback(() => {
+    clearTimeout(narrativeTimer.current);
+    beatQueueRef.current = [];
+    setCurrentBeat(null);
+    setPendingGs(null);
+    let s = gs;
+    for (let guard = 0; guard < 300 && s.phase !== 'GAME_OVER'; guard++) {
+      if (s.phase === 'AI_TURN') {
+        const afterDraw = doDrawCard(s);
+        const { state: next } = computeAIMove(afterDraw);
+        s = next;
+      } else {
+        break;
+      }
+    }
+    if (s.phase === 'GAME_OVER') setGs(s);
+  }, [gs]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Render guards ────────────────────────────────────────────
   // Deck-exhaustion showdown modal: reveal all survivors' cards before win flash
   if (gs.phase === 'GAME_OVER' && showShowdown && showdownData) {
@@ -732,8 +750,8 @@ export default function GamePage({
   }
 
   if (gs.phase === 'HAND_COVER') {
-    // Online: skip hand-cover (each player is on their own device, no need to hide screen)
-    if (isOnline) {
+    // Online or vsAI: only one human per device, no need to cover the screen
+    if (isOnline || hasAI) {
       setTimeout(() => setGs(prev => prev.phase === 'HAND_COVER'
         ? { ...prev, phase: 'DRAW' } : prev), 0);
       return null;
@@ -803,6 +821,12 @@ export default function GamePage({
             <span className={styles.settingIcon}>📖</span>
             <span>دليل البطاقات</span>
           </button>
+          {onQuit && (
+            <button className={`${styles.settingItem} ${styles.settingQuit}`} onClick={() => { SFX.buttonClick(); stopMusic(); setShowSettings(false); onQuit(); }}>
+              <span className={styles.settingIcon}>🚪</span>
+              <span>الخروج من الجولة</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -982,6 +1006,13 @@ export default function GamePage({
         )}
         {gs.phase === 'PLAY' && gs.drawnCard && isMyTurn && focusedSource && !isLocked && (
           <p className={styles.hint}>اضغط مرة ثانية للعب • ℹ️ للمعلومات</p>
+        )}
+
+        {/* Skip to end: shown when human is eliminated and AI are still playing */}
+        {humanPlayer?.isEliminated && hasAI && gs.phase !== 'GAME_OVER' && (
+          <button className={styles.skipEndBtn} onClick={handleSkipToEnd}>
+            تخطي إلى النهاية ⏭
+          </button>
         )}
       </div>
 

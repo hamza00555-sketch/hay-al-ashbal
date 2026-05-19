@@ -9,13 +9,13 @@
 
 .entry {
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 0.75rem;
-  color: #6B7A8A;
+  font-size: 0.82rem;
+  color: #3a5a7a;
   text-align: center;
   line-height: 1.4;
 }
 .entry:first-child {
   color: #1F3D5A;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   font-weight: 600;
 }

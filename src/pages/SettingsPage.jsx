@@ -4,11 +4,24 @@ import {
   loadProfile, saveProfile,
 } from '../utils/playerProfile';
 import PlayerAvatar from '../components/PlayerAvatar';
-import { SFX } from '../utils/sounds';
+import { SFX, getMusicVol, getSFXVol, setMusicVol, setSFXVol } from '../utils/sounds';
 import styles from './SettingsPage.module.css';
 
 export default function SettingsPage({ onBack }) {
-  const [profile, setProfile] = useState(() => loadProfile());
+  const [profile,   setProfile]   = useState(() => loadProfile());
+  const [musicVol,  setMusicVolState]  = useState(() => getMusicVol());
+  const [sfxVol,    setSFXVolState]    = useState(() => getSFXVol());
+
+  function handleMusicVol(v) {
+    setMusicVolState(v);
+    setMusicVol(v);
+  }
+
+  function handleSFXVol(v) {
+    setSFXVolState(v);
+    setSFXVol(v);
+    SFX.cardSelect();
+  }
 
   function update(field, value) {
     const next = { ...profile, [field]: value };
@@ -93,6 +106,32 @@ export default function SettingsPage({ onBack }) {
               onClick={() => { SFX.buttonClick(); update('frameColor', c); }}
             />
           ))}
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <p className={styles.label}>مستوى الصوت</p>
+        <div className={styles.volRow}>
+          <span className={styles.volIcon}>🎵</span>
+          <span className={styles.volLabel}>الموسيقى</span>
+          <input
+            type="range" min="0" max="1" step="0.05"
+            value={musicVol}
+            className={styles.volSlider}
+            onChange={e => handleMusicVol(parseFloat(e.target.value))}
+          />
+          <span className={styles.volPct}>{Math.round(musicVol * 100)}%</span>
+        </div>
+        <div className={styles.volRow}>
+          <span className={styles.volIcon}>🔊</span>
+          <span className={styles.volLabel}>المؤثرات</span>
+          <input
+            type="range" min="0" max="1" step="0.05"
+            value={sfxVol}
+            className={styles.volSlider}
+            onChange={e => handleSFXVol(parseFloat(e.target.value))}
+          />
+          <span className={styles.volPct}>{Math.round(sfxVol * 100)}%</span>
         </div>
       </section>
     </div>
