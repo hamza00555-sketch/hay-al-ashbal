@@ -74,22 +74,65 @@
 }
 
 /* ── Spotlight / overlay ─────────────────────────────────────── */
-.dimFull {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 997;
-}
 
-.spotOverlay {
+/* Full-screen click catcher: blocks wrong taps, advances on TAP_ANYWHERE */
+.dimOverlay {
   position: fixed;
   inset: 0;
   z-index: 997;
-  pointer-events: none;
+  pointer-events: all;
+  background: transparent;
 }
 
+/* Visual spotlight cutout — dim via box-shadow, gold pulsing ring */
 .spotHole {
+  position: fixed;
+  z-index: 998;
   pointer-events: none;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 2000px rgba(0, 0, 0, 0.65),
+    0 0 0 3px rgba(255, 215, 0, 0.9),
+    0 0 24px rgba(255, 215, 0, 0.5);
+  animation: spotPulse 1.6s ease-in-out infinite;
+}
+
+/* Portal click target — sits above everything, transparent, catches the correct tap */
+.spotTarget {
+  position: fixed;
+  z-index: 1001;
+  cursor: pointer;
+  border-radius: 18px;
+  background: transparent;
+}
+
+/* Wrong-tap toast */
+.wrongToast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1010;
+  background: rgba(255, 107, 107, 0.95);
+  color: #fff;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  padding: 12px 24px;
+  border-radius: 20px;
+  pointer-events: none;
+  animation: toastFade 0.7s ease forwards;
+  white-space: nowrap;
+}
+
+@keyframes spotPulse {
+  0%, 100% { box-shadow: 0 0 0 2000px rgba(0,0,0,0.65), 0 0 0 3px rgba(255,215,0,0.9), 0 0 16px rgba(255,215,0,0.4); }
+  50%       { box-shadow: 0 0 0 2000px rgba(0,0,0,0.65), 0 0 0 4px rgba(255,215,0,1.0), 0 0 32px rgba(255,215,0,0.8); }
+}
+
+@keyframes toastFade {
+  0%   { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* ── Arrow ───────────────────────────────────────────────────── */
@@ -103,7 +146,7 @@
   font-size: 2rem;
   color: #FFC83D;
   animation: arrowBounce 0.9s ease-in-out infinite;
-  z-index: 1001;
+  z-index: 1003;
   pointer-events: none;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
@@ -113,7 +156,7 @@
   position: fixed;
   left: 16px;
   right: 16px;
-  z-index: 1002;
+  z-index: 1005;
   background: #fff;
   border: 2px solid #60b8ff;
   border-radius: 20px;
@@ -469,6 +512,29 @@
   font-weight: 700;
   text-align: center;
   animation: phasePulse 0.7s ease-in-out infinite alternate;
+}
+
+.tapMeLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: #FFC83D;
+  font-weight: 700;
+  text-align: center;
+  animation: phasePulse 0.7s ease-in-out infinite alternate;
+  display: block;
+  margin-top: 4px;
+}
+
+.deckEmpty {
+  width: 78px;
+  height: 117px;
+  border-radius: 10px;
+  border: 2px dashed rgba(86, 130, 178, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(86, 130, 178, 0.4);
+  font-size: 1.5rem;
 }
 
 .practiceHand {
