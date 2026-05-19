@@ -396,6 +396,87 @@ export function stopMusic() {
 
 export function isMusicPlaying() { return _musicPlaying; }
 
+// ── Menu / lobby music (slower, warmer, no drums) ─────────────────
+// Uses Hijaz-ish scale: C Db E F G Ab Bb  →  warm Arabic flavour
+const HIJ = [261.63, 277.18, 329.63, 349.23, 392.00, 415.30, 466.16, 523.25];
+const MENU_MEL  = [4,3,2,null,3,4,null,6, 5,4,3,null,4,null,3,2, 2,1,0,null,1,2,null,4, 3,2,1,null,0,null,null,null];
+const MENU_BASS = [0,0,4,4,0,0,3,3];
+const MENU_PAD_SEQ = [[0,4,7],[3,7,10],[0,4,7],[5,9,12],[0,4,7],[3,7,10],[0,4,7],[4,7,11]];
+
+let _menuPlaying = false;
+let _menuTimer   = null;
+
+function scheduleMenuLoop(startT) {
+  if (!_menuPlaying) return;
+  const c    = ctx();
+  const bpm  = 62;
+  const beat = 60 / bpm;
+  const step = beat / 2;
+
+  // Melody (warm triangle, more reverb)
+  MENU_MEL.forEach((idx, i) => {
+    if (idx === null) return;
+    const t = startT + i * step;
+    const f = HIJ[idx % HIJ.length];
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.07, t + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + step * 1.2);
+    const o = c.createOscillator(); o.type = 'triangle'; o.frequency.value = f;
+    o.connect(g); g.connect(_wet);
+    o.start(t); o.stop(t + step * 1.4);
+  });
+
+  // Sustained bass (sine, very soft)
+  MENU_BASS.forEach((ri, i) => {
+    const t = startT + i * beat * 2;
+    const f = HIJ[ri % HIJ.length] / 2;
+    const dur = beat * 2.8;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.09, t + 0.10);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+    o.connect(g); g.connect(_dry);
+    o.start(t); o.stop(t + dur + 0.05);
+  });
+
+  // Lush pad chords (every 4 beats, heavy reverb)
+  const padRoot = 261.63;
+  MENU_PAD_SEQ.forEach((semis, i) => {
+    const t   = startT + i * beat * 4;
+    const dur = beat * 5;
+    semis.forEach(s => {
+      const f = padRoot * Math.pow(2, s / 12);
+      const g = c.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(0.03, t + 0.25);
+      g.gain.setValueAtTime(0.03, t + dur - 0.3);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      o.connect(g); g.connect(_wet);
+      o.start(t); o.stop(t + dur + 0.1);
+    });
+  });
+
+  const loopDur = MENU_MEL.length * step;
+  _menuTimer = setTimeout(() => scheduleMenuLoop(startT + loopDur), (loopDur - 0.6) * 1000);
+}
+
+export function startMenuMusic() {
+  if (_menuPlaying) return;
+  _menuPlaying = true;
+  stopMusic(); // never overlap with game music
+  try { scheduleMenuLoop(ctx().currentTime + 0.15); } catch(e) { console.warn('[menu-music]', e); }
+}
+
+export function stopMenuMusic() {
+  _menuPlaying = false;
+  if (_menuTimer) { clearTimeout(_menuTimer); _menuTimer = null; }
+}
+
+export function isMenuMusicPlaying() { return _menuPlaying; }
+
 export function haptic(pattern = [10]) {
   navigator.vibrate?.(pattern);
 }

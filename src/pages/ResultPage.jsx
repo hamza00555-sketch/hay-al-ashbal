@@ -1,4 +1,5 @@
 import { CardFace } from '../components/Card';
+import { SFX } from '../utils/sounds';
 import styles from './ResultPage.module.css';
 
 export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, onMenu }) {
@@ -43,10 +44,10 @@ export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, on
         </div>
 
         <div className={styles.buttons}>
-          <button className={styles.playAgain} onClick={onNewMatch}>
+          <button className={styles.playAgain} onClick={() => { SFX.confirmOk(); onNewMatch(); }}>
             مباراة جديدة
           </button>
-          <button className={styles.menu} onClick={onMenu}>
+          <button className={styles.menu} onClick={() => { SFX.buttonClick(); onMenu(); }}>
             القائمة الرئيسية
           </button>
         </div>

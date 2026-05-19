@@ -4,6 +4,7 @@ import {
   loadProfile, saveProfile,
 } from '../utils/playerProfile';
 import PlayerAvatar from '../components/PlayerAvatar';
+import { SFX } from '../utils/sounds';
 import styles from './SettingsPage.module.css';
 
 export default function SettingsPage({ onBack }) {
@@ -18,7 +19,7 @@ export default function SettingsPage({ onBack }) {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <button className={styles.back} onClick={onBack}>‹ رجوع</button>
+        <button className={styles.back} onClick={() => { SFX.buttonClick(); onBack(); }}>‹ رجوع</button>
         <h2 className={styles.title}>الملف الشخصي</h2>
       </div>
 
@@ -46,7 +47,7 @@ export default function SettingsPage({ onBack }) {
                   ? profile.frameColor
                   : 'rgba(255,255,255,0.15)',
               }}
-              onClick={() => update('cardImageId', id)}
+              onClick={() => { SFX.cardSelect(); update('cardImageId', id); }}
             >
               <img src={`/cards/${id}.png`} alt={id} className={styles.avatarThumb} />
             </button>
@@ -64,7 +65,7 @@ export default function SettingsPage({ onBack }) {
                 styles.shapeBtn,
                 profile.frameShape === s.id ? styles.shapeActive : '',
               ].join(' ')}
-              onClick={() => update('frameShape', s.id)}
+              onClick={() => { SFX.cardSelect(); update('frameShape', s.id); }}
             >
               <PlayerAvatar
                 cardImageId={profile.cardImageId}
@@ -89,7 +90,7 @@ export default function SettingsPage({ onBack }) {
                 profile.frameColor === c ? styles.colorActive : '',
               ].join(' ')}
               style={{ '--c': c }}
-              onClick={() => update('frameColor', c)}
+              onClick={() => { SFX.buttonClick(); update('frameColor', c); }}
             />
           ))}
         </div>

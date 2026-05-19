@@ -1,3 +1,4 @@
+import { SFX } from '../utils/sounds';
 import styles from './MenuPage.module.css';
 
 export default function MenuPage({ onStart, onSettings }) {
@@ -13,10 +14,10 @@ export default function MenuPage({ onStart, onSettings }) {
         </div>
 
         <div className={styles.buttons}>
-          <button className={styles.startBtn} onClick={onStart}>
+          <button className={styles.startBtn} onClick={() => { SFX.confirmOk(); onStart(); }}>
             ابدأ اللعب
           </button>
-          <button className={styles.settingsBtn} onClick={onSettings}>
+          <button className={styles.settingsBtn} onClick={() => { SFX.buttonClick(); onSettings(); }}>
             ⚙ الملف الشخصي
           </button>
         </div>

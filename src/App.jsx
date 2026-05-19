@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MenuPage        from './pages/MenuPage';
 import LobbyPage       from './pages/LobbyPage';
 import GamePage        from './pages/GamePage';
 import ResultPage      from './pages/ResultPage';
 import RoundOverScreen from './pages/RoundOverScreen';
 import SettingsPage    from './pages/SettingsPage';
+import { startMenuMusic, stopMenuMusic, stopMusic } from './utils/sounds';
 
 export default function App() {
   const [screen,       setScreen]       = useState('menu');
@@ -15,6 +16,15 @@ export default function App() {
   const [finalResult,  setFinalResult]  = useState(null);
   const [roundKey,     setRoundKey]     = useState(0);
   const [roundNumber,  setRoundNumber]  = useState(1);
+
+  useEffect(() => {
+    if (screen === 'game') {
+      stopMenuMusic();
+    } else {
+      stopMusic();
+      startMenuMusic();
+    }
+  }, [screen]);
 
   function handleLobbyReady(config) {
     setGameConfig(config);

@@ -1,4 +1,5 @@
 import { CardFace } from '../components/Card';
+import { SFX } from '../utils/sounds';
 import styles from './RoundOverScreen.module.css';
 
 export default function RoundOverScreen({ result, config, tokens, tokensToWin, onNextRound, onMenu }) {
@@ -49,10 +50,10 @@ export default function RoundOverScreen({ result, config, tokens, tokensToWin, o
         </div>
 
         <div className={styles.buttons}>
-          <button className={styles.nextBtn} onClick={onNextRound}>
+          <button className={styles.nextBtn} onClick={() => { SFX.confirmOk(); onNextRound(); }}>
             الجولة التالية ←
           </button>
-          <button className={styles.menuBtn} onClick={onMenu}>
+          <button className={styles.menuBtn} onClick={() => { SFX.buttonClick(); onMenu(); }}>
             القائمة الرئيسية
           </button>
         </div>

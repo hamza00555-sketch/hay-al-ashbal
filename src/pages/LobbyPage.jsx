@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { loadProfile, getAIProfile } from '../utils/playerProfile';
+import { SFX } from '../utils/sounds';
 import styles from './LobbyPage.module.css';
 
 const MODES = [
@@ -82,7 +83,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <button className={styles.back} onClick={onBack}>‹ رجوع</button>
+        <button className={styles.back} onClick={() => { SFX.buttonClick(); onBack(); }}>‹ رجوع</button>
         <h2 className={styles.title}>إعداد اللعبة</h2>
       </div>
 
@@ -93,7 +94,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
             <button
               key={m.id}
               className={`${styles.modeBtn} ${mode === m.id ? styles.active : ''}`}
-              onClick={() => handleModeChange(m.id)}
+              onClick={() => { SFX.cardSelect(); handleModeChange(m.id); }}
             >
               <span className={styles.modeIcon}>{m.icon}</span>
               <span className={styles.modeLabel}>{m.label}</span>
@@ -117,12 +118,12 @@ export default function LobbyPage({ onBack, onStartGame }) {
                   dir="rtl"
                 />
                 {players.length > minPlayers && (
-                  <button className={styles.removeBtn} onClick={() => removePlayer(i)}>✕</button>
+                  <button className={styles.removeBtn} onClick={() => { SFX.buttonClick(); removePlayer(i); }}>✕</button>
                 )}
               </div>
             ))}
             {players.length < maxPlayers && (
-              <button className={styles.addBtn} onClick={addPlayer}>
+              <button className={styles.addBtn} onClick={() => { SFX.cardSelect(); addPlayer(); }}>
                 + أضف لاعب
               </button>
             )}
@@ -152,7 +153,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
                 <button
                   key={n}
                   className={`${styles.countBtn} ${aiCount === n ? styles.countActive : ''}`}
-                  onClick={() => setAiCount(n)}
+                  onClick={() => { SFX.cardSelect(); setAiCount(n); }}
                 >
                   <span className={styles.countNum}>{n}</span>
                   <span className={styles.countSub}>
@@ -170,7 +171,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
                 <button
                   key={d.id}
                   className={`${styles.countBtn} ${difficulty === d.id ? styles.countActive : ''}`}
-                  onClick={() => setDifficulty(d.id)}
+                  onClick={() => { SFX.cardSelect(); setDifficulty(d.id); }}
                 >
                   <span className={styles.diffLabel}>{d.label}</span>
                   <span className={styles.countSub}>{d.desc}</span>
@@ -188,7 +189,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
             <button
               key={n}
               className={`${styles.countBtn} ${tokensToWin === n ? styles.countActive : ''}`}
-              onClick={() => setTokensToWin(n)}
+              onClick={() => { SFX.cardSelect(); setTokensToWin(n); }}
             >
               <span className={styles.countNum}>{n}</span>
               <span className={styles.countSub}>
@@ -202,7 +203,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
       <div className={styles.footer}>
         <button
           className={styles.startBtn}
-          onClick={startGame}
+          onClick={() => { SFX.confirmOk(); startGame(); }}
           disabled={!canStart}
         >
           ابدأ الجولة
