@@ -258,244 +258,30 @@ export const SFX = {
   })); },
 };
 
-// ── Background music ──────────────────────────────────────────────
-// Two-layer: melody (pentatonic) + bass + soft percussion
+// ── Background music (MP3 files) ─────────────────────────────────
 
-// C pentatonic major: C D E G A (and octave up)
-const PEN = [261.63, 293.66, 329.63, 392.00, 440.00,
-             523.25, 587.33, 659.25, 783.99, 880.00];
+let _gameBuffer = null;
+let _menuBuffer = null;
 
-// 8-bar melody pattern (indices into PEN, null = rest)
-const MELODY = [4,3,2,null,4,4,3,null, 6,5,4,null,6,6,5,null,
-                4,3,2,3,4,null,3,null, 2,1,0,null,2,2,1,null];
-
-// Bass (root on beat 1, fifth on beat 3)
-const BASS_ROOTS = [0, 0, 3, 3, 0, 0, 3, 5]; // indices into PEN / 2 octave
-
-// Chord pads every 4 beats
-const PADS = [
-  [0, 4, 7],        // C major
-  [0, 4, 7],
-  [5, 9, 14],       // G major (using PEN freqs)
-  [3, 7, 10],       // A minor
-  [0, 4, 7],
-  [0, 4, 7],
-  [3, 7, 10],
-  [5, 9, 12],
-];
-
-let _musicPlaying = false;
-let _musicTimer   = null;
-let _gameOscs     = []; // tracked so we can force-stop them
-
-function scheduleLoop(startT) {
-  if (!_musicPlaying) return;
-  const c    = ctx();
-  const bpm  = 88;
-  const beat = 60 / bpm;
-  const step = beat / 2;
-
-  function mkOsc(type, freq, gainNode, t, dur) {
-    const o = c.createOscillator(); o.type = type; o.frequency.value = freq;
-    o.connect(gainNode);
-    o.start(t); o.stop(t + dur + 0.05);
-    _gameOscs.push(o);
-    return o;
-  }
-
-  // Melody
-  MELODY.forEach((idx, i) => {
-    if (idx === null) return;
-    const t = startT + i * step;
-    const g = c.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(0.09, t + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + step * 0.75);
-    g.connect(_dry);
-    mkOsc('triangle', PEN[idx], g, t, step);
-  });
-
-  // Bass
-  BASS_ROOTS.forEach((ri, i) => {
-    const t = startT + i * beat * 2;
-    const f = PEN[ri] / 2;
-    const g = c.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(0.11, t + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + beat * 1.4);
-    g.connect(_dry);
-    mkOsc('sine', f, g, t, beat * 2);
-
-    const g2 = c.createGain();
-    g2.gain.setValueAtTime(0.0001, t + beat);
-    g2.gain.linearRampToValueAtTime(0.07, t + beat + 0.02);
-    g2.gain.exponentialRampToValueAtTime(0.0001, t + beat * 2);
-    g2.connect(_dry);
-    mkOsc('sine', f * 1.5, g2, t + beat, beat);
-  });
-
-  // Pads
-  const padRoot = 261.63;
-  PADS.forEach((semis, i) => {
-    const t   = startT + i * beat * 4;
-    const dur = beat * 3.5;
-    semis.forEach(s => {
-      const f = padRoot * Math.pow(2, s / 12);
-      const g = c.createGain();
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(0.04, t + 0.08);
-      g.gain.setValueAtTime(0.04, t + dur - 0.1);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      g.connect(_wet);
-      mkOsc('triangle', f, g, t, dur);
-    });
-  });
-
-  // Hi-hat
-  for (let i = 0; i < MELODY.length; i++) {
-    const t   = startT + i * step;
-    const buf = c.createBuffer(1, Math.floor(c.sampleRate * 0.04), c.sampleRate);
-    const dat = buf.getChannelData(0);
-    for (let j = 0; j < dat.length; j++) dat[j] = Math.random() * 2 - 1;
-    const src = c.createBufferSource(); src.buffer = buf;
-    const bp  = c.createBiquadFilter(); bp.type = 'highpass'; bp.frequency.value = 7000;
-    const g   = c.createGain();
-    g.gain.setValueAtTime(i % 4 === 0 ? 0.06 : 0.03, t);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
-    src.connect(bp); bp.connect(g); g.connect(_dry);
-    src.start(t); src.stop(t + 0.05);
-  }
-
-  // Kick
-  for (let bar = 0; bar < 4; bar++) {
-    const t  = startT + bar * beat * 4;
-    const kg = c.createGain();
-    kg.gain.setValueAtTime(0.22, t);
-    kg.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
-    const ko = c.createOscillator(); ko.type = 'sine';
-    ko.frequency.setValueAtTime(140, t);
-    ko.frequency.exponentialRampToValueAtTime(40, t + 0.18);
-    ko.connect(kg); kg.connect(_dry);
-    ko.start(t); ko.stop(t + 0.30);
-    _gameOscs.push(ko);
-  }
-
-  const loopDur = MELODY.length * step;
-  _musicTimer = setTimeout(() => scheduleLoop(startT + loopDur), (loopDur - 0.5) * 1000);
+async function loadBuffer(url) {
+  const c   = ctx();
+  const res = await fetch(url);
+  const ab  = await res.arrayBuffer();
+  return c.decodeAudioData(ab);
 }
 
-export function startMusic() {
-  if (_musicPlaying) return;
-  _musicPlaying = true;
-  // Fade out menu music, then start game music after fade
-  _stopMenuMusicFade(750, () => {
-    if (!_musicPlaying) return;
-    try { _gameOscs = []; scheduleLoop(ctx().currentTime + 0.1); }
-    catch(e) { console.warn('[music]', e); }
-  });
-}
-
-export function stopMusic() {
-  _musicPlaying = false;
-  if (_musicTimer) { clearTimeout(_musicTimer); _musicTimer = null; }
-  _gameOscs.forEach(o => { try { o.stop(); } catch(_) {} });
-  _gameOscs = [];
-}
-
-export function isMusicPlaying() { return _musicPlaying; }
-
-// ── Menu / lobby music ────────────────────────────────────────────
-const HIJ = [261.63, 277.18, 329.63, 349.23, 392.00, 415.30, 466.16, 523.25];
-const MENU_MEL     = [4,3,2,null,3,4,null,6, 5,4,3,null,4,null,3,2, 2,1,0,null,1,2,null,4, 3,2,1,null,0,null,null,null];
-const MENU_BASS    = [0,0,4,4,0,0,3,3];
-const MENU_PAD_SEQ = [[0,4,7],[3,7,10],[0,4,7],[5,9,12],[0,4,7],[3,7,10],[0,4,7],[4,7,11]];
+// ── Menu music ────────────────────────────────────────────────────
 
 let _menuPlaying = false;
-let _menuTimer   = null;
-let _menuGain    = null; // master fade gain for all menu notes
-let _menuOscs    = []; // tracked nodes for force-stop
+let _menuSource  = null;
+let _menuGain    = null;
 
-function getMenuGain() {
-  if (_menuGain) return _menuGain;
-  const c = ctx();
-  _menuGain = c.createGain();
-  _menuGain.gain.value = 1;
-  _menuGain.connect(_dry);
-  _menuGain.connect(_rev); // reverb send
-  return _menuGain;
-}
-
-function scheduleMenuLoop(startT) {
-  if (!_menuPlaying) return;
-  const c    = ctx();
-  const mg   = getMenuGain();
-  const bpm  = 62;
-  const beat = 60 / bpm;
-  const step = beat / 2;
-
-  function mkMenuOsc(type, freq, gainNode, t, dur) {
-    const o = c.createOscillator(); o.type = type; o.frequency.value = freq;
-    o.connect(gainNode);
-    o.start(t); o.stop(t + dur + 0.05);
-    _menuOscs.push(o);
-  }
-
-  // Melody
-  MENU_MEL.forEach((idx, i) => {
-    if (idx === null) return;
-    const t = startT + i * step;
-    const f = HIJ[idx % HIJ.length];
-    const g = c.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(0.07, t + 0.05);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + step * 1.2);
-    g.connect(mg);
-    mkMenuOsc('triangle', f, g, t, step * 1.4);
-  });
-
-  // Bass
-  MENU_BASS.forEach((ri, i) => {
-    const t   = startT + i * beat * 2;
-    const f   = HIJ[ri % HIJ.length] / 2;
-    const dur = beat * 2.8;
-    const g   = c.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(0.09, t + 0.10);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    g.connect(mg);
-    mkMenuOsc('sine', f, g, t, dur);
-  });
-
-  // Pads
-  const padRoot = 261.63;
-  MENU_PAD_SEQ.forEach((semis, i) => {
-    const t   = startT + i * beat * 4;
-    const dur = beat * 5;
-    semis.forEach(s => {
-      const f = padRoot * Math.pow(2, s / 12);
-      const g = c.createGain();
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(0.03, t + 0.25);
-      g.gain.setValueAtTime(0.03, t + dur - 0.3);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      g.connect(mg);
-      mkMenuOsc('sine', f, g, t, dur);
-    });
-  });
-
-  const loopDur = MENU_MEL.length * step;
-  _menuTimer = setTimeout(() => scheduleMenuLoop(startT + loopDur), (loopDur - 0.6) * 1000);
-}
-
-// Internal: fade out menu and call cb when done (or immediately if no fade)
 function _stopMenuMusicFade(fadeMs, cb) {
   _menuPlaying = false;
-  if (_menuTimer) { clearTimeout(_menuTimer); _menuTimer = null; }
 
   const doStop = () => {
-    _menuOscs.forEach(o => { try { o.stop(); } catch(_) {} });
-    _menuOscs = [];
-    if (_menuGain) { try { _menuGain.disconnect(); } catch(_) {} _menuGain = null; }
+    if (_menuSource) { try { _menuSource.stop(); } catch(_) {} _menuSource = null; }
+    if (_menuGain)   { try { _menuGain.disconnect(); } catch(_) {} _menuGain = null; }
     cb?.();
   };
 
@@ -509,19 +295,70 @@ function _stopMenuMusicFade(fadeMs, cb) {
   }
 }
 
-export function startMenuMusic() {
+export async function startMenuMusic() {
   if (_menuPlaying) return;
   _menuPlaying = true;
   stopMusic();
-  try { scheduleMenuLoop(ctx().currentTime + 0.15); }
-  catch(e) { console.warn('[menu-music]', e); }
+  try {
+    const c   = ctx();
+    const buf = _menuBuffer || await loadBuffer('/music-menu.mp3');
+    _menuBuffer = buf;
+    if (!_menuPlaying) return;
+
+    _menuGain = c.createGain();
+    _menuGain.gain.setValueAtTime(0.0001, c.currentTime);
+    _menuGain.gain.linearRampToValueAtTime(0.55, c.currentTime + 1.8);
+    _menuGain.connect(_comp);
+
+    _menuSource = c.createBufferSource();
+    _menuSource.buffer = buf;
+    _menuSource.loop = true;
+    _menuSource.connect(_menuGain);
+    _menuSource.start();
+  } catch(e) { console.warn('[menu-music]', e); }
 }
 
-export function stopMenuMusic() {
-  _stopMenuMusicFade(0); // immediate stop when going back to menu (no fade needed)
-}
-
+export function stopMenuMusic() { _stopMenuMusicFade(0); }
 export function isMenuMusicPlaying() { return _menuPlaying; }
+
+// ── Game music ────────────────────────────────────────────────────
+
+let _musicPlaying = false;
+let _gameSource   = null;
+let _gameGain     = null;
+
+export function startMusic() {
+  if (_musicPlaying) return;
+  _musicPlaying = true;
+  _stopMenuMusicFade(750, async () => {
+    if (!_musicPlaying) return;
+    try {
+      const c   = ctx();
+      const buf = _gameBuffer || await loadBuffer('/music-game.mp3');
+      _gameBuffer = buf;
+      if (!_musicPlaying) return;
+
+      _gameGain = c.createGain();
+      _gameGain.gain.setValueAtTime(0.0001, c.currentTime);
+      _gameGain.gain.linearRampToValueAtTime(0.60, c.currentTime + 1.5);
+      _gameGain.connect(_comp);
+
+      _gameSource = c.createBufferSource();
+      _gameSource.buffer = buf;
+      _gameSource.loop = true;
+      _gameSource.connect(_gameGain);
+      _gameSource.start();
+    } catch(e) { console.warn('[music]', e); }
+  });
+}
+
+export function stopMusic() {
+  _musicPlaying = false;
+  if (_gameSource) { try { _gameSource.stop(); } catch(_) {} _gameSource = null; }
+  if (_gameGain)   { try { _gameGain.disconnect(); } catch(_) {} _gameGain = null; }
+}
+
+export function isMusicPlaying() { return _musicPlaying; }
 
 export function haptic(pattern = [10]) {
   navigator.vibrate?.(pattern);
