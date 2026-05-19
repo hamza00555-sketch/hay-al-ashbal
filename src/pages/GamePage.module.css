@@ -871,25 +871,49 @@
 }
 
 /* ── Online: waiting for opponent ────────────────────────────── */
-.onlineWaitOverlay {
-  position: fixed;
-  top: 50%;
+.onlineWaitBanner {
+  position: absolute;
+  top: 8px;
   left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 150;
-  background: rgba(15, 35, 60, 0.82);
-  backdrop-filter: blur(6px);
+  transform: translateX(-50%);
+  z-index: 120;
+  background: rgba(15, 35, 60, 0.80);
+  backdrop-filter: blur(4px);
   border: 1px solid rgba(96, 184, 255, 0.25);
   border-radius: 20px;
-  padding: 18px 28px;
+  padding: 5px 14px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   pointer-events: none;
+  color: #a8d4ff;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.actionToast {
+  position: fixed;
+  bottom: 130px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: rgba(10, 25, 50, 0.93);
+  border: 1px solid rgba(96, 184, 255, 0.4);
+  border-radius: 16px;
+  padding: 10px 22px;
   color: #fff;
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: toastSlideUp 0.3s ease;
+}
+
+@keyframes toastSlideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0);    }
 }
 
 .onlineWaitDots {

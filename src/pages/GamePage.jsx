@@ -10,7 +10,7 @@ import {
   mustPlayBustan,
 } from '../engine/gameEngine';
 import { computeAIMove } from '../ai/aiPlayer';
-import { buildNarrative } from '../engine/narrativeBuilder';
+import { buildNarrative, buildActionText } from '../engine/narrativeBuilder';
 import { CardFace, CardBack, FlipCard } from '../components/Card';
 import ActionModal from '../components/ActionModal';
 import HandCover from '../components/HandCover';
@@ -215,6 +215,11 @@ export default function GamePage({
   const drawnCardRef  = useRef(null);
   const deckRef       = useRef(null);
 
+  // Online: action toast shown to the opponent
+  const [actionToast,   setActionToast]   = useState(null);
+  const lastActionTs  = useRef(-1);
+  const toastTimer    = useRef(null);
+
   const [musicOn,      setMusicOn]     = useState(true);
   const [showGuide,    setShowGuide]   = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -286,9 +291,15 @@ export default function GamePage({
     }
   }
 
-  function pushNarrative(beats, nextState) {
-    // Stamp version for online sync
-    const stamped = isOnline ? { ...nextState, _v: (nextState._v ?? 0) + 1 } : nextState;
+  function pushNarrative(beats, nextState, actionText = null) {
+    const stamped = isOnline
+      ? {
+          ...nextState,
+          _v:      (nextState._v ?? 0) + 1,
+          _author: myPlayerIdx,
+          ...(actionText ? { _action: { text: actionText, ts: Date.now() } } : {}),
+        }
+      : nextState;
     clearTimeout(narrativeTimer.current);
     beatQueueRef.current = beats;
     setPendingGs(stamped);
@@ -301,36 +312,46 @@ export default function GamePage({
     return () => {
       clearTimeout(narrativeTimer.current);
       clearTimeout(announceTimer.current);
+      clearTimeout(toastTimer.current);
     };
   }, []);
 
-  // ── Online: sync gs to Firebase after every change (host only) ──
+  // ── Online: each player writes their own turns to Firebase ──
+  // _author is stamped = myPlayerIdx when we make a move, so echo is skipped on receive.
   const lastSyncedV = useRef(-1);
   useEffect(() => {
-    if (!isOnline || !isHost || !roomCode) return;
+    if (!isOnline || !roomCode) return;
+    if ((gs._author ?? -1) !== myPlayerIdx) return; // only write my own turns
     const v = gs._v ?? 0;
     if (v === lastSyncedV.current) return;
     lastSyncedV.current = v;
     writeGameState(roomCode, gs).catch(e => console.warn('[sync]', e));
-  }, [gs, isOnline, isHost, roomCode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [gs, isOnline, roomCode, myPlayerIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Online: receive gs from Firebase (non-host, or guest receiving host updates) ──
+  // ── Online: receive opponent's turns from Firebase ──
   const lastReceivedV = useRef(-1);
   useEffect(() => {
-    if (!isOnline || isHost || !roomCode) return;
+    if (!isOnline || !roomCode) return;
     const unsub = listenRoom(roomCode, room => {
       if (!room?.state) return;
       const incoming = room.state;
       const v = incoming._v ?? 0;
       if (v <= lastReceivedV.current) return;
+      if ((incoming._author ?? -1) === myPlayerIdx) return; // skip own echo
       lastReceivedV.current = v;
-      // Don't update if narrative is playing (wait for it to finish)
+      // Show action toast for the opponent's move
+      if (incoming._action?.ts && incoming._action.ts !== lastActionTs.current) {
+        lastActionTs.current = incoming._action.ts;
+        clearTimeout(toastTimer.current);
+        setActionToast(incoming._action.text);
+        toastTimer.current = setTimeout(() => setActionToast(null), 3500);
+      }
       if (beatQueueRef.current.length === 0 && !currentBeat) {
         setGs(sanitizeGs(incoming));
       }
     });
     return () => unsub();
-  }, [isOnline, isHost, roomCode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOnline, roomCode, myPlayerIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track newly eliminated players for animation + haptic
   useEffect(() => {
@@ -426,7 +447,8 @@ export default function GamePage({
         prevGs:           afterDraw,
         isAI:             true,
       });
-      pushNarrative(beats, nextGsRaw);
+      const txt = isOnline ? buildActionText({ card: playedCard, actorName: currentPlayer.name, targetName: targetPlayer?.name ?? null, nextGs: nextGsRaw, prevGs: afterDraw }) : null;
+      pushNarrative(beats, nextGsRaw, txt);
       return;
     }
 
@@ -437,7 +459,7 @@ export default function GamePage({
       const t = setTimeout(() => {
         setIsDrawing(false);
         setGs(prev => {
-          const next = { ...doDrawCard(prev), _v: (prev._v ?? 0) + 1 };
+          const next = { ...doDrawCard(prev), _v: (prev._v ?? 0) + 1, _author: myPlayerIdx };
           return next;
         });
       }, 750);
@@ -494,7 +516,8 @@ export default function GamePage({
             prevGs:    prevGsSnap,
             isAI:      false,
           });
-          pushNarrative(beats, nextGsRaw);
+          const txt = isOnline ? buildActionText({ card, actorName: currentPlayer.name, targetName: null, nextGs: nextGsRaw, prevGs: prevGsSnap }) : null;
+          pushNarrative(beats, nextGsRaw, txt);
         } else {
           setPendingPlay({ card, source });
           setShowAction(true);
@@ -558,16 +581,21 @@ export default function GamePage({
       prevGs:           gs,
       isAI:             false,
     });
-    pushNarrative(beats, nextGsRaw);
+    const txt = isOnline ? buildActionText({ card: pendingPlay.card, actorName: currentPlayer.name, targetName: targetPlayer?.name ?? null, nextGs: nextGsRaw, prevGs: gs }) : null;
+    pushNarrative(beats, nextGsRaw, txt);
     setFocusedSource(null);
     setPendingPlay(null);
-  }, [gs, pendingPlay, currentPlayer]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [gs, pendingPlay, currentPlayer, isOnline]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePeekDone = useCallback(() => {
     const next = advanceTurn({ ...gs, phase: 'DONE', peekCard: null, peekTargetName: null });
-    // Increment _v so host sync effect writes post-peek state to Firebase
-    setGs(isOnline ? { ...next, _v: (next._v ?? 0) + 1 } : next);
-  }, [gs, isOnline]);
+    if (isOnline) {
+      const txt = `👀 ${currentPlayer.name} رأى كرت ${gs.peekTargetName ?? 'خصمه'}`;
+      setGs({ ...next, _v: (next._v ?? 0) + 1, _author: myPlayerIdx, _action: { text: txt, ts: Date.now() } });
+    } else {
+      setGs(next);
+    }
+  }, [gs, isOnline, myPlayerIdx, currentPlayer.name]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleMusic = () => {
     SFX.buttonClick();
@@ -623,23 +651,18 @@ export default function GamePage({
   }
 
   if (gs.phase === 'PEEK_REVEAL') {
-    // Online guest: shouldn't see the host's peeked card — show waiting overlay
-    if (isOnline && onlineWaiting) {
+    // Online: only the active player sees the peek screen; opponent falls through to live board
+    if (!isOnline || !onlineWaiting) {
       return (
-        <div className={styles.onlineWaitOverlay} style={{ position: 'fixed', inset: 0, zIndex: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(10,25,50,0.9)' }}>
-          <div className={styles.onlineWaitDots}><span/><span/><span/></div>
-          <p style={{ color: '#fff', marginTop: 12 }}>دور {currentPlayer.name}...</p>
+        <div className={styles.peekScreen}>
+          <p className={styles.peekTitle}>كرت {gs.peekTargetName}</p>
+          {gs.peekCard && <CardFace card={gs.peekCard} size="large" />}
+          <p className={styles.peekNote}>شوفه وحدك، لا تبيّن 😏</p>
+          <button className={styles.peekDone} onClick={handlePeekDone}>فهمت</button>
         </div>
       );
     }
-    return (
-      <div className={styles.peekScreen}>
-        <p className={styles.peekTitle}>كرت {gs.peekTargetName}</p>
-        {gs.peekCard && <CardFace card={gs.peekCard} size="large" />}
-        <p className={styles.peekNote}>شوفه وحدك، لا تبيّن 😏</p>
-        <button className={styles.peekDone} onClick={handlePeekDone}>فهمت</button>
-      </div>
-    );
+    // Opponent: fall through to board render (they'll see the action toast)
   }
 
   const isMyTurn = currentPlayer.id === humanPlayer?.id;
@@ -687,12 +710,17 @@ export default function GamePage({
         </div>
       )}
 
-      {/* Online: waiting for opponent overlay */}
-      {onlineWaiting && !currentBeat && (
-        <div className={styles.onlineWaitOverlay}>
+      {/* Online: small top banner while opponent is playing */}
+      {onlineWaiting && (
+        <div className={styles.onlineWaitBanner}>
           <div className={styles.onlineWaitDots}><span/><span/><span/></div>
-          <p>دور {currentPlayer.name}...</p>
+          <span>دور {currentPlayer.name}</span>
         </div>
+      )}
+
+      {/* Online: action toast describing opponent's last move */}
+      {actionToast && (
+        <div className={styles.actionToast}>{actionToast}</div>
       )}
 
       {/* Round indicator */}

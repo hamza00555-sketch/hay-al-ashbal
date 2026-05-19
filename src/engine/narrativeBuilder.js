@@ -89,3 +89,29 @@ export function buildNarrative({
 
   return beats;
 }
+
+// Short Arabic summary of an action — used by the opponent to see what happened
+export function buildActionText({ card, actorName, targetName, nextGs, prevGs }) {
+  const newlyEliminated = nextGs.players.filter(p => {
+    const was = prevGs?.players?.find(x => x.id === p.id);
+    return p.isEliminated && was && !was.isEliminated;
+  });
+  const elim = newlyEliminated[0]?.name;
+  switch (card.id) {
+    case 1: return elim
+      ? `🎯 ${actorName} خمّن صح — ${elim} خرج!`
+      : `❌ ${actorName} خمّن وأخطأ`;
+    case 2: return `👀 ${actorName} رأى كرت ${targetName ?? 'خصمه'}`;
+    case 3: return elim
+      ? `⚔️ ${actorName} قارن مع ${targetName} — ${elim} خرج!`
+      : `⚔️ ${actorName} قارن مع ${targetName} — تعادل`;
+    case 4: return `🛡️ ${actorName} حمى نفسه`;
+    case 5: return elim
+      ? `💥 ${actorName} أجبر ${targetName} — ${elim} خرج!`
+      : `🔄 ${actorName} أجبر ${targetName} على تغيير كرته`;
+    case 6: return `🔀 ${actorName} بادل كرته مع ${targetName ?? 'خصمه'}`;
+    case 7: return `🌿 ${actorName} رمى البستان`;
+    case 8: return `⭐ ${actorName} لفّ النجمة — خرج!`;
+    default: return `${actorName} لعب بطاقة`;
+  }
+}
