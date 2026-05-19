@@ -216,12 +216,12 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  /* 54px clears the roundBadge + settingsBtn fixed at top:12px */
-  padding: 54px 0 4px;
+  /* 62px: settingsBtn ends at 50px + 3D rotateX visual offset ~5px + 7px gap */
+  padding: 62px 0 4px;
   position: relative;
   z-index: 1;
 }
-.topZone.empty { padding: 0; }
+.topZone.empty { padding: 56px 0 0; } /* reserve space for fixed badges even with no opponent */
 
 .leftZone {
   grid-area: left;
@@ -300,19 +300,20 @@
   z-index: 1;
   box-shadow: 0 -4px 20px rgba(86,130,178,0.1);
   transition: box-shadow 0.4s;
-  /* Prevent humanZone from overflowing on short screens */
-  min-height: 0;
+  /* overflow:hidden clips content that exceeds available height;
+     do NOT set min-height:0 — it allows the grid auto track to shrink
+     smaller than content, causing cards to be clipped */
   overflow: hidden;
 }
 
 @media (max-height: 720px) {
-  .topZone { padding-top: 46px; }
+  .topZone { padding-top: 58px; }
   .humanZone { gap: 5px; }
   .arena { gap: 8px; padding: 4px 6px; }
 }
 
 @media (max-height: 680px) {
-  .topZone { padding-top: 42px; }
+  .topZone { padding-top: 56px; }
   .humanZone {
     padding: 6px 12px calc(8px + env(safe-area-inset-bottom, 0px));
     gap: 4px;
@@ -323,7 +324,7 @@
 }
 
 @media (max-height: 620px) {
-  .topZone { padding-top: 38px; }
+  .topZone { padding-top: 54px; }
   .humanZone { gap: 2px; padding-block: 4px; }
   .arena { gap: 3px; padding: 0 4px; }
   .turnHUDName { font-size: 0.88rem; }
