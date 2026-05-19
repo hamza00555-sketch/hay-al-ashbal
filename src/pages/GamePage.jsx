@@ -394,6 +394,24 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
     }
   }, [gs.phase, gs.currentPlayerIndex, turnAnnounce]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Skip AI vs AI when human is eliminated ───────────────────────
+  useEffect(() => {
+    if (!hasAI) return;
+    if (gs.phase === 'GAME_OVER') return;
+    if (currentBeat || pendingGs || beatQueueRef.current.length > 0) return;
+    if (!humanPlayer?.isEliminated) return;
+
+    // Fast-forward remaining AI turns silently to determine the winner
+    let s = gs;
+    for (let guard = 0; guard < 300 && s.phase !== 'GAME_OVER'; guard++) {
+      if (s.phase !== 'AI_TURN') break;
+      const afterDraw = doDrawCard(s);
+      const { state: next } = computeAIMove(afterDraw);
+      s = next;
+    }
+    if (s.phase === 'GAME_OVER') setGs(s);
+  }, [gs, currentBeat, pendingGs, hasAI, humanPlayer?.isEliminated]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Handlers ─────────────────────────────────────────────────
   const handleCardClick = useCallback((source) => {
     if (isLocked) return;
