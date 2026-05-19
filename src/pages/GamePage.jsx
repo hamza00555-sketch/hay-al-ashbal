@@ -392,6 +392,9 @@ export default function GamePage({
           : cp.id === humanPlayer?.id // vsAI: only when it's the human's turn
         );
 
+    // Online opponent turns: skip full-screen announce entirely (wait banner is enough)
+    if (isOnline && !isMe) return;
+
     if (isMe) SFX.turnHuman(); else SFX.turnAI();
     setTurnAnnounce({ name: cp.name, profile: cp.profile, isMe, isAI: cp.isAI });
 
@@ -417,7 +420,8 @@ export default function GamePage({
 
   // ── Main phase driver ────────────────────────────────────────
   useEffect(() => {
-    if (turnAnnounce) return; // wait until announcement is dismissed
+    // In online mode while waiting: don't block phase driver on turnAnnounce
+    if (turnAnnounce && !onlineWaiting) return;
 
     if (gs.phase === 'GAME_OVER') {
       SFX.win();
@@ -604,7 +608,12 @@ export default function GamePage({
   };
 
   // ── Render guards ────────────────────────────────────────────
-  if (gs.phase === 'GAME_OVER') return null;
+  // Show win flash during the 1s delay before onGameOver navigates away
+  if (gs.phase === 'GAME_OVER') {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: winFlash ? '#fff' : '#0b1b2d', zIndex: 9999 }} />
+    );
+  }
 
   // Turn announcement screen
   if (turnAnnounce) {
