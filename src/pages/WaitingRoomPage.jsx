@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { listenRoom, startGame, leaveRoom } from '../services/gameRoom';
+import { listenRoom, startGame, leaveRoom, sanitizeGs } from '../services/gameRoom';
 import { createInitialState } from '../engine/gameEngine';
 import { loadProfile, getAIProfile } from '../utils/playerProfile';
 import { SFX } from '../utils/sounds';
@@ -25,7 +25,7 @@ export default function WaitingRoomPage({ user, roomInfo, onGameStart, onLeave }
     const uidToIdx = room.uidToIdx || {};
     const myIdx    = uidToIdx[myUid] ?? 0;
     onGameStart({
-      initialGs: room.state,
+      initialGs: sanitizeGs(room.state),
       myPlayerIdx: myIdx,
       uidToIdx,
       roomCode: code,

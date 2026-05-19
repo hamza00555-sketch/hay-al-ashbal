@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { writeGameState, listenRoom } from '../services/gameRoom';
+import { writeGameState, listenRoom, sanitizeGs } from '../services/gameRoom';
 import {
   createInitialState,
   getCurrentPlayer,
@@ -326,7 +326,7 @@ export default function GamePage({
       lastReceivedV.current = v;
       // Don't update if narrative is playing (wait for it to finish)
       if (beatQueueRef.current.length === 0 && !currentBeat) {
-        setGs(incoming);
+        setGs(sanitizeGs(incoming));
       }
     });
     return () => unsub();

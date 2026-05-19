@@ -57,6 +57,24 @@ export function listenRoom(code, callback) {
   return onValue(ref(db, `rooms/${code}`), snap => callback(snap.val()));
 }
 
+// Firebase drops empty arrays (converts [] to null). Restore them after reading.
+export function sanitizeGs(raw) {
+  if (!raw) return null;
+  const toArr = v => (Array.isArray(v) ? v : v != null ? Object.values(v) : []);
+  return {
+    ...raw,
+    gameLog:       Array.isArray(raw.gameLog)       ? raw.gameLog       : [],
+    globalDiscard: Array.isArray(raw.globalDiscard) ? raw.globalDiscard : [],
+    deck:          toArr(raw.deck),
+    players:       toArr(raw.players).map(p => ({
+      ...p,
+      hand:        toArr(p.hand),
+      discardPile: Array.isArray(p.discardPile) ? p.discardPile : [],
+      peekMemory:  p.peekMemory ?? {},
+    })),
+  };
+}
+
 // Write game state (called after every action by the active player)
 export async function writeGameState(code, state, tokens, roundNum) {
   const upd = { state, pendingAction: null };
