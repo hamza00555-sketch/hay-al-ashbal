@@ -1,0 +1,110 @@
+.page {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #0b1b2d 0%, #1a3a5c 100%);
+  padding: 24px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 40px 28px 32px;
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.logo {
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #FFC83D;
+  margin: 0 0 6px;
+}
+
+.sub {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 32px;
+}
+
+.googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  background: #fff;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  margin-bottom: 16px;
+}
+.googleBtn:hover  { opacity: 0.92; transform: translateY(-1px); }
+.googleBtn:active { transform: scale(0.98); }
+.googleBtn:disabled { opacity: 0.6; cursor: wait; }
+
+.googleIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4285F4, #34A853, #FBBC05, #EA4335);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid #ccc;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.err {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.85rem;
+  color: #ff6b6b;
+  margin: 0 0 12px;
+}
+
+.skipBtn {
+  background: none;
+  border: none;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.15s;
+}
+.skipBtn:hover { color: rgba(255, 255, 255, 0.7); }

@@ -1,0 +1,219 @@
+.page {
+  min-height: 100svh;
+  background: linear-gradient(180deg, #EAF4FF 0%, #F5FAFF 100%);
+  font-family: 'Zanjabeel', sans-serif;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 32px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid rgba(86, 130, 178, 0.1);
+}
+
+.leaveBtn {
+  background: none;
+  border: 1px solid rgba(229, 57, 53, 0.3);
+  border-radius: 8px;
+  color: #e53935;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.leaveBtn:hover { background: rgba(229, 57, 53, 0.06); }
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #1F3D5A;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+/* Code section */
+.codeSection {
+  text-align: center;
+  padding: 28px 20px 20px;
+}
+
+.codeLabel {
+  font-size: 0.85rem;
+  color: #6B7A8A;
+  margin: 0 0 12px;
+}
+
+.codeBox {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 2px solid #60b8ff;
+  border-radius: 18px;
+  padding: 14px 20px;
+  box-shadow: 0 4px 20px rgba(96, 184, 255, 0.2);
+}
+
+.code {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #1F3D5A;
+  letter-spacing: 8px;
+  line-height: 1;
+  direction: ltr;
+}
+
+.copyBtn {
+  background: #60b8ff;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.copyBtn:hover { opacity: 0.85; }
+
+/* Players */
+.players {
+  padding: 0 20px;
+  flex: 1;
+}
+
+.playersLabel {
+  font-size: 0.82rem;
+  color: #5682B2;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.playerRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(86, 130, 178, 0.08);
+  border: 1.5px solid rgba(86, 130, 178, 0.12);
+}
+
+.playerIcon {
+  font-size: 1.5rem;
+}
+
+.playerName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1F3D5A;
+  flex: 1;
+}
+
+.hostBadge {
+  background: #FFC83D;
+  color: #1F3D5A;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.emptySlot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(86, 130, 178, 0.04);
+  border: 1.5px dashed rgba(86, 130, 178, 0.2);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.emptyIcon {
+  font-size: 1.5rem;
+  color: rgba(86, 130, 178, 0.3);
+}
+
+.emptyText {
+  font-size: 0.9rem;
+  color: rgba(86, 130, 178, 0.4);
+}
+
+.err {
+  font-size: 0.88rem;
+  color: #e53935;
+  text-align: center;
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+
+/* Footer */
+.footer {
+  padding: 16px 20px 0;
+}
+
+.startBtn {
+  width: 100%;
+  padding: 16px;
+  background: #FFC83D;
+  border: none;
+  border-radius: 16px;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #1F3D5A;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 200, 61, 0.35);
+  transition: opacity 0.15s, transform 0.1s;
+}
+.startBtn:hover   { opacity: 0.92; transform: translateY(-1px); }
+.startBtn:active  { transform: scale(0.98); }
+.startBtn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.waitHint {
+  font-size: 0.8rem;
+  color: #6B7A8A;
+  text-align: center;
+  margin: 8px 0 0;
+}
+
+/* Guest waiting */
+.waitingMsg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 20px;
+  color: #5682B2;
+  font-size: 0.9rem;
+}
+
+.waitDots {
+  display: flex;
+  gap: 6px;
+}
+
+.waitDots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #60b8ff;
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+.waitDots span:nth-child(2) { animation-delay: 0.2s; }
+.waitDots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+  40%           { transform: scale(1.2); opacity: 1; }
+}

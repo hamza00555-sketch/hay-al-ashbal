@@ -1,0 +1,137 @@
+.page {
+  min-height: 100svh;
+  background: linear-gradient(180deg, #EAF4FF 0%, #F5FAFF 100%);
+  padding: 0 0 40px;
+  font-family: 'Zanjabeel', sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px 8px;
+  border-bottom: 1px solid rgba(86, 130, 178, 0.1);
+}
+
+.back {
+  background: none;
+  border: none;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  color: #5682B2;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #1F3D5A;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.nameRow {
+  padding: 20px 20px 8px;
+}
+
+.label {
+  display: block;
+  font-size: 0.82rem;
+  color: #5682B2;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(86, 130, 178, 0.25);
+  border-radius: 12px;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  color: #1F3D5A;
+  background: #fff;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input:focus { border-color: #60b8ff; }
+
+.codeInput {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: #1F3D5A;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 16px 20px 0;
+  background: rgba(86, 130, 178, 0.08);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.9rem;
+  color: #5682B2;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tabActive {
+  background: #fff;
+  color: #1F3D5A;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(86, 130, 178, 0.12);
+}
+
+.section {
+  padding: 20px 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hint {
+  font-size: 0.88rem;
+  color: #6B7A8A;
+  margin: 0;
+  text-align: center;
+}
+
+.actionBtn {
+  width: 100%;
+  padding: 16px;
+  background: #FFC83D;
+  border: none;
+  border-radius: 16px;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #1F3D5A;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 200, 61, 0.35);
+  transition: opacity 0.15s, transform 0.1s;
+  margin-top: 4px;
+}
+.actionBtn:hover   { opacity: 0.92; transform: translateY(-1px); }
+.actionBtn:active  { transform: scale(0.98); }
+.actionBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.err {
+  font-size: 0.88rem;
+  color: #e53935;
+  text-align: center;
+  margin: 12px 20px 0;
+}

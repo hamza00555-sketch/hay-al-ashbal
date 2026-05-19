@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { writeGameState, listenRoom } from '../services/gameRoom';
 import {
   createInitialState,
   getCurrentPlayer,
@@ -176,8 +177,13 @@ function FlyingCard({ card, fromRect, toRect, onDone }) {
 }
 
 // ── Main GamePage ────────────────────────────────────────────────
-export default function GamePage({ config, onGameOver, roundNumber = 1, tokensToWin = 1, tokens = {} }) {
-  const [gs, setGs] = useState(() => createInitialState(config.players));
+export default function GamePage({
+  config, onGameOver, roundNumber = 1, tokensToWin = 1, tokens = {},
+  // Online mode props
+  isOnline = false, isHost = false, myPlayerIdx = 0, roomCode = null,
+  initialGs = null,
+}) {
+  const [gs, setGs] = useState(() => initialGs ?? createInitialState(config.players));
 
   const [focusedSource, setFocusedSource] = useState(null);
   const [showAction, setShowAction]       = useState(false);
@@ -218,7 +224,10 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
 
   const currentPlayer = getCurrentPlayer(gs);
   const hasAI         = gs.players.some(p => p.isAI);
-  const humanPlayer   = hasAI ? gs.players.find(p => !p.isAI) : currentPlayer;
+  // In online mode, "human" is the player at myPlayerIdx; otherwise use existing logic
+  const humanPlayer   = isOnline
+    ? gs.players[myPlayerIdx]
+    : (hasAI ? gs.players.find(p => !p.isAI) : currentPlayer);
 
   const legalPlays   = gs.drawnCard ? getLegalPlays(currentPlayer.hand[0], gs.drawnCard) : [];
   const bustanForced = gs.drawnCard ? mustPlayBustan(currentPlayer.hand[0], gs.drawnCard) : false;
@@ -226,8 +235,9 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   const seats    = assignSeats(gs.players, humanPlayer?.id ?? gs.players[0]?.id);
   const activeId = gs.players[gs.currentPlayerIndex]?.id;
 
-  // isLocked: narrative playing OR fly animation in progress
-  const isLocked = !!currentBeat || !!flyState;
+  // isLocked: narrative playing OR fly animation OR waiting for online opponent
+  const onlineWaiting = isOnline && currentPlayer.id !== humanPlayer?.id;
+  const isLocked = !!currentBeat || !!flyState || onlineWaiting;
 
   // ── Narrative queue driver ───────────────────────────────────
   function kickQueue() {
@@ -277,9 +287,11 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   }
 
   function pushNarrative(beats, nextState) {
+    // Stamp version for online sync
+    const stamped = isOnline ? { ...nextState, _v: (nextState._v ?? 0) + 1 } : nextState;
     clearTimeout(narrativeTimer.current);
     beatQueueRef.current = beats;
-    setPendingGs(nextState);
+    setPendingGs(stamped);
     kickQueue();
   }
 
@@ -291,6 +303,34 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       clearTimeout(announceTimer.current);
     };
   }, []);
+
+  // ── Online: sync gs to Firebase after every change (host only) ──
+  const lastSyncedV = useRef(-1);
+  useEffect(() => {
+    if (!isOnline || !isHost || !roomCode) return;
+    const v = gs._v ?? 0;
+    if (v === lastSyncedV.current) return;
+    lastSyncedV.current = v;
+    writeGameState(roomCode, gs).catch(e => console.warn('[sync]', e));
+  }, [gs, isOnline, isHost, roomCode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Online: receive gs from Firebase (non-host, or guest receiving host updates) ──
+  const lastReceivedV = useRef(-1);
+  useEffect(() => {
+    if (!isOnline || isHost || !roomCode) return;
+    const unsub = listenRoom(roomCode, room => {
+      if (!room?.state) return;
+      const incoming = room.state;
+      const v = incoming._v ?? 0;
+      if (v <= lastReceivedV.current) return;
+      lastReceivedV.current = v;
+      // Don't update if narrative is playing (wait for it to finish)
+      if (beatQueueRef.current.length === 0 && !currentBeat) {
+        setGs(incoming);
+      }
+    });
+    return () => unsub();
+  }, [isOnline, isHost, roomCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track newly eliminated players for animation + haptic
   useEffect(() => {
@@ -388,15 +428,20 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
     }
 
     if (gs.phase === 'DRAW' && !currentPlayer.isAI) {
+      // Online: only draw if it's my turn (I'm the current player)
+      if (isOnline && onlineWaiting) return;
       SFX.cardDraw();
       setIsDrawing(true);
       const t = setTimeout(() => {
         setIsDrawing(false);
-        setGs(doDrawCard);
+        setGs(prev => {
+          const next = { ...doDrawCard(prev), _v: (prev._v ?? 0) + 1 };
+          return next;
+        });
       }, 750);
       return () => clearTimeout(t);
     }
-  }, [gs.phase, gs.currentPlayerIndex, turnAnnounce]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [gs.phase, gs.currentPlayerIndex, turnAnnounce, onlineWaiting]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Skip AI vs AI when human is eliminated ───────────────────────
   useEffect(() => {
@@ -620,6 +665,14 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
             <span className={styles.settingIcon}>📖</span>
             <span>دليل البطاقات</span>
           </button>
+        </div>
+      )}
+
+      {/* Online: waiting for opponent overlay */}
+      {onlineWaiting && !currentBeat && (
+        <div className={styles.onlineWaitOverlay}>
+          <div className={styles.onlineWaitDots}><span/><span/><span/></div>
+          <p>دور {currentPlayer.name}...</p>
         </div>
       )}
 

@@ -1,7 +1,7 @@
 import { SFX } from '../utils/sounds';
 import styles from './MenuPage.module.css';
 
-export default function MenuPage({ onStart, onSettings, onTutorial }) {
+export default function MenuPage({ onStart, onSettings, onTutorial, onOnline }) {
   return (
     <div className={styles.page}>
       <div className={styles.content}>
@@ -17,6 +17,9 @@ export default function MenuPage({ onStart, onSettings, onTutorial }) {
           <button className={styles.startBtn} onClick={() => { SFX.confirmOk(); onStart(); }}>
             ابدأ اللعب
           </button>
+          <button className={styles.onlineBtn} onClick={() => { SFX.confirmOk(); onOnline?.(); }}>
+            🌐 العب أونلاين
+          </button>
           <button className={styles.tutorialBtn} onClick={() => { SFX.buttonClick(); onTutorial?.(); }}>
             📖 كيف ألعب؟
           </button>
@@ -25,7 +28,7 @@ export default function MenuPage({ onStart, onSettings, onTutorial }) {
           </button>
         </div>
 
-        <p className={styles.players}>3 — 6 لاعبين · Pass &amp; Play · ضد AI</p>
+        <p className={styles.players}>2 — 4 لاعبين · أونلاين · ضد AI · Pass &amp; Play</p>
       </div>
     </div>
   );
