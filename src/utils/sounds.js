@@ -1,51 +1,90 @@
-let ctx = null;
-let musicNodes = [];
-let musicGain = null;
-let musicPlaying = false;
+import * as Tone from 'tone';
 
-function getCtx() {
-  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-  if (ctx.state === 'suspended') ctx.resume();
-  return ctx;
+// Resume AudioContext after first user gesture (browser autoplay policy)
+if (typeof document !== 'undefined') {
+  const resume = () => Tone.start();
+  document.addEventListener('click', resume, { once: true });
+  document.addEventListener('touchstart', resume, { once: true, passive: true });
 }
 
-function playTone(freq, type, duration, gainVal, delay = 0, fadeOut = true) {
-  const c = getCtx();
-  const osc = c.createOscillator();
-  const g = c.createGain();
-  osc.connect(g);
-  g.connect(c.destination);
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, c.currentTime + delay);
-  g.gain.setValueAtTime(gainVal, c.currentTime + delay);
-  if (fadeOut) g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + duration);
-  osc.start(c.currentTime + delay);
-  osc.stop(c.currentTime + delay + duration + 0.01);
-}
+// ── Shared effects chain ──────────────────────────────────────────
+const limiter  = new Tone.Limiter(-1).toDestination();
+const comp     = new Tone.Compressor({ threshold: -14, ratio: 4, attack: 0.003, release: 0.18 }).connect(limiter);
+const revShort = new Tone.Reverb({ decay: 0.4, wet: 0.14 }).connect(comp);
+const revMed   = new Tone.Reverb({ decay: 1.3, wet: 0.26 }).connect(comp);
 
-function noise(duration, gainVal, delay = 0) {
-  const c = getCtx();
-  const bufSize = c.sampleRate * duration;
-  const buf = c.createBuffer(1, bufSize, c.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-  const src = c.createBufferSource();
-  src.buffer = buf;
-  const g = c.createGain();
-  const filter = c.createBiquadFilter();
-  filter.type = 'bandpass';
-  filter.frequency.value = 2000;
-  src.connect(filter);
-  filter.connect(g);
-  g.connect(c.destination);
-  g.gain.setValueAtTime(gainVal, c.currentTime + delay);
-  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + duration);
-  src.start(c.currentTime + delay);
-  src.stop(c.currentTime + delay + duration + 0.01);
-}
+// ── Instruments ──────────────────────────────────────────────────
 
-function pv(freq, pct = 0.03) { return freq * (1 + (Math.random() * 2 - 1) * pct); }
+// Paper/card rustle
+const cardNoise = new Tone.NoiseSynth({
+  noise: { type: 'pink' },
+  envelope: { attack: 0.001, decay: 0.10, sustain: 0, release: 0.03 },
+  volume: -8,
+}).connect(revShort);
 
+// Kick/impact thump
+const kick = new Tone.MembraneSynth({
+  pitchDecay: 0.055,
+  octaves: 8,
+  envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.1 },
+  volume: -6,
+}).connect(comp);
+
+// Plucked string pings — UI and card actions
+const pluck = new Tone.PluckSynth({
+  attackNoise: 0.5,
+  dampening: 4000,
+  resonance: 0.98,
+  volume: -11,
+}).connect(revShort);
+
+// Lush chords — win and protection
+const chords = new Tone.PolySynth(Tone.Synth, {
+  oscillator: { type: 'triangle8' },
+  envelope: { attack: 0.02, decay: 0.4, sustain: 0.25, release: 1.2 },
+  volume: -10,
+}).connect(revMed);
+
+// Metal shimmer — reveals and gold accents
+const metal = new Tone.MetalSynth({
+  frequency: 500,
+  envelope: { attack: 0.001, decay: 0.28, release: 0.12 },
+  harmonicity: 5.1,
+  modulationIndex: 32,
+  resonance: 3800,
+  octaves: 1.5,
+  volume: -13,
+}).connect(revShort);
+
+// FM bass drop — eliminations and ominous events
+const fmBass = new Tone.FMSynth({
+  harmonicity: 0.5,
+  modulationIndex: 10,
+  oscillator: { type: 'sawtooth' },
+  envelope: { attack: 0.01, decay: 0.6, sustain: 0, release: 0.4 },
+  modulation: { type: 'sine' },
+  modulationEnvelope: { attack: 0.01, decay: 0.35, sustain: 0, release: 0.3 },
+  volume: -7,
+}).connect(revMed);
+
+// Bright triangle — turn announcements and UI
+const ui = new Tone.Synth({
+  oscillator: { type: 'triangle' },
+  envelope: { attack: 0.001, decay: 0.12, sustain: 0, release: 0.03 },
+  volume: -15,
+}).connect(revShort);
+
+// AM synth — swap/shuffle pulsing feel
+const amSynth = new Tone.AMSynth({
+  harmonicity: 2.5,
+  oscillator: { type: 'triangle' },
+  envelope: { attack: 0.005, decay: 0.18, sustain: 0, release: 0.1 },
+  modulation: { type: 'square' },
+  modulationEnvelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.1 },
+  volume: -14,
+}).connect(revShort);
+
+// ── Cooldown helper ──────────────────────────────────────────────
 const _cd = {};
 function cd(name, ms, fn) {
   if (_cd[name]) return;
@@ -54,193 +93,188 @@ function cd(name, ms, fn) {
   setTimeout(() => { delete _cd[name]; }, ms);
 }
 
+// ── SFX ──────────────────────────────────────────────────────────
 export const SFX = {
   cardSelect() {
-    playTone(520, 'sine', 0.08, 0.15);
-    playTone(780, 'sine', 0.06, 0.08, 0.04);
+    const n = Tone.now();
+    pluck.triggerAttackRelease('E5', n);
+    pluck.triggerAttackRelease('B5', n + 0.06);
   },
+
   cardPlay() {
-    noise(0.12, 0.25);
-    playTone(220, 'triangle', 0.18, 0.2, 0.05);
+    const n = Tone.now();
+    cardNoise.triggerAttackRelease('16n', n);
+    kick.triggerAttackRelease('C2', '8n', n + 0.04);
   },
+
   cardFlip() {
-    noise(0.15, 0.18);
-    playTone(440, 'sine', 0.1, 0.1, 0.06);
-    playTone(660, 'sine', 0.08, 0.07, 0.12);
+    const n = Tone.now();
+    cardNoise.triggerAttackRelease('8n', n);
+    pluck.triggerAttackRelease('A4', n + 0.07);
   },
+
   cardDraw() {
-    noise(0.1, 0.2);
-    playTone(300, 'triangle', 0.12, 0.12, 0.03);
+    const n = Tone.now();
+    cardNoise.triggerAttackRelease('16n', n);
+    ui.triggerAttackRelease('F4', '32n', n + 0.03);
   },
+
   eliminate() {
-    playTone(200, 'sawtooth', 0.3, 0.3);
-    playTone(150, 'sawtooth', 0.25, 0.25, 0.1);
-    playTone(100, 'sawtooth', 0.3, 0.2, 0.2);
-    noise(0.35, 0.15, 0.05);
+    const n = Tone.now();
+    kick.triggerAttackRelease('A1', '4n', n);
+    fmBass.triggerAttackRelease('G2', '4n', n + 0.03);
+    fmBass.triggerAttackRelease('D2', '4n', n + 0.25);
+    metal.triggerAttackRelease('8n', n + 0.13);
   },
+
   win() {
-    const notes = [523, 659, 784, 1047];
-    notes.forEach((f, i) => playTone(f, 'triangle', 0.35, 0.22, i * 0.13));
-    playTone(1568, 'sine', 0.5, 0.18, notes.length * 0.13);
+    const n = Tone.now();
+    chords.triggerAttackRelease(['C4', 'E4', 'G4'], '4n', n);
+    chords.triggerAttackRelease(['E4', 'G4', 'C5'], '4n', n + 0.32);
+    chords.triggerAttackRelease(['G4', 'C5', 'E5'], '2n', n + 0.64);
+    metal.triggerAttackRelease('8n', n + 0.78);
+    metal.triggerAttackRelease('8n', n + 0.96);
   },
+
   aiThink() {
-    playTone(380, 'sine', 0.07, 0.06);
-    playTone(480, 'sine', 0.07, 0.05, 0.18);
+    const n = Tone.now();
+    ui.triggerAttackRelease('D4', '32n', n);
+    ui.triggerAttackRelease('F4', '32n', n + 0.24);
+    ui.triggerAttackRelease('A4', '32n', n + 0.48);
   },
+
   buttonClick() {
-    cd('btn', 40, () => playTone(pv(600), 'sine', 0.06, 0.10));
+    cd('btn', 50, () => pluck.triggerAttackRelease('C5', Tone.now()));
   },
 
   panelPop() {
-    noise(0.06, 0.10);
-    playTone(pv(900), 'sine', 0.05, 0.10);
-    playTone(pv(1100), 'sine', 0.04, 0.07, 0.04);
+    const n = Tone.now();
+    cardNoise.triggerAttackRelease('32n', n);
+    pluck.triggerAttackRelease('G5', n + 0.02);
   },
 
   confirmOk() {
-    playTone(pv(520), 'triangle', 0.09, 0.12);
-    playTone(pv(660), 'sine', 0.07, 0.09, 0.05);
+    const n = Tone.now();
+    pluck.triggerAttackRelease('E5', n);
+    pluck.triggerAttackRelease('A5', n + 0.08);
   },
 
   turnHuman() {
-    playTone(440, 'triangle', 0.14, 0.14);
-    playTone(550, 'triangle', 0.12, 0.13, 0.09);
-    playTone(660, 'sine',     0.10, 0.12, 0.18);
+    const n = Tone.now();
+    ui.triggerAttackRelease('A4', '16n', n);
+    ui.triggerAttackRelease('C5', '16n', n + 0.11);
+    ui.triggerAttackRelease('E5', '16n', n + 0.22);
   },
 
   turnAI() {
-    noise(0.09, 0.07);
-    playTone(320, 'sine', 0.09, 0.07, 0.03);
+    const n = Tone.now();
+    cardNoise.triggerAttackRelease('32n', n);
+    ui.triggerAttackRelease('D4', '32n', n + 0.04);
   },
 
   compareReveal() {
-    noise(0.07, 0.22);
-    playTone(200, 'sawtooth', 0.10, 0.20, 0.03);
-    noise(0.06, 0.18, 0.13);
-    playTone(160, 'sawtooth', 0.09, 0.16, 0.17);
+    const n = Tone.now();
+    cardNoise.triggerAttackRelease('8n', n);
+    metal.triggerAttackRelease('8n', n + 0.06);
+    kick.triggerAttackRelease('D2', '8n', n + 0.15);
   },
 
   protectionFlash() {
-    playTone(523, 'sine', 0.22, 0.14);
-    playTone(659, 'sine', 0.20, 0.12, 0.05);
-    playTone(784, 'sine', 0.18, 0.10, 0.10);
-    noise(0.10, 0.07, 0.06);
+    const n = Tone.now();
+    chords.triggerAttackRelease(['C4', 'G4'], '4n', n);
+    chords.triggerAttackRelease(['E4', 'B4'], '4n', n + 0.09);
+    metal.triggerAttackRelease('8n', n + 0.06);
   },
 
   swapVisual() {
-    playTone(380, 'triangle', 0.14, 0.14);
-    playTone(560, 'triangle', 0.12, 0.13, 0.09);
-    playTone(480, 'sine',     0.10, 0.11, 0.18);
-    noise(0.08, 0.07, 0.08);
+    const n = Tone.now();
+    amSynth.triggerAttackRelease('G4', '16n', n);
+    amSynth.triggerAttackRelease('E4', '16n', n + 0.16);
+    amSynth.triggerAttackRelease('C5', '8n',  n + 0.32);
   },
 
   forceDiscard() {
-    noise(0.11, 0.22);
-    playTone(260, 'triangle', 0.13, 0.18, 0.04);
-    playTone(130, 'sawtooth', 0.10, 0.16, 0.13);
+    const n = Tone.now();
+    cardNoise.triggerAttackRelease('8n', n);
+    kick.triggerAttackRelease('E2', '8n', n + 0.03);
+    fmBass.triggerAttackRelease('B2', '8n', n + 0.19);
   },
 
   correctGuess() {
-    noise(0.05, 0.16);
-    playTone(440,  'triangle', 0.10, 0.20);
-    playTone(659,  'sine',     0.12, 0.17, 0.07);
-    playTone(880,  'sine',     0.10, 0.15, 0.14);
-    playTone(1046, 'sine',     0.08, 0.13, 0.21);
+    const n = Tone.now();
+    metal.triggerAttackRelease('16n', n);
+    chords.triggerAttackRelease(['E4', 'G4', 'B4'], '8n', n + 0.07);
+    chords.triggerAttackRelease(['G4', 'B4', 'D5'], '4n', n + 0.25);
+    pluck.triggerAttackRelease('E6', n + 0.21);
   },
 
   wrongGuess() {
-    playTone(440, 'triangle', 0.10, 0.09);
-    playTone(330, 'triangle', 0.09, 0.08, 0.08);
-    noise(0.06, 0.05, 0.04);
+    const n = Tone.now();
+    fmBass.triggerAttackRelease('C3', '8n', n);
+    fmBass.triggerAttackRelease('A2', '8n', n + 0.14);
   },
 
   secretView() {
-    playTone(880,  'sine', 0.14, 0.07);
-    playTone(1100, 'sine', 0.12, 0.06, 0.07);
-    playTone(1320, 'sine', 0.10, 0.05, 0.14);
-    noise(0.07, 0.04, 0.04);
+    const n = Tone.now();
+    pluck.triggerAttackRelease('A5', n);
+    pluck.triggerAttackRelease('C6', n + 0.09);
+    pluck.triggerAttackRelease('E6', n + 0.18);
+    metal.triggerAttackRelease('16n', n + 0.14);
   },
 
   errorInvalid() {
     cd('error', 300, () => {
-      playTone(200, 'sawtooth', 0.09, 0.13);
-      playTone(185, 'sawtooth', 0.07, 0.11, 0.05);
+      const n = Tone.now();
+      fmBass.triggerAttackRelease('G2', '16n', n);
+      fmBass.triggerAttackRelease('F2', '16n', n + 0.08);
     });
   },
 };
 
-// ── Background music ──────────────────────────────────────────────
-const SCALE = [261, 293, 330, 349, 392, 440, 494, 523];
-const MELODY = [4, 3, 2, 3, 4, 4, 4, 3, 3, 3, 4, 6, 6];
-const BASS   = [0, 0, 2, 2, 4, 4, 2, 0];
+// ── Background music (Tone.Transport + Sequence) ──────────────────
+const NOTES    = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+const MEL_IDX  = [4, 3, 2, 3, 4, 4, 4, 3, 3, 3, 4, 6, 6];
+const BASS_IDX = [0, 0, 2, 2, 4, 4, 2, 0];
 
-function scheduleMusic() {
-  const c = getCtx();
-  musicGain = c.createGain();
-  musicGain.gain.value = 0.07;
-  musicGain.connect(c.destination);
+const melNotes  = MEL_IDX.map(i => NOTES[i % NOTES.length]);
+const bassNotes = BASS_IDX.map(i => NOTES[i % NOTES.length].replace(/(\d+)/, m => String(parseInt(m) - 1)));
 
-  const bpm = 72;
-  const beat = 60 / bpm;
-  let t = c.currentTime + 0.1;
+const melSynth = new Tone.Synth({
+  oscillator: { type: 'triangle' },
+  envelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 0.8 },
+  volume: -19,
+}).connect(revMed);
 
-  function scheduleLoop() {
-    if (!musicPlaying) return;
+const bassSynth = new Tone.Synth({
+  oscillator: { type: 'sine' },
+  envelope: { attack: 0.02, decay: 0.5, sustain: 0, release: 0.5 },
+  volume: -23,
+}).connect(revMed);
 
-    MELODY.forEach((idx, i) => {
-      const freq = SCALE[idx % SCALE.length];
-      const osc = c.createOscillator();
-      const g = c.createGain();
-      osc.type = 'triangle';
-      osc.frequency.value = freq;
-      osc.connect(g);
-      g.connect(musicGain);
-      g.gain.setValueAtTime(0.001, t + i * beat);
-      g.gain.linearRampToValueAtTime(1, t + i * beat + 0.04);
-      g.gain.exponentialRampToValueAtTime(0.001, t + i * beat + beat * 0.85);
-      osc.start(t + i * beat);
-      osc.stop(t + i * beat + beat);
-      musicNodes.push(osc);
-    });
-
-    BASS.forEach((idx, i) => {
-      const freq = SCALE[idx] / 2;
-      const osc = c.createOscillator();
-      const g = c.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      osc.connect(g);
-      g.connect(musicGain);
-      g.gain.setValueAtTime(0.001, t + i * beat * 2);
-      g.gain.linearRampToValueAtTime(0.6, t + i * beat * 2 + 0.06);
-      g.gain.exponentialRampToValueAtTime(0.001, t + i * beat * 2 + beat * 1.6);
-      osc.start(t + i * beat * 2);
-      osc.stop(t + i * beat * 2 + beat * 2);
-      musicNodes.push(osc);
-    });
-
-    const loopDuration = MELODY.length * beat;
-    t += loopDuration;
-    setTimeout(scheduleLoop, (loopDuration - 0.5) * 1000);
-  }
-
-  scheduleLoop();
-}
+let melSeq   = null;
+let bassSeq  = null;
+let _musicOn = false;
 
 export function startMusic() {
-  if (musicPlaying) return;
-  musicPlaying = true;
-  scheduleMusic();
+  if (_musicOn) return;
+  _musicOn = true;
+  Tone.start();
+  Tone.Transport.bpm.value = 72;
+  melSeq  = new Tone.Sequence((t, note) => melSynth.triggerAttackRelease(note, '8n', t),  melNotes,  '8n');
+  bassSeq = new Tone.Sequence((t, note) => bassSynth.triggerAttackRelease(note, '4n', t), bassNotes, '4n');
+  melSeq.start(0);
+  bassSeq.start(0);
+  Tone.Transport.start();
 }
 
 export function stopMusic() {
-  musicPlaying = false;
-  musicNodes.forEach(n => { try { n.stop(); } catch (_) {} });
-  musicNodes = [];
-  if (musicGain) { musicGain.disconnect(); musicGain = null; }
+  _musicOn = false;
+  melSeq?.stop();  melSeq?.dispose();  melSeq  = null;
+  bassSeq?.stop(); bassSeq?.dispose(); bassSeq = null;
+  Tone.Transport.stop();
 }
 
-export function isMusicPlaying() { return musicPlaying; }
+export function isMusicPlaying() { return _musicOn; }
 
 export function haptic(pattern = [10]) {
   navigator.vibrate?.(pattern);
