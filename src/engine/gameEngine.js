@@ -102,22 +102,24 @@ export function advanceTurn(state) {
   const winState = checkWin(state);
   if (winState) return winState;
 
+  // Find next active player first so we can clear THEIR protection
+  // (protection lasts until the start of the protected player's next turn)
+  let nextIndex = (state.currentPlayerIndex + 1) % state.players.length;
+  let safety = 0;
+  while (state.players[nextIndex].isEliminated && safety < state.players.length) {
+    nextIndex = (nextIndex + 1) % state.players.length;
+    safety++;
+  }
+
   let cleared = {
     ...state,
     players: state.players.map((p, i) =>
-      i === state.currentPlayerIndex ? { ...p, isProtected: false } : p
+      i === nextIndex ? { ...p, isProtected: false } : p
     ),
     drawnCard: null,
     peekCard: null,
     peekTargetName: null,
   };
-
-  let nextIndex = (cleared.currentPlayerIndex + 1) % cleared.players.length;
-  let safety = 0;
-  while (cleared.players[nextIndex].isEliminated && safety < cleared.players.length) {
-    nextIndex = (nextIndex + 1) % cleared.players.length;
-    safety++;
-  }
 
   const next = { ...cleared, currentPlayerIndex: nextIndex };
   const nextPlayer = next.players[nextIndex];
@@ -168,7 +170,7 @@ export function resolveCard(state, playedCard, cardSource, targetPlayerId, guess
     }
     case 2: {
       const target = newState.players.find(p => p.id === targetPlayerId);
-      const peekCard = target?.hand[0];
+      const peekCard = target?.isProtected ? null : target?.hand[0];
       // Store in the peeker's private memory (each AI remembers independently)
       if (peekCard != null) {
         newState = {
