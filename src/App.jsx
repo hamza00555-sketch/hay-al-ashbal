@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './services/firebase';
-import MenuPage          from './pages/MenuPage';
-import LobbyPage         from './pages/LobbyPage';
-import GamePage          from './pages/GamePage';
-import ResultPage        from './pages/ResultPage';
-import RoundOverScreen   from './pages/RoundOverScreen';
-import SettingsPage      from './pages/SettingsPage';
-import TutorialPage      from './pages/TutorialPage';
-import LoginPage         from './pages/LoginPage';
-import OnlineLobbyPage   from './pages/OnlineLobbyPage';
-import WaitingRoomPage   from './pages/WaitingRoomPage';
-import { isTutorialDone }  from './tutorial/tutorialStorage';
+import MenuPage        from './pages/MenuPage';
+import LobbyPage       from './pages/LobbyPage';
+import GamePage        from './pages/GamePage';
+import ResultPage      from './pages/ResultPage';
+import RoundOverScreen from './pages/RoundOverScreen';
+import SettingsPage    from './pages/SettingsPage';
+import TutorialPage    from './pages/TutorialPage';
+import LoginPage       from './pages/LoginPage';
+import OnlineLobbyPage from './pages/OnlineLobbyPage';
+import WaitingRoomPage from './pages/WaitingRoomPage';
+import { isTutorialDone } from './tutorial/tutorialStorage';
 import { startMenuMusic, stopMenuMusic, stopMusic } from './utils/sounds';
 
 export default function App() {
@@ -24,24 +24,25 @@ export default function App() {
   const [roundKey,     setRoundKey]     = useState(0);
   const [roundNumber,  setRoundNumber]  = useState(1);
 
-  // Online mode state
-  const [user,           setUser]         = useState(null);
-  const [authReady,      setAuthReady]    = useState(false);
-  const [onlineRoom,     setOnlineRoom]   = useState(null); // { code, isHost, myUid, myPlayerIdx, uidToIdx }
-  const [onlineInitialGs, setOnlineInitialGs] = useState(null); // shared initial state (same deck on all devices)
+  // Auth
+  const [user,         setUser]         = useState(null);
+  const [authReady,    setAuthReady]    = useState(false);
+
+  // Online mode
+  const [roomInfo,     setRoomInfo]     = useState(null); // { code, isHost, myUid, ... }
+  const [onlineGame,   setOnlineGame]   = useState(null); // { initialGs, myPlayerIdx, uidToIdx, roomCode, isHost, config }
 
   const audioUnlocked = useRef(false);
 
   // Firebase auth listener
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, u => {
+    return onAuthStateChanged(auth, u => {
       setUser(u);
       setAuthReady(true);
     });
-    return () => unsub();
   }, []);
 
-  // Start menu music the moment the user first taps anywhere (browser autoplay policy)
+  // Start menu music the moment the user first taps anywhere
   useEffect(() => {
     const unlock = () => {
       if (audioUnlocked.current) return;
@@ -56,7 +57,6 @@ export default function App() {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle screen transitions
   useEffect(() => {
     if (!audioUnlocked.current) return;
     if (screen === 'game') {
@@ -67,14 +67,14 @@ export default function App() {
     }
   }, [screen]);
 
-  // ── Local game handlers ───────────────────────────────────────
+  // ── Local game handlers ──────────────────────────────────────
   function handleLobbyReady(config) {
     setGameConfig(config);
     setTokensToWin(config.tokensToWin ?? 3);
     setTokens({});
     setRoundNumber(1);
     setRoundKey(k => k + 1);
-    setOnlineRoom(null);
+    setOnlineGame(null);
     setScreen('game');
   }
 
@@ -102,22 +102,43 @@ export default function App() {
     setScreen('game');
   }
 
-  // ── Online game handlers ──────────────────────────────────────
-  function handleOnlineGame({ initialGs, myPlayerIdx, uidToIdx, roomCode, isHost, config }) {
-    setOnlineRoom({ code: roomCode, isHost, myUid: user?.uid, myPlayerIdx, uidToIdx });
-    setOnlineInitialGs(initialGs);                          // same shuffled deck for everyone
-    setGameConfig({ players: initialGs.players, tokensToWin: config?.tokensToWin ?? 3 });
-    setTokensToWin(config?.tokensToWin ?? 3);
+  // ── Online game handlers ─────────────────────────────────────
+  function handleOnlineGameStart(info) {
+    // info: { initialGs, myPlayerIdx, uidToIdx, roomCode, isHost, config }
+    setOnlineGame(info);
+    setGameConfig({ players: info.initialGs.players });
+    setTokensToWin(info.config?.tokensToWin ?? 3);
     setTokens({});
     setRoundNumber(1);
     setRoundKey(k => k + 1);
     setScreen('game');
   }
 
-  // ── Render ────────────────────────────────────────────────────
+  if (!authReady) return null; // brief auth check before rendering
+
   return (
     <div dir="rtl">
-
+      {screen === 'login' && (
+        <LoginPage
+          onLoggedIn={u => { setUser(u); setScreen('online_lobby'); }}
+          onSkip={() => setScreen('menu')}
+        />
+      )}
+      {screen === 'online_lobby' && (
+        <OnlineLobbyPage
+          user={user}
+          onRoomReady={info => { setRoomInfo(info); setScreen('waiting_room'); }}
+          onBack={() => setScreen('menu')}
+        />
+      )}
+      {screen === 'waiting_room' && (
+        <WaitingRoomPage
+          user={user}
+          roomInfo={roomInfo}
+          onGameStart={handleOnlineGameStart}
+          onLeave={() => setScreen('menu')}
+        />
+      )}
       {screen === 'tutorial' && (
         <TutorialPage
           onComplete={() => setScreen('lobby')}
@@ -125,58 +146,27 @@ export default function App() {
           onRetry={() => { setScreen('menu'); setTimeout(() => setScreen('tutorial'), 50); }}
         />
       )}
-
       {screen === 'menu' && (
         <MenuPage
           onStart={() => setScreen('lobby')}
           onSettings={() => setScreen('settings')}
           onTutorial={() => setScreen('tutorial')}
           onOnline={() => {
-            if (!user) setScreen('login');
-            else       setScreen('online_lobby');
+            if (user) setScreen('online_lobby');
+            else      setScreen('login');
           }}
         />
       )}
-
-      {screen === 'login' && (
-        <LoginPage
-          onLoggedIn={u => { setUser(u); setScreen('online_lobby'); }}
-          onSkip={() => setScreen('menu')}
-        />
-      )}
-
-      {screen === 'online_lobby' && user && (
-        <OnlineLobbyPage
-          user={user}
-          onRoomReady={info => {
-            setScreen('waiting_room');
-            setOnlineRoom(info);
-          }}
-          onBack={() => setScreen('menu')}
-        />
-      )}
-
-      {screen === 'waiting_room' && onlineRoom && user && (
-        <WaitingRoomPage
-          user={user}
-          roomInfo={onlineRoom}
-          onGameStart={handleOnlineGame}
-          onLeave={() => { setOnlineRoom(null); setScreen('menu'); }}
-        />
-      )}
-
       {screen === 'settings' && (
         <SettingsPage onBack={() => setScreen('menu')} />
       )}
-
       {screen === 'lobby' && (
         <LobbyPage
           onBack={() => setScreen('menu')}
           onStartGame={handleLobbyReady}
         />
       )}
-
-      {screen === 'game' && gameConfig && (
+      {screen === 'game' && (
         <GamePage
           key={roundKey}
           config={gameConfig}
@@ -184,14 +174,14 @@ export default function App() {
           tokensToWin={tokensToWin}
           tokens={tokens}
           onGameOver={handleGameOver}
-          isOnline={!!onlineRoom}
-          isHost={onlineRoom?.isHost ?? false}
-          myPlayerIdx={onlineRoom?.myPlayerIdx ?? 0}
-          roomCode={onlineRoom?.code ?? null}
-          initialGs={onlineRoom ? onlineInitialGs : null}
+          // Online props (null/defaults for local play)
+          isOnline={!!onlineGame}
+          isHost={onlineGame?.isHost ?? false}
+          myPlayerIdx={onlineGame?.myPlayerIdx ?? 0}
+          roomCode={onlineGame?.roomCode ?? null}
+          initialGs={onlineGame?.initialGs ?? null}
         />
       )}
-
       {screen === 'round_over' && (
         <RoundOverScreen
           result={roundResult}
@@ -202,7 +192,6 @@ export default function App() {
           onMenu={() => setScreen('menu')}
         />
       )}
-
       {screen === 'result' && (
         <ResultPage
           result={finalResult}
@@ -212,7 +201,6 @@ export default function App() {
           onMenu={() => setScreen('menu')}
         />
       )}
-
     </div>
   );
 }
