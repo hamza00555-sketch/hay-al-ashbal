@@ -364,9 +364,12 @@ export default function GamePage({
       return;
     }
 
-    const isMe = !hasAI
-      ? true                          // Pass & Play: human always confirms
-      : cp.id === humanPlayer?.id;    // vsAI: only when it's the human's turn
+    const isMe = isOnline
+      ? cp.id === humanPlayer?.id     // Online: only when it's my turn
+      : (!hasAI
+          ? true                      // Pass & Play: human always confirms
+          : cp.id === humanPlayer?.id // vsAI: only when it's the human's turn
+        );
 
     if (isMe) SFX.turnHuman(); else SFX.turnAI();
     setTurnAnnounce({ name: cp.name, profile: cp.profile, isMe, isAI: cp.isAI });
@@ -430,8 +433,7 @@ export default function GamePage({
     if (gs.phase === 'DRAW' && !currentPlayer.isAI) {
       // Online: only draw if it's my turn (I'm the current player)
       if (isOnline && onlineWaiting) return;
-      SFX.cardDraw();
-      setIsDrawing(true);
+      SFX.cardDraw();      setIsDrawing(true);
       const t = setTimeout(() => {
         setIsDrawing(false);
         setGs(prev => {
@@ -562,8 +564,10 @@ export default function GamePage({
   }, [gs, pendingPlay, currentPlayer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePeekDone = useCallback(() => {
-    setGs(advanceTurn({ ...gs, phase: 'DONE', peekCard: null, peekTargetName: null }));
-  }, [gs]);
+    const next = advanceTurn({ ...gs, phase: 'DONE', peekCard: null, peekTargetName: null });
+    // Increment _v so host sync effect writes post-peek state to Firebase
+    setGs(isOnline ? { ...next, _v: (next._v ?? 0) + 1 } : next);
+  }, [gs, isOnline]);
 
   const toggleMusic = () => {
     SFX.buttonClick();
@@ -604,6 +608,12 @@ export default function GamePage({
   }
 
   if (gs.phase === 'HAND_COVER') {
+    // Online: skip hand-cover (each player is on their own device, no need to hide screen)
+    if (isOnline) {
+      setTimeout(() => setGs(prev => prev.phase === 'HAND_COVER'
+        ? { ...prev, phase: 'DRAW' } : prev), 0);
+      return null;
+    }
     return (
       <HandCover
         playerName={currentPlayer.name}
@@ -613,6 +623,15 @@ export default function GamePage({
   }
 
   if (gs.phase === 'PEEK_REVEAL') {
+    // Online guest: shouldn't see the host's peeked card — show waiting overlay
+    if (isOnline && onlineWaiting) {
+      return (
+        <div className={styles.onlineWaitOverlay} style={{ position: 'fixed', inset: 0, zIndex: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(10,25,50,0.9)' }}>
+          <div className={styles.onlineWaitDots}><span/><span/><span/></div>
+          <p style={{ color: '#fff', marginTop: 12 }}>دور {currentPlayer.name}...</p>
+        </div>
+      );
+    }
     return (
       <div className={styles.peekScreen}>
         <p className={styles.peekTitle}>كرت {gs.peekTargetName}</p>
