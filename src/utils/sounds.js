@@ -315,7 +315,10 @@ export async function startMenuMusic() {
     _menuSource.loop = true;
     _menuSource.connect(_menuGain);
     _menuSource.start();
-  } catch(e) { console.warn('[menu-music]', e); }
+  } catch(e) {
+    console.warn('[menu-music]', e);
+    _menuPlaying = false; // allow retry after user gesture
+  }
 }
 
 export function stopMenuMusic() { _stopMenuMusicFade(0); }

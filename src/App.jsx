@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import MenuPage        from './pages/MenuPage';
 import LobbyPage       from './pages/LobbyPage';
 import GamePage        from './pages/GamePage';
@@ -17,19 +17,26 @@ export default function App() {
   const [roundKey,     setRoundKey]     = useState(0);
   const [roundNumber,  setRoundNumber]  = useState(1);
 
-  // Start menu music on very first user gesture (browser blocks autoplay until then)
+  const audioUnlocked = useRef(false);
+
+  // Start menu music the moment the user first taps anywhere (browser autoplay policy)
   useEffect(() => {
-    const unlock = () => { if (screen !== 'game') startMenuMusic(); };
-    document.addEventListener('click',      unlock, { once: true, capture: true });
-    document.addEventListener('touchstart', unlock, { once: true, capture: true, passive: true });
+    const unlock = () => {
+      if (audioUnlocked.current) return;
+      audioUnlocked.current = true;
+      startMenuMusic();
+    };
+    document.addEventListener('click',      unlock, { capture: true, passive: true });
+    document.addEventListener('touchstart', unlock, { capture: true, passive: true });
     return () => {
       document.removeEventListener('click',      unlock, { capture: true });
       document.removeEventListener('touchstart', unlock, { capture: true });
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle screen transitions
+  // Handle screen transitions (skip first render — audio not unlocked yet)
   useEffect(() => {
+    if (!audioUnlocked.current) return;
     if (screen === 'game') {
       stopMenuMusic();
     } else {
