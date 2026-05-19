@@ -209,8 +209,9 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   const drawnCardRef  = useRef(null);
   const deckRef       = useRef(null);
 
-  const [musicOn,     setMusicOn]     = useState(true);
-  const [showGuide,   setShowGuide]   = useState(false);
+  const [musicOn,      setMusicOn]     = useState(true);
+  const [showGuide,    setShowGuide]   = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [elimIds,     setElimIds]     = useState(new Set());
   const [winFlash,    setWinFlash]    = useState(false);
   const prevPlayersRef  = useRef(null);
@@ -519,8 +520,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
     setGs(advanceTurn({ ...gs, phase: 'DONE', peekCard: null, peekTargetName: null }));
   }, [gs]);
 
-  const toggleMusic = (e) => {
-    e.stopPropagation();
+  const toggleMusic = () => {
     SFX.buttonClick();
     if (musicOn) { stopMusic(); setMusicOn(false); }
     else { startMusic(); setMusicOn(true); }
@@ -592,7 +592,7 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
   })();
 
   return (
-    <div className={styles.board} onClick={() => focusedSource && setFocusedSource(null)}>
+    <div className={styles.board} onClick={() => { if (focusedSource) setFocusedSource(null); setShowSettings(false); }}>
 
       {/* Win flash + confetti */}
       {winFlash && <div className={styles.winFlash} />}
@@ -605,10 +605,23 @@ export default function GamePage({ config, onGameOver, roundNumber = 1, tokensTo
       )}
       {impactFlash && <div className={styles.impactFlash} />}
 
-      <button className={styles.musicBtn} onClick={toggleMusic}>
-        {musicOn ? '🔊' : '🔇'}
-      </button>
-      <button className={styles.guideBtn} onClick={() => setShowGuide(true)}>?</button>
+      {/* ── Settings button + dropdown ── */}
+      <button
+        className={styles.settingsBtn}
+        onClick={e => { e.stopPropagation(); SFX.buttonClick(); setShowSettings(s => !s); }}
+      >⚙️</button>
+      {showSettings && (
+        <div className={styles.settingsPanel} onClick={e => e.stopPropagation()}>
+          <button className={styles.settingItem} onClick={() => { toggleMusic(); setShowSettings(false); }}>
+            <span className={styles.settingIcon}>{musicOn ? '🔊' : '🔇'}</span>
+            <span>{musicOn ? 'إيقاف الموسيقى' : 'تشغيل الموسيقى'}</span>
+          </button>
+          <button className={styles.settingItem} onClick={() => { SFX.buttonClick(); setShowGuide(true); setShowSettings(false); }}>
+            <span className={styles.settingIcon}>📖</span>
+            <span>دليل البطاقات</span>
+          </button>
+        </div>
+      )}
 
       {/* Round indicator */}
       <div className={styles.roundBadge}>

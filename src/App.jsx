@@ -17,6 +17,18 @@ export default function App() {
   const [roundKey,     setRoundKey]     = useState(0);
   const [roundNumber,  setRoundNumber]  = useState(1);
 
+  // Start menu music on very first user gesture (browser blocks autoplay until then)
+  useEffect(() => {
+    const unlock = () => { if (screen !== 'game') startMenuMusic(); };
+    document.addEventListener('click',      unlock, { once: true, capture: true });
+    document.addEventListener('touchstart', unlock, { once: true, capture: true, passive: true });
+    return () => {
+      document.removeEventListener('click',      unlock, { capture: true });
+      document.removeEventListener('touchstart', unlock, { capture: true });
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Handle screen transitions
   useEffect(() => {
     if (screen === 'game') {
       stopMenuMusic();
