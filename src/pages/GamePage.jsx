@@ -206,6 +206,7 @@ export default function GamePage({
   const kickSeqRef        = useRef(0);    // seq counter — prevents stale setTimeout from double-draining
   const pendingRemoteRef  = useRef(null);
   const pendingGsRef      = useRef(null); // mirrors pendingGs — lets kickQueue read it without a setState updater
+  const gsRef             = useRef(null); // always-current gs snapshot for Firebase listener (avoids stale closure)
 
   // TurnBanner (brief flash)
   const [turnBanner, setTurnBanner]   = useState(null);
@@ -325,13 +326,15 @@ export default function GamePage({
     }
   }
 
-  function pushNarrative(beats, nextState, actionText = null) {
+  // actionMeta: { text, targetIdx? } or null. targetIdx lets the viewer replay the narrative.
+  function pushNarrative(beats, nextState, actionMeta = null) {
+    const meta = typeof actionMeta === 'string' ? { text: actionMeta } : actionMeta;
     const stamped = isOnline
       ? {
           ...nextState,
           _v:      (nextState._v ?? 0) + 1,
           _author: myPlayerIdx,
-          ...(actionText ? { _action: { text: actionText, ts: Date.now() } } : {}),
+          ...(meta ? { _action: { ...meta, ts: Date.now() } } : {}),
         }
       : nextState;
     clearTimeout(narrativeTimer.current);
@@ -340,6 +343,9 @@ export default function GamePage({
     setPendingGs(stamped);
     kickQueue();
   }
+
+  // Keep gsRef always current — used in Firebase listener to avoid stale closures
+  useEffect(() => { gsRef.current = gs; });
 
   // Cleanup timers on unmount + set --real-vh/vw for accurate Android/iOS layout
   useEffect(() => {
@@ -408,20 +414,63 @@ export default function GamePage({
       if (v <= lastReceivedV.current) return;
       if ((incoming._author ?? -1) === myPlayerIdx) return; // skip own echo
       lastReceivedV.current = v;
-      // Show action toast for the opponent's move
-      if (incoming._action?.ts && incoming._action.ts !== lastActionTs.current) {
-        lastActionTs.current = incoming._action.ts;
-        clearTimeout(toastTimer.current);
-        setActionToast(incoming._action.text);
-        toastTimer.current = setTimeout(() => setActionToast(null), 3500);
-      }
-      const sanitized = sanitizeGs(incoming);
-      if (beatQueueRef.current.length === 0 && !currentBeatRef.current) {
-        setGs(sanitized);
-        pendingRemoteRef.current = null;
+
+      const sanitized  = sanitizeGs(incoming);
+      const action     = incoming._action;
+      const prevGsSnap = gsRef.current;
+
+      // Did the opponent play a card? (globalDiscard grew)
+      const discardBefore = prevGsSnap?.globalDiscard?.length ?? 0;
+      const cardPlayed    = sanitized.globalDiscard.length > discardBefore;
+
+      if (cardPlayed && action?.ts && action.ts !== lastActionTs.current) {
+        // Build narrative beats so the viewer sees the same animation as the active player
+        lastActionTs.current = action.ts;
+
+        const playedCard        = sanitized.globalDiscard[sanitized.globalDiscard.length - 1];
+        const actorIdx          = incoming._author ?? 0;
+        const targetIdx         = action.targetIdx ?? null;
+        const targetCardBefore  = targetIdx != null
+          ? prevGsSnap?.players[targetIdx]?.hand[0] ?? null
+          : null;
+
+        const beats = buildNarrative({
+          card:            playedCard,
+          actorId:         actorIdx,
+          actorName:       prevGsSnap?.players[actorIdx]?.name ?? '',
+          targetId:        targetIdx,
+          targetName:      targetIdx != null ? prevGsSnap?.players[targetIdx]?.name ?? null : null,
+          targetCardBefore,
+          nextGs:          sanitized,
+          prevGs:          prevGsSnap,
+          isAI:            true,  // use shorter timings (900ms thinking → 1300ms anticipate)
+        }).filter(b => b.type !== 'AI_THINKING'); // skip thinking beat — viewer just sees the card
+
+        if (beatQueueRef.current.length === 0 && !currentBeatRef.current) {
+          beatQueueRef.current = beats;
+          pendingGsRef.current = sanitized;
+          setPendingGs(sanitized);
+          kickQueue();
+        } else {
+          if (!pendingRemoteRef.current || v > (pendingRemoteRef.current._v ?? 0)) {
+            pendingRemoteRef.current = sanitized;
+          }
+        }
       } else {
-        if (!pendingRemoteRef.current || v > (pendingRemoteRef.current._v ?? 0)) {
-          pendingRemoteRef.current = sanitized;
+        // Turn advance without a new card (e.g. PEEK done, skip) — show toast, apply state
+        if (action?.ts && action.ts !== lastActionTs.current) {
+          lastActionTs.current = action.ts;
+          clearTimeout(toastTimer.current);
+          setActionToast(action.text);
+          toastTimer.current = setTimeout(() => setActionToast(null), 3500);
+        }
+        if (beatQueueRef.current.length === 0 && !currentBeatRef.current) {
+          setGs(sanitized);
+          pendingRemoteRef.current = null;
+        } else {
+          if (!pendingRemoteRef.current || v > (pendingRemoteRef.current._v ?? 0)) {
+            pendingRemoteRef.current = sanitized;
+          }
         }
       }
     });
@@ -540,7 +589,7 @@ export default function GamePage({
         isAI:             true,
       });
       const txt = isOnline ? buildActionText({ card: playedCard, actorName: currentPlayer.name, targetName: targetPlayer?.name ?? null, nextGs: nextGsRaw, prevGs: afterDraw }) : null;
-      pushNarrative(beats, nextGsRaw, txt);
+      pushNarrative(beats, nextGsRaw, txt ? { text: txt, targetIdx: targetId ?? null } : null);
       return;
     }
 
@@ -608,7 +657,7 @@ export default function GamePage({
             isAI:      false,
           });
           const txt = isOnline ? buildActionText({ card, actorName: currentPlayer.name, targetName: null, nextGs: nextGsRaw, prevGs: prevGsSnap }) : null;
-          pushNarrative(beats, nextGsRaw, txt);
+          pushNarrative(beats, nextGsRaw, txt ? { text: txt } : null);
         } else {
           setPendingPlay({ card, source });
           setShowAction(true);
@@ -676,7 +725,8 @@ export default function GamePage({
       isAI:             false,
     });
     const txt = isOnline ? buildActionText({ card: pendingPlay.card, actorName: currentPlayer.name, targetName: targetPlayer?.name ?? null, nextGs: nextGsRaw, prevGs: gs }) : null;
-    pushNarrative(beats, nextGsRaw, txt);
+    const targetIdx = targetId != null ? gs.players.findIndex(p => p.id === targetId) : null;
+    pushNarrative(beats, nextGsRaw, txt ? { text: txt, targetIdx } : null);
     setFocusedSource(null);
     setPendingPlay(null);
   }, [gs, pendingPlay, currentPlayer, isOnline]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -685,7 +735,8 @@ export default function GamePage({
     const next = advanceTurn({ ...gs, phase: 'DONE', peekCard: null, peekTargetName: null });
     if (isOnline) {
       const txt = `👀 ${currentPlayer.name} رأى كرت ${gs.peekTargetName ?? 'خصمه'}`;
-      setGs({ ...next, _v: (next._v ?? 0) + 1, _author: myPlayerIdx, _action: { text: txt, ts: Date.now() } });
+      const targetIdx = gs.players.findIndex(p => p.name === gs.peekTargetName);
+      setGs({ ...next, _v: (next._v ?? 0) + 1, _author: myPlayerIdx, _action: { text: txt, ts: Date.now(), targetIdx: targetIdx >= 0 ? targetIdx : null } });
     } else {
       setGs(next);
     }
