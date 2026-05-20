@@ -75,7 +75,7 @@ function GuessModal({ players, currentPlayerId, onResolve }) {
             <div
               key={card.id}
               className={styles.guessCard}
-              onClick={() => targetId && onResolve({ targetId, guessedCardId: card.id })}
+              onClick={() => targetId != null && onResolve({ targetId, guessedCardId: card.id })}
             >
               <CardFace card={card} size="small" />
             </div>
