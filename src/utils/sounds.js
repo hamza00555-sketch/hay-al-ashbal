@@ -62,6 +62,16 @@ function ctx() {
   return _ctx;
 }
 
+// ── Pause audio when tab is hidden, resume when visible ──────────
+document.addEventListener('visibilitychange', () => {
+  if (!_ctx) return;
+  if (document.hidden) {
+    _ctx.suspend().catch(() => {});
+  } else {
+    _ctx.resume().catch(() => {});
+  }
+});
+
 // Route a node to both dry and wet paths
 function out(node, wetAmt = 0.22) {
   const c = ctx();
