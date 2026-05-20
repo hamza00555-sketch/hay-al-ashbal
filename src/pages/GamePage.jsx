@@ -427,24 +427,34 @@ export default function GamePage({
         // Build narrative beats so the viewer sees the same animation as the active player
         lastActionTs.current = action.ts;
 
-        const playedCard        = sanitized.globalDiscard[sanitized.globalDiscard.length - 1];
-        const actorIdx          = incoming._author ?? 0;
-        const targetIdx         = action.targetIdx ?? null;
-        const targetCardBefore  = targetIdx != null
-          ? prevGsSnap?.players[targetIdx]?.hand[0] ?? null
+        // Guard: gsRef not yet initialised (should not happen but prevents a crash)
+        if (!prevGsSnap) { setGs(sanitized); return; }
+
+        const playedCard = sanitized.globalDiscard[sanitized.globalDiscard.length - 1];
+        const actorIdx   = incoming._author ?? 0;
+        const tgtIdx     = action.targetIdx ?? null;
+        // Use player ID strings (not numeric indices) so buildNarrative's players.find() resolves correctly
+        const actorId    = prevGsSnap.players[actorIdx]?.id ?? null;
+        const tgtId      = tgtIdx != null ? prevGsSnap.players[tgtIdx]?.id ?? null : null;
+        const targetCardBefore = tgtIdx != null
+          ? prevGsSnap.players[tgtIdx]?.hand[0] ?? null
           : null;
 
         const beats = buildNarrative({
           card:            playedCard,
-          actorId:         actorIdx,
-          actorName:       prevGsSnap?.players[actorIdx]?.name ?? '',
-          targetId:        targetIdx,
-          targetName:      targetIdx != null ? prevGsSnap?.players[targetIdx]?.name ?? null : null,
+          actorId,
+          actorName:       prevGsSnap.players[actorIdx]?.name ?? '',
+          targetId:        tgtId,
+          targetName:      tgtIdx != null ? prevGsSnap.players[tgtIdx]?.name ?? null : null,
           targetCardBefore,
           nextGs:          sanitized,
           prevGs:          prevGsSnap,
-          isAI:            true,  // use shorter timings (900ms thinking → 1300ms anticipate)
-        }).filter(b => b.type !== 'AI_THINKING'); // skip thinking beat — viewer just sees the card
+          isAI:            true,
+        })
+          .filter(b => b.type !== 'AI_THINKING')
+          // Viewer side: auto-advance confirm beats (durationMs=0) after 1.8 s so the viewer
+          // doesn't have to tap "حسناً" during the opponent's turn (would cause a permanent freeze)
+          .map(b => b.durationMs === 0 ? { ...b, durationMs: 1800 } : b);
 
         if (beatQueueRef.current.length === 0 && !currentBeatRef.current) {
           beatQueueRef.current = beats;
