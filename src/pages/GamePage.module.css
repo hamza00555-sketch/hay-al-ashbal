@@ -82,9 +82,10 @@
   inset: 0;
   display: grid;
   grid-template-columns: 110px 1fr 110px;
-  /* humanZone gets a fixed 42dvh — never squeezed by topZone size.
-     arena gets whatever remains. topZone sizes itself to content. */
-  grid-template-rows: auto 1fr 42dvh;
+  /* humanZone gets a fixed 42vh using --real-vh (set from window.innerHeight)
+     so it's accurate on Android where dvh != window.innerHeight.
+     Falls back to 42dvh if JS hasn't run yet. */
+  grid-template-rows: auto 1fr calc(var(--real-vh, 1dvh) * 42);
   grid-template-areas:
     ".     top    ."
     "left  arena  right"

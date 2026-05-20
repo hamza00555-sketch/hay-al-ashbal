@@ -199,6 +199,7 @@ export default function GamePage({
 
   // ── Narrative queue ──────────────────────────────────────────
   const [currentBeat, setCurrentBeat] = useState(null);
+  const currentBeatRef = useRef(null); // mirror for Firebase listener (avoids stale closure)
   const [pendingGs,   setPendingGs]   = useState(null);
   const beatQueueRef  = useRef([]);
   const narrativeTimer = useRef(null);
@@ -267,6 +268,7 @@ export default function GamePage({
     clearTimeout(narrativeTimer.current);
     const q = beatQueueRef.current;
     if (q.length === 0) {
+      currentBeatRef.current = null;
       setCurrentBeat(null);
       setPendingGs(prev => {
         if (prev) setGs(prev);
@@ -276,6 +278,7 @@ export default function GamePage({
     }
     const [next, ...rest] = q;
     beatQueueRef.current = rest;
+    currentBeatRef.current = next;
     switch (next.type) {
       case 'AI_THINKING':       SFX.panelPop();                                           break;
       case 'CARD_ANTICIPATE':   SFX.panelPop();                                           break;
@@ -303,7 +306,7 @@ export default function GamePage({
       }
       default: break;
     }
-    setCurrentBeat(next);
+    setCurrentBeat(next); // also tracked in currentBeatRef above
     if (next.durationMs > 0) {
       narrativeTimer.current = setTimeout(kickQueue, next.durationMs);
     }
@@ -324,13 +327,19 @@ export default function GamePage({
     kickQueue();
   }
 
-  // Cleanup timers on unmount
+  // Cleanup timers on unmount + set --real-vh for accurate Android layout
   useEffect(() => {
-    startMusic(); // auto-start on game load
+    startMusic();
+    function setRealVh() {
+      document.documentElement.style.setProperty('--real-vh', `${window.innerHeight * 0.01}px`);
+    }
+    setRealVh();
+    window.addEventListener('resize', setRealVh);
     return () => {
       clearTimeout(narrativeTimer.current);
       clearTimeout(announceTimer.current);
       clearTimeout(toastTimer.current);
+      window.removeEventListener('resize', setRealVh);
     };
   }, []);
 
@@ -372,7 +381,7 @@ export default function GamePage({
         setActionToast(incoming._action.text);
         toastTimer.current = setTimeout(() => setActionToast(null), 3500);
       }
-      if (beatQueueRef.current.length === 0 && !currentBeat) {
+      if (beatQueueRef.current.length === 0 && !currentBeatRef.current) {
         setGs(sanitizeGs(incoming));
       }
     });
@@ -496,10 +505,9 @@ export default function GamePage({
       SFX.cardDraw();      setIsDrawing(true);
       const t = setTimeout(() => {
         setIsDrawing(false);
-        setGs(prev => {
-          const next = { ...doDrawCard(prev), _v: (prev._v ?? 0) + 1, _author: myPlayerIdx };
-          return next;
-        });
+        // Do NOT stamp _author/_v here — DRAW is a local intermediate step.
+        // Only pushNarrative (on PLAY) syncs to Firebase, avoiding a spurious broadcast.
+        setGs(prev => doDrawCard(prev));
       }, 750);
       return () => clearTimeout(t);
     }
