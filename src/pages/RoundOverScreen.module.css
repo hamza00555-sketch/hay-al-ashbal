@@ -160,3 +160,11 @@
   transition: background 0.15s;
 }
 .menuBtn:hover { background: #fff; }
+
+.waitingMsg {
+  font-size: 1rem;
+  color: #60b8ff;
+  text-align: center;
+  padding: 14px 0;
+  opacity: 0.85;
+}

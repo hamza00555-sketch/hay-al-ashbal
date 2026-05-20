@@ -13,6 +13,8 @@ import OnlineLobbyPage from './pages/OnlineLobbyPage';
 import WaitingRoomPage from './pages/WaitingRoomPage';
 import { isTutorialDone } from './tutorial/tutorialStorage';
 import { startMenuMusic, stopMenuMusic, stopMusic } from './utils/sounds';
+import { createInitialState } from './engine/gameEngine';
+import { listenRoom, sanitizeGs, writeRoundStart } from './services/gameRoom';
 
 export default function App() {
   const [screen,       setScreen]       = useState('menu');
@@ -96,7 +98,10 @@ export default function App() {
     }
   }
 
-  function handleNextRound() {
+  function handleNextRound(newInitialGs = null) {
+    if (newInitialGs && onlineGame) {
+      setOnlineGame(prev => ({ ...prev, initialGs: newInitialGs }));
+    }
     setRoundNumber(n => n + 1);
     setRoundKey(k => k + 1);
     setScreen('game');
@@ -113,6 +118,24 @@ export default function App() {
     setRoundKey(k => k + 1);
     setScreen('game');
   }
+
+  // Host: create fresh state for round 2+, write to Firebase, start locally.
+  async function handleOnlineNextRound() {
+    const newGs = createInitialState(gameConfig.players);
+    await writeRoundStart(onlineGame.roomCode, newGs);
+    handleNextRound(newGs);
+  }
+
+  // Guest: listen during round_over screen — auto-start when host writes nextRound.
+  useEffect(() => {
+    if (screen !== 'round_over' || !onlineGame || onlineGame.isHost) return;
+    const unsub = listenRoom(onlineGame.roomCode, room => {
+      if (!room?.nextRound) return;
+      const newGs = sanitizeGs(room.nextRound);
+      handleNextRound(newGs);
+    });
+    return () => unsub();
+  }, [screen, onlineGame?.roomCode, onlineGame?.isHost]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!authReady) return null; // brief auth check before rendering
 
@@ -189,7 +212,8 @@ export default function App() {
           config={gameConfig}
           tokens={roundResult?.tokens ?? {}}
           tokensToWin={roundResult?.tokensToWin ?? 3}
-          onNextRound={handleNextRound}
+          onNextRound={onlineGame?.isHost ? handleOnlineNextRound : (onlineGame ? null : handleNextRound)}
+          isOnlineGuest={!!onlineGame && !onlineGame.isHost}
           onMenu={() => setScreen('menu')}
         />
       )}

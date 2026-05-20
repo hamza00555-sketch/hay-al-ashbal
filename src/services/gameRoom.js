@@ -92,6 +92,11 @@ export async function endRoom(code) {
   await update(ref(db, `rooms/${code}`), { status: 'done' });
 }
 
+// Host writes fresh initialGs to Firebase so guest auto-starts next round.
+export async function writeRoundStart(code, gs) {
+  await update(ref(db, `rooms/${code}`), { nextRound: gs, status: 'playing' });
+}
+
 export async function leaveRoom(code, uid) {
   await remove(ref(db, `rooms/${code}/players/${uid}`));
 }

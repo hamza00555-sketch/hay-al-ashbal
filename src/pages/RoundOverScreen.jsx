@@ -2,7 +2,7 @@ import { CardFace } from '../components/Card';
 import { SFX } from '../utils/sounds';
 import styles from './RoundOverScreen.module.css';
 
-export default function RoundOverScreen({ result, config, tokens, tokensToWin, onNextRound, onMenu }) {
+export default function RoundOverScreen({ result, config, tokens, tokensToWin, onNextRound, onMenu, isOnlineGuest = false }) {
   const { winner, players } = result;
   const isDraw = !winner;
 
@@ -50,9 +50,13 @@ export default function RoundOverScreen({ result, config, tokens, tokensToWin, o
         </div>
 
         <div className={styles.buttons}>
-          <button className={styles.nextBtn} onClick={() => { SFX.confirmOk(); onNextRound(); }}>
-            الجولة التالية ←
-          </button>
+          {isOnlineGuest ? (
+            <p className={styles.waitingMsg}>⏳ ينتظر المضيف ليبدأ الجولة التالية...</p>
+          ) : (
+            <button className={styles.nextBtn} onClick={() => { SFX.confirmOk(); onNextRound(); }}>
+              الجولة التالية ←
+            </button>
+          )}
           <button className={styles.menuBtn} onClick={() => { SFX.buttonClick(); onMenu(); }}>
             القائمة الرئيسية
           </button>
