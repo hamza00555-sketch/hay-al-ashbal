@@ -30,7 +30,9 @@ function AvatarRow({ players, actorId, targetId }) {
           size="md"
           name={actor.name}
         />
-        <span className={styles.avatarLabel}>{actor.name}</span>
+        <span className={styles.avatarLabel} style={{ color: ap.frameColor ?? '#60b8ff' }}>
+          {actor.name}
+        </span>
       </div>
       {hasTarget && tp && (
         <>
@@ -43,7 +45,9 @@ function AvatarRow({ players, actorId, targetId }) {
               size="md"
               name={target.name}
             />
-            <span className={styles.avatarLabel}>{target.name}</span>
+            <span className={styles.avatarLabel} style={{ color: tp.frameColor ?? '#60b8ff' }}>
+              {target.name}
+            </span>
           </div>
         </>
       )}
@@ -84,88 +88,111 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
           </>
         )}
 
-        {type === 'CARD_IMPACT' && (
-          <>
-            <AvatarRow players={players} actorId={payload.actorId} targetId={payload.targetId} />
-            <div className={styles.cardGlow}>
-              <CardFace card={payload.card} size="normal" />
-            </div>
-            {payload.targetName && (
-              <span className={styles.targetRow}>
-                {payload.hit
-                  ? <span className={styles.hitText}>تخمين صحيح! {payload.targetName} يخرج 🎯</span>
-                  : payload.card.id === 1
-                  ? <span className={styles.missText}>تخمين خاطئ — {payload.targetName} آمن 😌</span>
-                  : payload.card.id === 2
-                  ? <span className={styles.targetText}>شاف كرت {payload.targetName} سراً 👀</span>
-                  : <span className={styles.targetText}>استهدف {payload.targetName}</span>
-                }
-              </span>
-            )}
-            {payload.card.id === 7 && (
-              <span className={styles.missText}>رُمي مجبراً 🌿</span>
-            )}
-            <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>
-          </>
-        )}
-
-        {type === 'COMPARE_REVEAL' && (
-          <>
-            <AvatarRow players={players} actorId={payload.actorId} targetId={payload.targetId} />
-            <span className={styles.sectionLabel}>مقارنة الكروت</span>
-            <div className={styles.compareRow}>
-              <div className={[
-                styles.compareSlot,
-                payload.eliminatedName === payload.actorName ? styles.loser : '',
-              ].join(' ')}>
-                <CardFace card={payload.actorCard} size="normal" />
-                <span className={styles.playerTag}>{payload.actorName}</span>
+        {type === 'CARD_IMPACT' && (() => {
+          const tgt = players?.find(p => p.id === payload.targetId);
+          const tc  = tgt?.profile?.frameColor ?? '#60b8ff';
+          const N   = <span style={{ color: tc, fontWeight: 700 }}>{payload.targetName}</span>;
+          return (
+            <>
+              <AvatarRow players={players} actorId={payload.actorId} targetId={payload.targetId} />
+              <div className={styles.cardGlow}>
+                <CardFace card={payload.card} size="normal" />
               </div>
-              <span className={styles.vs}>VS</span>
-              <div className={[
-                styles.compareSlot,
-                payload.eliminatedName === payload.targetName ? styles.loser : '',
-              ].join(' ')}>
-                <CardFace card={payload.targetCard} size="normal" />
-                <span className={styles.playerTag}>{payload.targetName}</span>
-              </div>
-            </div>
-            {payload.eliminatedName
-              ? <span className={styles.hitText}>{payload.eliminatedName} يخرج! ❌</span>
-              : <span className={styles.tieText}>تعادل — لا أحد يخرج</span>
-            }
-            <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>
-          </>
-        )}
-
-        {type === 'FORCE_RESULT' && (
-          <>
-            <AvatarRow players={players} actorId={payload.actorId} targetId={payload.targetId} />
-            <span className={styles.sectionLabel}>{payload.actorName} أجبر {payload.targetName}</span>
-            <div className={styles.forceRow}>
-              {payload.discardedCard
-                ? <CardFace card={payload.discardedCard} size="normal" />
-                : <div className={styles.unknownCard}>؟</div>
-              }
-              <span className={styles.arrow}>←</span>
-              {payload.wasEliminated
-                ? <div className={styles.unknownCard}>خرج!</div>
-                : <div className={styles.unknownCard}>كرت جديد</div>
-              }
-            </div>
-            {payload.wasEliminated ? (
-              <>
-                <span className={styles.hitText}>{payload.targetName} خرج! ⭐</span>
-                <span className={styles.ruleNote}>
-                  نجمة الحي: من رُمي كرته لأي سبب يخرج فوراً
+              {payload.targetName && (
+                <span className={styles.targetRow}>
+                  {payload.hit
+                    ? <span className={styles.hitText}>تخمين صحيح! {N} يخرج 🎯</span>
+                    : payload.card.id === 1
+                    ? <span className={styles.missText}>تخمين خاطئ — {N} آمن 😌</span>
+                    : payload.card.id === 2
+                    ? <span className={styles.targetText}>شاف كرت {N} سراً 👀</span>
+                    : <span className={styles.targetText}>استهدف {N}</span>
+                  }
                 </span>
-              </>
-            ) : (
-              <span className={styles.targetText}>بُدّل كرت {payload.targetName}</span>
-            )}
-            <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>
-          </>
-        )}
+              )}
+              {payload.card.id === 7 && (
+                <span className={styles.missText}>رُمي مجبراً 🌿</span>
+              )}
+              <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>
+            </>
+          );
+        })()}
+
+        {type === 'COMPARE_REVEAL' && (() => {
+          const actor  = players?.find(p => p.id === payload.actorId);
+          const target = players?.find(p => p.id === payload.targetId);
+          const ac = actor?.profile?.frameColor  ?? '#60b8ff';
+          const tc = target?.profile?.frameColor ?? '#60b8ff';
+          const loserColor = payload.eliminatedName === payload.actorName ? ac : tc;
+          return (
+            <>
+              <AvatarRow players={players} actorId={payload.actorId} targetId={payload.targetId} />
+              <span className={styles.sectionLabel}>مقارنة الكروت</span>
+              <div className={styles.compareRow}>
+                <div className={[
+                  styles.compareSlot,
+                  payload.eliminatedName === payload.actorName ? styles.loser : '',
+                ].join(' ')}>
+                  <CardFace card={payload.actorCard} size="normal" />
+                  <span className={styles.playerTag} style={{ color: ac }}>{payload.actorName}</span>
+                </div>
+                <span className={styles.vs}>VS</span>
+                <div className={[
+                  styles.compareSlot,
+                  payload.eliminatedName === payload.targetName ? styles.loser : '',
+                ].join(' ')}>
+                  <CardFace card={payload.targetCard} size="normal" />
+                  <span className={styles.playerTag} style={{ color: tc }}>{payload.targetName}</span>
+                </div>
+              </div>
+              {payload.eliminatedName
+                ? <span className={styles.hitText}>
+                    <span style={{ color: loserColor, fontWeight: 700 }}>{payload.eliminatedName}</span>
+                    {' يخرج! ❌'}
+                  </span>
+                : <span className={styles.tieText}>تعادل — لا أحد يخرج</span>
+              }
+              <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>
+            </>
+          );
+        })()}
+
+        {type === 'FORCE_RESULT' && (() => {
+          const actor  = players?.find(p => p.id === payload.actorId);
+          const target = players?.find(p => p.id === payload.targetId);
+          const ac = actor?.profile?.frameColor  ?? '#60b8ff';
+          const tc = target?.profile?.frameColor ?? '#60b8ff';
+          const AN = <span style={{ color: ac, fontWeight: 700 }}>{payload.actorName}</span>;
+          const TN = <span style={{ color: tc, fontWeight: 700 }}>{payload.targetName}</span>;
+          return (
+            <>
+              <AvatarRow players={players} actorId={payload.actorId} targetId={payload.targetId} />
+              <span className={styles.sectionLabel}>{AN} أجبر {TN}</span>
+              <div className={styles.forceRow}>
+                {payload.discardedCard
+                  ? <CardFace card={payload.discardedCard} size="normal" />
+                  : <div className={styles.unknownCard}>؟</div>
+                }
+                <span className={styles.arrow}>←</span>
+                {payload.wasEliminated
+                  ? <div className={styles.unknownCard}>خرج!</div>
+                  : <div className={styles.unknownCard}>كرت جديد</div>
+                }
+              </div>
+              {payload.wasEliminated ? (
+                <>
+                  <span className={styles.hitText}>{TN} خرج! ⭐</span>
+                  <span className={styles.ruleNote}>
+                    نجمة الحي: من رُمي كرته لأي سبب يخرج فوراً
+                  </span>
+                </>
+              ) : (
+                <span className={styles.targetText}>بُدّل كرت {TN}</span>
+              )}
+              <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>
+            </>
+          );
+        })()}
 
         {type === 'SWAP_VISUAL' && (
           <>
@@ -201,6 +228,7 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
             payload.playerId != null ? p.id === payload.playerId : p.name === payload.playerName
           );
           const ep = elim?.profile;
+          const ec = ep?.frameColor ?? '#FF8888';
           return (
             <div className={styles.eliminationWrap}>
               {ep && (
@@ -213,7 +241,11 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
                 />
               )}
               <span className={styles.eliminationIcon}>💀</span>
-              <span className={styles.eliminationText}>خرج {payload.playerName}!</span>
+              <span className={styles.eliminationText}>
+                {'خرج '}
+                <span style={{ color: ec }}>{payload.playerName}</span>
+                {'!'}
+              </span>
               <button className={styles.confirmBtn} onClick={onConfirm}>حسناً</button>
             </div>
           );

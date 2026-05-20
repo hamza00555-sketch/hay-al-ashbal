@@ -39,8 +39,9 @@
 
 .sectionLabel {
   font-family: var(--font, 'Zanjabeel', sans-serif);
-  font-size: 0.9rem;
-  color: #6B7A8A;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3a5a7a;
   text-align: center;
 }
 
@@ -79,29 +80,33 @@
 
 .hitText {
   font-family: var(--font, 'Zanjabeel', sans-serif);
-  font-size: 1rem;
-  color: #FF8888;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e05050;
   text-align: center;
 }
 
 .missText {
   font-family: var(--font, 'Zanjabeel', sans-serif);
-  font-size: 0.9rem;
-  color: #6B7A8A;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3a5a7a;
   text-align: center;
 }
 
 .targetText {
   font-family: var(--font, 'Zanjabeel', sans-serif);
-  font-size: 0.9rem;
-  color: #6B7A8A;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3a5a7a;
   text-align: center;
 }
 
 .tieText {
   font-family: var(--font, 'Zanjabeel', sans-serif);
-  font-size: 0.95rem;
-  color: #6B7A8A;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3a5a7a;
   text-align: center;
 }
 
@@ -122,9 +127,9 @@
 
 .avatarLabel {
   font-family: var(--font, 'Zanjabeel', sans-serif);
-  font-size: 0.7rem;
-  color: #6B7A8A;
-  max-width: 64px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  max-width: 72px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -208,8 +213,8 @@
 
 .playerTag {
   font-family: var(--font, 'Zanjabeel', sans-serif);
-  font-size: 0.68rem;
-  color: #6B7A8A;
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 
 .vs {
