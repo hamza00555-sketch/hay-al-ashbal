@@ -701,10 +701,27 @@ export default function GamePage({
   const handleActionResolve = useCallback(({ targetId, guessedCardId, skip }) => {
     setShowAction(false);
     if (skip || !pendingPlay) {
-      // Must sync to Firebase in online mode — use pushNarrative (stamps _author/_v when isOnline)
       setFocusedSource(null);
+      const play = pendingPlay;
       setPendingPlay(null);
-      pushNarrative([], advanceTurn(gs));
+      // When no valid target exists the chosen card is still discarded (Love Letter rule).
+      // Without resolveCard the drawnCard would be silently dropped by advanceTurn — BUG FIX.
+      const baseGs = play
+        ? (() => {
+            const { card: playedCard, source } = play;
+            return {
+              ...gs,
+              players: gs.players.map((p, i) => {
+                if (i !== gs.currentPlayerIndex) return p;
+                const kept = source === 'hand' ? gs.drawnCard : p.hand[0];
+                return { ...p, hand: [kept], discardPile: [...p.discardPile, playedCard] };
+              }),
+              drawnCard: null,
+              globalDiscard: [...(gs.globalDiscard ?? []), playedCard],
+            };
+          })()
+        : gs;
+      pushNarrative([], advanceTurn(baseGs));
       return;
     }
 
