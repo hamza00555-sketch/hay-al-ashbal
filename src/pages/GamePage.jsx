@@ -201,8 +201,9 @@ export default function GamePage({
   const [currentBeat, setCurrentBeat] = useState(null);
   const currentBeatRef = useRef(null); // mirror for Firebase listener (avoids stale closure)
   const [pendingGs,   setPendingGs]   = useState(null);
-  const beatQueueRef  = useRef([]);
-  const narrativeTimer = useRef(null);
+  const beatQueueRef      = useRef([]);
+  const narrativeTimer    = useRef(null);
+  const pendingRemoteRef  = useRef(null);
 
   // TurnBanner (brief flash)
   const [turnBanner, setTurnBanner]   = useState(null);
@@ -270,7 +271,14 @@ export default function GamePage({
       currentBeatRef.current = null;
       setCurrentBeat(null);
       setPendingGs(prev => {
-        if (prev) setGs(prev);
+        const remote = pendingRemoteRef.current;
+        if (remote && (remote._v ?? 0) > (prev?._v ?? 0)) {
+          pendingRemoteRef.current = null;
+          setGs(remote);
+        } else {
+          pendingRemoteRef.current = null;
+          if (prev) setGs(prev);
+        }
         return null;
       });
       return;
@@ -388,8 +396,14 @@ export default function GamePage({
         setActionToast(incoming._action.text);
         toastTimer.current = setTimeout(() => setActionToast(null), 3500);
       }
+      const sanitized = sanitizeGs(incoming);
       if (beatQueueRef.current.length === 0 && !currentBeatRef.current) {
-        setGs(sanitizeGs(incoming));
+        setGs(sanitized);
+        pendingRemoteRef.current = null;
+      } else {
+        if (!pendingRemoteRef.current || v > (pendingRemoteRef.current._v ?? 0)) {
+          pendingRemoteRef.current = sanitized;
+        }
       }
     });
     return () => unsub();
@@ -973,51 +987,47 @@ export default function GamePage({
           )}
         </div>
 
-        {bustanForced && (
+        {isMyTurn && bustanForced && (
           <div className={styles.ruleWarning}>يجب عليك رمي صاحب البستان!</div>
         )}
 
         <div className={styles.hand}>
-          {isMyTurn ? (
-            <>
-              <CardSlot
-                label="في يدك"
-                card={currentPlayer.hand[0]}
-                source="hand"
-                size={handCardSize}
-                focused={focusedSource === 'hand'}
-                dimmed={gs.phase === 'PLAY' && !legalPlays.includes('hand')}
-                playable={gs.phase === 'PLAY' && !isLocked}
-                hidden={flyState?.source === 'hand'}
-                kickingBack={kickBackSource === 'hand'}
-                cardRef={handCardRef}
-                onCardClick={handleCardClick}
-                onInfoClick={handleInfoClick}
-              />
-              {gs.drawnCard && (
-                <CardSlot
-                  label="سحبته الآن"
-                  card={gs.drawnCard}
-                  source="drawn"
-                  size={handCardSize}
-                  focused={focusedSource === 'drawn'}
-                  dimmed={!legalPlays.includes('drawn')}
-                  playable={gs.phase === 'PLAY' && !isLocked}
-                  flipping={drawnFlipping}
-                  onFlipDone={() => setDrawnFlipping(false)}
-                  hidden={flyState?.source === 'drawn'}
-                  kickingBack={kickBackSource === 'drawn'}
-                  cardRef={drawnCardRef}
-                  onCardClick={handleCardClick}
-                  onInfoClick={handleInfoClick}
-                />
-              )}
-            </>
-          ) : (
-            <div className={styles.aiHandCover}>
-              <CardBack size={handCardSize} />
-              {currentBeat?.type === 'CARD_ANTICIPATE' && <CardBack size={handCardSize} />}
-            </div>
+          {humanPlayer?.hand[0] && (
+            <CardSlot
+              label="في يدك"
+              card={humanPlayer.hand[0]}
+              source="hand"
+              size={handCardSize}
+              focused={isMyTurn && focusedSource === 'hand'}
+              dimmed={isMyTurn && gs.phase === 'PLAY' && !legalPlays.includes('hand')}
+              playable={isMyTurn && gs.phase === 'PLAY' && !isLocked}
+              hidden={isMyTurn && flyState?.source === 'hand'}
+              kickingBack={isMyTurn && kickBackSource === 'hand'}
+              cardRef={handCardRef}
+              onCardClick={isMyTurn ? handleCardClick : undefined}
+              onInfoClick={isMyTurn ? handleInfoClick : undefined}
+            />
+          )}
+          {isMyTurn && gs.drawnCard && (
+            <CardSlot
+              label="سحبته الآن"
+              card={gs.drawnCard}
+              source="drawn"
+              size={handCardSize}
+              focused={focusedSource === 'drawn'}
+              dimmed={!legalPlays.includes('drawn')}
+              playable={gs.phase === 'PLAY' && !isLocked}
+              flipping={drawnFlipping}
+              onFlipDone={() => setDrawnFlipping(false)}
+              hidden={flyState?.source === 'drawn'}
+              kickingBack={kickBackSource === 'drawn'}
+              cardRef={drawnCardRef}
+              onCardClick={handleCardClick}
+              onInfoClick={handleInfoClick}
+            />
+          )}
+          {!isMyTurn && currentBeat?.type === 'CARD_ANTICIPATE' && (
+            <CardBack size={handCardSize} />
           )}
         </div>
 
