@@ -76,6 +76,10 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
           </>
         )}
 
+        {type === 'CARD_DRAWN' && (
+          <span className={styles.sectionLabel}>سحبت كرتك ✋</span>
+        )}
+
         {type === 'CARD_ANTICIPATE' && (
           <>
             <AvatarRow players={players} actorId={payload.actorId} />

@@ -16,10 +16,13 @@ export function buildNarrative({
   const beats = [];
 
   if (isAI) {
-    beats.push(beat('AI_THINKING', { name: actorName, actorId }, 1600));
+    beats.push(beat('AI_THINKING', { name: actorName, actorId }, 900));    // 1600 → 900ms
+  } else {
+    beats.push(beat('CARD_DRAWN', {}, 600));  // brief "سحبت كرتك" before human plays
   }
 
-  beats.push(beat('CARD_ANTICIPATE', { card, actorName, actorId }, 2000));
+  // AI gets shorter anticipate (1300ms); human gets full dramatic pause (2000ms)
+  beats.push(beat('CARD_ANTICIPATE', { card, actorName, actorId }, isAI ? 1300 : 2000));
 
   const newlyEliminated = nextGs.players.filter(p => {
     const prev = prevGs.players.find(x => x.id === p.id);

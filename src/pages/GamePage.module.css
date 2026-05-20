@@ -82,10 +82,9 @@
   inset: 0;
   display: grid;
   grid-template-columns: 110px 1fr 110px;
-  /* humanZone gets a fixed 42vh using --real-vh (set from window.innerHeight)
-     so it's accurate on Android where dvh != window.innerHeight.
-     Falls back to 42dvh if JS hasn't run yet. */
-  grid-template-rows: auto 1fr calc(var(--real-vh, 1dvh) * 42);
+  /* humanZone = 40% of real viewport (--real-vh from window.innerHeight + orientationchange).
+     Reduced from 42% → 40% to give arena more breathing room on short screens. */
+  grid-template-rows: auto 1fr calc(var(--real-vh, 1dvh) * 40);
   grid-template-areas:
     ".     top    ."
     "left  arena  right"
@@ -297,7 +296,7 @@
 /* ── Human zone (full width bottom) ─────────────────────────── */
 .humanZone {
   grid-area: human;
-  padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 16px max(14px, env(safe-area-inset-bottom));
   border-top: 1px solid rgba(86,130,178,0.15);
   background: rgba(255,255,255,0.85);
   backdrop-filter: blur(12px);
@@ -309,6 +308,8 @@
   z-index: 1;
   box-shadow: 0 -4px 20px rgba(86,130,178,0.1);
   transition: box-shadow 0.4s;
+  /* clamp ensures a sane range: never below 180px (cards invisible) or above 52vh */
+  min-height: clamp(180px, 34vh, 52vh);
   /* overflow:hidden clips content that exceeds available height;
      do NOT set min-height:0 — it allows the grid auto track to shrink
      smaller than content, causing cards to be clipped */
@@ -522,16 +523,22 @@
   text-overflow: ellipsis;
 }
 
-@media (max-width: 360px) {
-  .board      { grid-template-columns: 72px 1fr 72px; }
-  .seatName   { max-width: 66px; }
+@media (max-width: 400px) {
+  .board      { grid-template-columns: 80px 1fr 80px; }
+  .seatName   { max-width: 72px; }
   .humanZone  { gap: 6px; }
 }
 
+@media (max-width: 360px) {
+  .board      { grid-template-columns: 72px 1fr 72px; }
+  .seatName   { max-width: 60px; }
+}
+
 @media (max-height: 600px) {
-  .seat_top .seatCardWrap  { transform: scale(0.72); }
+  /* Unified scale for all seats — removes the 0.72 vs 0.80 inconsistency */
+  .seat_top .seatCardWrap,
   .seat_left .seatCardWrap,
-  .seat_right .seatCardWrap { transform: scale(0.80); }
+  .seat_right .seatCardWrap { transform: scale(0.76); }
   .arena { gap: 6px; padding: 4px; }
 }
 
@@ -796,6 +803,20 @@
   color: #2d3e52;
   margin: 0;
   text-align: center;
+}
+
+/* ── Card ability hint (shown when a card is focused) ─────────── */
+.cardHint {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.75rem;
+  color: #5682B2;
+  text-align: center;
+  padding: 3px 12px;
+  border-radius: 8px;
+  background: rgba(86,130,178,0.08);
+  animation: announceFadeIn 0.2s ease;
+  max-width: 280px;
+  line-height: 1.4;
 }
 
 /* ── Card-with-info wrapper ──────────────────────────────────── */

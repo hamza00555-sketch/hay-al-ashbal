@@ -217,6 +217,7 @@ export default function GamePage({
   const handCardRef   = useRef(null);
   const drawnCardRef  = useRef(null);
   const deckRef       = useRef(null);
+  const bannerTimer   = useRef(null);
 
   // Online: action toast shown to the opponent
   const [actionToast,   setActionToast]   = useState(null);
@@ -241,17 +242,15 @@ export default function GamePage({
     ? gs.players[myPlayerIdx]
     : (hasAI ? gs.players.find(p => !p.isAI) : currentPlayer);
 
-  // Responsive card size — humanZone = 42dvh = 0.42 * window.innerHeight.
-  // Content height: TurnHUD(60) + gap(8) + label+card + padding(24).
-  // large(210px): needs 302px → 0.42*h ≥ 302 → h ≥ 720
-  // normal(165px): needs 257px → 0.42*h ≥ 257 → h ≥ 612
-  // small(117px): needs 209px → always fits
-  const handCardSize = useMemo(() => {
-    const h = window.innerHeight;
+  // Responsive card size — updates on resize and orientation change (Grok approach)
+  function computeHandCardSize(h, w) {
+    if (w <= 400 || h < 612) return 'small';
     if (h >= 720) return 'large';
-    if (h >= 612) return 'normal';
-    return 'small';
-  }, []);
+    return 'normal';
+  }
+  const [handCardSize, setHandCardSize] = useState(
+    () => computeHandCardSize(window.innerHeight, window.innerWidth)
+  );
 
   const legalPlays   = gs.drawnCard ? getLegalPlays(currentPlayer.hand[0], gs.drawnCard) : [];
   const bustanForced = gs.drawnCard ? mustPlayBustan(currentPlayer.hand[0], gs.drawnCard) : false;
@@ -327,21 +326,29 @@ export default function GamePage({
     kickQueue();
   }
 
-  // Cleanup timers on unmount + set --real-vh for accurate Android layout
+  // Cleanup timers on unmount + set --real-vh/vw for accurate Android/iOS layout
   useEffect(() => {
     startMusic();
-    function setRealVh() {
-      document.documentElement.style.setProperty('--real-vh', `${window.innerHeight * 0.01}px`);
+    function updateLayout() {
+      const h = window.innerHeight, w = window.innerWidth;
+      document.documentElement.style.setProperty('--real-vh', `${h * 0.01}px`);
+      document.documentElement.style.setProperty('--real-vw', `${w * 0.01}px`);
+      setHandCardSize(computeHandCardSize(h, w));
     }
-    setRealVh();
-    window.addEventListener('resize', setRealVh);
+    updateLayout();
+    window.addEventListener('resize', updateLayout);
+    // iOS fires orientationchange before innerHeight updates — wait 150ms (Grok fix)
+    const onOrient = () => setTimeout(updateLayout, 150);
+    window.addEventListener('orientationchange', onOrient);
     return () => {
       clearTimeout(narrativeTimer.current);
       clearTimeout(announceTimer.current);
       clearTimeout(toastTimer.current);
-      window.removeEventListener('resize', setRealVh);
+      clearTimeout(bannerTimer.current);
+      window.removeEventListener('resize', updateLayout);
+      window.removeEventListener('orientationchange', onOrient);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Online: Firebase connection status ──────────────────────
   useEffect(() => {
@@ -432,6 +439,11 @@ export default function GamePage({
 
     if (isMe) SFX.turnHuman(); else SFX.turnAI();
     setTurnAnnounce({ name: cp.name, profile: cp.profile, isMe, isAI: cp.isAI });
+
+    // Flash TurnBanner for 2.2s (shows even while TurnAnnounce is up, persists after)
+    setTurnBanner(isMe ? 'دورك!' : `دور ${cp.name}`);
+    clearTimeout(bannerTimer.current);
+    bannerTimer.current = setTimeout(() => setTurnBanner(null), 2200);
 
     // AI turns: auto-dismiss after 1.6s
     if (cp.isAI) {
@@ -1013,7 +1025,15 @@ export default function GamePage({
           <p className={styles.hint}>اضغط كرت لتحديده، ثم مرة ثانية للعب</p>
         )}
         {gs.phase === 'PLAY' && gs.drawnCard && isMyTurn && focusedSource && !isLocked && (
-          <p className={styles.hint}>اضغط مرة ثانية للعب • ℹ️ للمعلومات</p>
+          <>
+            <p className={styles.hint}>اضغط مرة ثانية للعب • ℹ️ للمعلومات</p>
+            {(() => {
+              const c = focusedSource === 'hand' ? currentPlayer.hand[0] : gs.drawnCard;
+              return c?.ability ? (
+                <div className={styles.cardHint}>{c.ability}</div>
+              ) : null;
+            })()}
+          </>
         )}
 
         {/* Skip to end: shown when human is eliminated and AI are still playing */}
