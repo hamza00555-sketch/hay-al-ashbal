@@ -57,19 +57,20 @@ export function listenRoom(code, callback) {
   return onValue(ref(db, `rooms/${code}`), snap => callback(snap.val()));
 }
 
-// Firebase drops empty arrays (converts [] to null). Restore them after reading.
+// Firebase drops empty arrays (converts [] to null) and may return dense arrays as
+// numeric-keyed objects. toArr handles both cases safely.
 export function sanitizeGs(raw) {
   if (!raw) return null;
   const toArr = v => (Array.isArray(v) ? v : v != null ? Object.values(v) : []);
   return {
     ...raw,
-    gameLog:       Array.isArray(raw.gameLog)       ? raw.gameLog       : [],
-    globalDiscard: Array.isArray(raw.globalDiscard) ? raw.globalDiscard : [],
+    gameLog:       toArr(raw.gameLog),
+    globalDiscard: toArr(raw.globalDiscard),
     deck:          toArr(raw.deck),
     players:       toArr(raw.players).map(p => ({
       ...p,
       hand:        toArr(p.hand),
-      discardPile: Array.isArray(p.discardPile) ? p.discardPile : [],
+      discardPile: toArr(p.discardPile),
       peekMemory:  p.peekMemory ?? {},
     })),
   };
@@ -93,8 +94,10 @@ export async function endRoom(code) {
 }
 
 // Host writes fresh initialGs to Firebase so guest auto-starts next round.
+// IMPORTANT: state is cleared to null so the new GamePage's Firebase listener
+// does not receive and apply the old round's GAME_OVER state on mount.
 export async function writeRoundStart(code, gs) {
-  await update(ref(db, `rooms/${code}`), { nextRound: gs, status: 'playing' });
+  await update(ref(db, `rooms/${code}`), { nextRound: gs, status: 'playing', state: null });
 }
 
 export async function leaveRoom(code, uid) {
