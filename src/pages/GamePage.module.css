@@ -71,7 +71,7 @@
 .announceWait {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.9rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0;
   animation: phasePulse 1s ease-in-out infinite alternate;
 }
@@ -194,7 +194,7 @@
   padding: 7px 22px;
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.95rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   pointer-events: none;
   box-shadow: 0 4px 16px rgba(86,130,178,0.12);
   animation: bannerSlideIn 0.3s cubic-bezier(0.34,1.56,0.64,1),
@@ -422,7 +422,7 @@
 .waitBadge {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.75rem;
-  color: #6B7A8A;
+  color: #2d3e52;
 }
 
 /* ── Seat ────────────────────────────────────────────────────── */
@@ -537,7 +537,7 @@
 .seatDiscard {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.60rem;
-  color: #6B7A8A;
+  color: #2d3e52;
 }
 
 .diffBadge {
@@ -623,7 +623,7 @@
 .deckCount {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.78rem;
-  color: #6B7A8A;
+  color: #2d3e52;
 }
 
 .emptyDeck {
@@ -684,7 +684,7 @@
 .turnHUDPhase {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.78rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   animation: phasePulse 1.2s ease-in-out infinite alternate;
 }
 
@@ -716,7 +716,7 @@
 .turnLabel {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.9rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   display: flex; align-items: center; gap: 8px;
 }
 .turnLabel strong { color: #1F3D5A; }
@@ -786,13 +786,13 @@
 .cardLabel {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.7rem;
-  color: #6B7A8A;
+  color: #2d3e52;
 }
 
 .hint {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.8rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0;
   text-align: center;
 }
@@ -844,7 +844,7 @@
 .peekNote {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.9rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0;
 }
 .peekDone {

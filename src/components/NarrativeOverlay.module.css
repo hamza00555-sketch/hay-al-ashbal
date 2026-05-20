@@ -34,7 +34,7 @@
 .actorName {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.88rem;
-  color: #6B7A8A;
+  color: #2d3e52;
 }
 
 .sectionLabel {
@@ -55,7 +55,7 @@
 .ability {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.8rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   text-align: center;
   line-height: 1.5;
 }
@@ -63,7 +63,7 @@
 .tapHint {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.72rem;
-  color: rgba(31,61,90,0.35);
+  color: rgba(31,61,90,0.55);
   text-align: center;
   margin-top: 2px;
   animation: hintBlink 1.2s ease-in-out infinite alternate;
@@ -220,7 +220,8 @@
 .vs {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 1.1rem;
-  color: rgba(31,61,90,0.3);
+  font-weight: 700;
+  color: #2d3e52;
   flex-shrink: 0;
 }
 
@@ -346,7 +347,7 @@
   background: rgba(86,130,178,0.06);
   border: 1px solid rgba(86,130,178,0.2);
   border-radius: 12px;
-  color: #6B7A8A;
+  color: #2d3e52;
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.82rem;
   padding: 6px 20px;

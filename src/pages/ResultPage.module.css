@@ -44,7 +44,7 @@
 .winCardLabel {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.8rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0;
 }
 
@@ -60,7 +60,7 @@
 .standingsTitle {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.8rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0;
   padding: 10px 16px;
   border-bottom: 1px solid rgba(86,130,178,0.1);
@@ -70,7 +70,7 @@
 .eyebrow {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.85rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0;
   text-align: center;
 }
@@ -116,7 +116,7 @@
 .tokenCount {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.78rem;
-  color: #6B7A8A;
+  color: #2d3e52;
 }
 
 .buttons {

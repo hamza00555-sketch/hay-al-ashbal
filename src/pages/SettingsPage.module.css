@@ -50,7 +50,7 @@
 .label {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.82rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0 0 12px;
 }
 
@@ -192,7 +192,7 @@
 .volPct {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.78rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   min-width: 34px;
   text-align: center;
 }

@@ -31,7 +31,7 @@
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(86, 130, 178, 0.25);
   border-radius: 10px;
-  color: #6B7A8A;
+  color: #2d3e52;
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.82rem;
   padding: 6px 14px;
@@ -262,7 +262,7 @@
 .deckCount {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.78rem;
-  color: #6B7A8A;
+  color: #2d3e52;
 }
 
 .drawHint {
@@ -490,7 +490,7 @@
 .deckLabel {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.75rem;
-  color: #6B7A8A;
+  color: #2d3e52;
 }
 
 .emptyDeckSlot {

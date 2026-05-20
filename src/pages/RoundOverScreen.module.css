@@ -19,7 +19,7 @@
 .eyebrow {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.85rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0;
   letter-spacing: 0.06em;
 }
@@ -64,7 +64,7 @@
 .tokenLabel {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.78rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0;
   text-align: center;
 }
@@ -89,7 +89,7 @@
 .tokenName {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.9rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   min-width: 60px;
 }
 
@@ -118,7 +118,7 @@
 .tokenCount {
   font-family: var(--font, 'Zanjabeel', sans-serif);
   font-size: 0.78rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   min-width: 30px;
   text-align: left;
 }

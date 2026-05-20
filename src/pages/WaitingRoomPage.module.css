@@ -45,7 +45,7 @@
 
 .codeLabel {
   font-size: 0.85rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   margin: 0 0 12px;
 }
 
@@ -182,7 +182,7 @@
 
 .waitHint {
   font-size: 0.8rem;
-  color: #6B7A8A;
+  color: #2d3e52;
   text-align: center;
   margin: 8px 0 0;
 }
