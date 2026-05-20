@@ -203,7 +203,9 @@ export default function GamePage({
   const [pendingGs,   setPendingGs]   = useState(null);
   const beatQueueRef      = useRef([]);
   const narrativeTimer    = useRef(null);
+  const kickSeqRef        = useRef(0);    // seq counter — prevents stale setTimeout from double-draining
   const pendingRemoteRef  = useRef(null);
+  const pendingGsRef      = useRef(null); // mirrors pendingGs — lets kickQueue read it without a setState updater
 
   // TurnBanner (brief flash)
   const [turnBanner, setTurnBanner]   = useState(null);
@@ -265,21 +267,23 @@ export default function GamePage({
 
   // ── Narrative queue driver ───────────────────────────────────
   function kickQueue() {
+    const mySeq = ++kickSeqRef.current; // increment before clearTimeout so any in-flight timer is stale
     clearTimeout(narrativeTimer.current);
     const q = beatQueueRef.current;
     if (q.length === 0) {
       currentBeatRef.current = null;
       setCurrentBeat(null);
+      // Snapshot both refs BEFORE any setState call — updater functions must be pure
       const remote = pendingRemoteRef.current;
       pendingRemoteRef.current = null;
-      setPendingGs(prev => {
-        if (remote && (remote._v ?? 0) > (prev?._v ?? 0)) {
-          setGs(remote);
-        } else {
-          if (prev) setGs(prev);
-        }
-        return null;
-      });
+      const prev = pendingGsRef.current;
+      pendingGsRef.current = null;
+      setPendingGs(null);
+      if (remote && (remote._v ?? 0) > (prev?._v ?? 0)) {
+        setGs(remote);
+      } else if (prev) {
+        setGs(prev);
+      }
       return;
     }
     const [next, ...rest] = q;
@@ -314,7 +318,10 @@ export default function GamePage({
     }
     setCurrentBeat(next); // also tracked in currentBeatRef above
     if (next.durationMs > 0) {
-      narrativeTimer.current = setTimeout(kickQueue, next.durationMs);
+      // Capture seq so this timer is a no-op if kickQueue was called manually (e.g., "تخطى" button)
+      narrativeTimer.current = setTimeout(() => {
+        if (kickSeqRef.current === mySeq) kickQueue();
+      }, next.durationMs);
     }
   }
 
@@ -329,6 +336,7 @@ export default function GamePage({
       : nextState;
     clearTimeout(narrativeTimer.current);
     beatQueueRef.current = beats;
+    pendingGsRef.current = stamped; // keep ref in sync with state
     setPendingGs(stamped);
     kickQueue();
   }
@@ -634,7 +642,10 @@ export default function GamePage({
   const handleActionResolve = useCallback(({ targetId, guessedCardId, skip }) => {
     setShowAction(false);
     if (skip || !pendingPlay) {
-      setGs(advanceTurn(gs));
+      // Must sync to Firebase in online mode — use pushNarrative (stamps _author/_v when isOnline)
+      setFocusedSource(null);
+      setPendingPlay(null);
+      pushNarrative([], advanceTurn(gs));
       return;
     }
 
