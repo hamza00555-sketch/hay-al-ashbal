@@ -270,13 +270,12 @@ export default function GamePage({
     if (q.length === 0) {
       currentBeatRef.current = null;
       setCurrentBeat(null);
+      const remote = pendingRemoteRef.current;
+      pendingRemoteRef.current = null;
       setPendingGs(prev => {
-        const remote = pendingRemoteRef.current;
         if (remote && (remote._v ?? 0) > (prev?._v ?? 0)) {
-          pendingRemoteRef.current = null;
           setGs(remote);
         } else {
-          pendingRemoteRef.current = null;
           if (prev) setGs(prev);
         }
         return null;
@@ -357,6 +356,18 @@ export default function GamePage({
       window.removeEventListener('orientationchange', onOrient);
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── HAND_COVER → DRAW (online / vsAI) ───────────────────────
+  // Must be a useEffect — never a render-body side effect — so the transition
+  // is guaranteed to fire after every commit regardless of overlay ordering.
+  useEffect(() => {
+    if (gs.phase !== 'HAND_COVER') return;
+    if (!isOnline && !hasAI) return;
+    const t = setTimeout(() => {
+      setGs(prev => prev.phase === 'HAND_COVER' ? { ...prev, phase: 'DRAW' } : prev);
+    }, 0);
+    return () => clearTimeout(t);
+  }, [gs.phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Online: Firebase connection status ──────────────────────
   useEffect(() => {
@@ -784,12 +795,7 @@ export default function GamePage({
   }
 
   if (gs.phase === 'HAND_COVER') {
-    // Online or vsAI: only one human per device, no need to cover the screen
-    if (isOnline || hasAI) {
-      setTimeout(() => setGs(prev => prev.phase === 'HAND_COVER'
-        ? { ...prev, phase: 'DRAW' } : prev), 0);
-      return null;
-    }
+    if (isOnline || hasAI) return null; // useEffect above handles the transition
     return (
       <HandCover
         playerName={currentPlayer.name}
