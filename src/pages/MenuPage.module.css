@@ -1,20 +1,23 @@
 .page {
   min-height: 100dvh;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  background: linear-gradient(160deg, #EAF2FB 0%, #FFF6E5 100%);
+  background:
+    linear-gradient(to bottom, transparent 40%, rgba(11,27,45,0.55) 65%, rgba(11,27,45,0.90) 100%),
+    url('/bg-menu.jpg') center top / cover no-repeat;
+  background-color: #EAF2FB;
 }
 
 .content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 48px 28px;
+  gap: 20px;
+  padding: 32px 28px max(env(safe-area-inset-bottom, 16px), 28px);
   text-align: center;
   width: 100%;
-  max-width: 360px;
+  max-width: 400px;
 }
 
 .logo { display: flex; justify-content: center; }

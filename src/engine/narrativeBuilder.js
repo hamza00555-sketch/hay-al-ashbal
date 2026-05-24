@@ -47,9 +47,13 @@ export function buildNarrative({
     case 3: { // COMPARE
       const actorAfter = nextGs.players.find(p => p.id === actorId);
       const actorCard  = actorAfter?.hand[0];
+      // Only reveal card faces if the human player is directly involved in the compare.
+      // When both sides are AI the human is a spectator and shouldn't see hidden hands.
+      const targetIsAI = prevGs.players.find(p => p.id === targetId)?.isAI ?? true;
+      const humanInvolved = !isAI || !targetIsAI;
       beats.push(beat('COMPARE_REVEAL', {
-        actorName, actorId, actorCard,
-        targetName, targetId, targetCard: targetCardBefore,
+        actorName, actorId, actorCard: humanInvolved ? actorCard : null,
+        targetName, targetId, targetCard: humanInvolved ? targetCardBefore : null,
         eliminatedName: newlyEliminated[0]?.name ?? null,
       }, 0));
       newlyEliminated.forEach(p => {

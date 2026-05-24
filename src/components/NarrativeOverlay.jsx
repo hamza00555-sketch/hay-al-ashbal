@@ -137,7 +137,9 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
                   styles.compareSlot,
                   payload.eliminatedName === payload.actorName ? styles.loser : '',
                 ].join(' ')}>
-                  <CardFace card={payload.actorCard} size="normal" />
+                  {payload.actorCard
+                    ? <CardFace card={payload.actorCard} size="normal" />
+                    : <CardBack size="normal" />}
                   <span className={styles.playerTag} style={{ color: ac }}>{payload.actorName}</span>
                 </div>
                 <span className={styles.vs}>VS</span>
@@ -145,7 +147,9 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
                   styles.compareSlot,
                   payload.eliminatedName === payload.targetName ? styles.loser : '',
                 ].join(' ')}>
-                  <CardFace card={payload.targetCard} size="normal" />
+                  {payload.targetCard
+                    ? <CardFace card={payload.targetCard} size="normal" />
+                    : <CardBack size="normal" />}
                   <span className={styles.playerTag} style={{ color: tc }}>{payload.targetName}</span>
                 </div>
               </div>
