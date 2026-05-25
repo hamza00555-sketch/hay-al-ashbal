@@ -46,6 +46,18 @@ export default function SettingsPage({ onBack }) {
       </div>
 
       <section className={styles.section}>
+        <p className={styles.label}>اسمك في اللعبة</p>
+        <input
+          className={styles.nameInput}
+          type="text"
+          maxLength={16}
+          placeholder="أدخل اسمك..."
+          value={profile.name ?? ''}
+          onChange={e => update('name', e.target.value)}
+        />
+      </section>
+
+      <section className={styles.section}>
         <p className={styles.label}>الشخصية (صورة البطاقة)</p>
         <div className={styles.avatarGrid}>
           {AVATAR_IMAGE_IDS.map(id => (

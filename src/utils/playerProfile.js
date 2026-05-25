@@ -15,6 +15,7 @@ export const FRAME_COLORS = [
 ];
 
 export const DEFAULT_PROFILE = {
+  name:        '',
   cardImageId: '1',
   frameShape:  'circle',
   frameColor:  '#60b8ff',

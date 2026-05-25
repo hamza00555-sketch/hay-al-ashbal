@@ -11,6 +11,7 @@ import TutorialPage    from './pages/TutorialPage';
 import LoginPage       from './pages/LoginPage';
 import OnlineLobbyPage from './pages/OnlineLobbyPage';
 import WaitingRoomPage from './pages/WaitingRoomPage';
+import LoadingScreen from './components/LoadingScreen';
 import { isTutorialDone } from './tutorial/tutorialStorage';
 import { startMenuMusic, stopMenuMusic, stopMusic } from './utils/sounds';
 import { createInitialState } from './engine/gameEngine';
@@ -137,7 +138,7 @@ export default function App() {
     return () => unsub();
   }, [screen, onlineGame?.roomCode, onlineGame?.isHost]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!authReady) return null; // brief auth check before rendering
+  if (!authReady) return <LoadingScreen />;
 
   return (
     <div dir="rtl">

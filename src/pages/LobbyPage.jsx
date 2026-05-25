@@ -21,8 +21,9 @@ export default function LobbyPage({ onBack, onStartGame }) {
   const [aiCount, setAiCount] = useState(2);
   const [difficulty, setDifficulty] = useState('medium');
   const [tokensToWin, setTokensToWin] = useState(3);
+  const savedName = loadProfile().name?.trim() || 'اللاعب 1';
   const [players, setPlayers] = useState([
-    { name: 'اللاعب 1' },
+    { name: savedName },
     { name: 'اللاعب 2' },
   ]);
 
@@ -47,10 +48,11 @@ export default function LobbyPage({ onBack, onStartGame }) {
 
   function handleModeChange(newMode) {
     setMode(newMode);
+    const n = loadProfile().name?.trim() || 'اللاعب 1';
     if (newMode === 'vsai') {
-      setPlayers([{ name: 'اللاعب 1' }]);
+      setPlayers([{ name: n }]);
     } else {
-      setPlayers([{ name: 'اللاعب 1' }, { name: 'اللاعب 2' }]);
+      setPlayers([{ name: n }, { name: 'اللاعب 2' }]);
     }
   }
 
