@@ -1141,13 +1141,14 @@ export default function GamePage({
           </>
         )}
 
-        {/* Skip to end: shown when human is eliminated and AI are still playing */}
+      </div>
+
+        {/* Skip to end: fixed above all overlays when human is eliminated */}
         {humanPlayer?.isEliminated && hasAI && gs.phase !== 'GAME_OVER' && (
           <button className={styles.skipEndBtn} onClick={handleSkipToEnd}>
             تخطي إلى النهاية ⏭
           </button>
         )}
-      </div>
 
       {/* ── Flying card ── */}
       {flyState && (

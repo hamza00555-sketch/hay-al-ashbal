@@ -4,8 +4,8 @@ import { SFX } from '../utils/sounds';
 import styles from './LobbyPage.module.css';
 
 const MODES = [
-  { id: 'passplay', label: 'Pass & Play', desc: 'لاعبين على نفس الجوال', icon: '📱' },
-  { id: 'vsai', label: 'ضد AI', desc: 'ألعب وحدك ضد الذكاء الاصطناعي', icon: '🤖' },
+  { id: 'passplay', label: 'Pass & Play', desc: 'لاعبين على نفس الجوال', icon: '/icons/i-passplay.webp' },
+  { id: 'vsai', label: 'ضد AI', desc: 'ألعب وحدك ضد الذكاء الاصطناعي', icon: '/icons/i-vsai.webp' },
 ];
 
 const AI_NAMES = ['خالد', 'سارة', 'علي'];
@@ -98,7 +98,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
               className={`${styles.modeBtn} ${mode === m.id ? styles.active : ''}`}
               onClick={() => { SFX.cardSelect(); handleModeChange(m.id); }}
             >
-              <span className={styles.modeIcon}>{m.icon}</span>
+              <img src={m.icon} alt="" className={styles.modeIcon} />
               <span className={styles.modeLabel}>{m.label}</span>
               <span className={styles.modeDesc}>{m.desc}</span>
             </button>

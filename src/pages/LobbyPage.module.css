@@ -75,7 +75,7 @@
   box-shadow: 0 4px 16px rgba(86,130,178,0.2);
 }
 
-.modeIcon { font-size: 1.5rem; }
+.modeIcon { width: 64px; height: 64px; object-fit: contain; }
 .modeLabel {
   font-family: 'Zanjabeel', sans-serif;
   font-size: 0.9rem;
