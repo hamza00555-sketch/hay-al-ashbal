@@ -46,27 +46,24 @@ export default function App() {
     });
   }, []);
 
-  // Give LoadingScreen 600ms to animate to 100% before hiding
+  // Give LoadingScreen 600ms to animate to 100% before hiding, then start music
   useEffect(() => {
     if (!authReady) return;
-    const t = setTimeout(() => setShowLoading(false), 600);
+    const t = setTimeout(() => {
+      setShowLoading(false);
+      // Start music after loading — first tap unlocks AudioContext on mobile
+      const unlock = () => {
+        if (audioUnlocked.current) return;
+        audioUnlocked.current = true;
+        startMenuMusic();
+        document.removeEventListener('click',      unlock, { capture: true });
+        document.removeEventListener('touchstart', unlock, { capture: true });
+      };
+      document.addEventListener('click',      unlock, { capture: true, passive: true });
+      document.addEventListener('touchstart', unlock, { capture: true, passive: true });
+    }, 600);
     return () => clearTimeout(t);
-  }, [authReady]);
-
-  // Start menu music the moment the user first taps anywhere
-  useEffect(() => {
-    const unlock = () => {
-      if (audioUnlocked.current) return;
-      audioUnlocked.current = true;
-      startMenuMusic();
-    };
-    document.addEventListener('click',      unlock, { capture: true, passive: true });
-    document.addEventListener('touchstart', unlock, { capture: true, passive: true });
-    return () => {
-      document.removeEventListener('click',      unlock, { capture: true });
-      document.removeEventListener('touchstart', unlock, { capture: true });
-    };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [authReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!audioUnlocked.current) return;

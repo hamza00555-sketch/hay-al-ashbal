@@ -93,7 +93,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 10px;
+  padding-right: 18px;
   min-width: 44px;
   box-shadow: 0 2px 8px rgba(58,157,224,0.4);
 }
