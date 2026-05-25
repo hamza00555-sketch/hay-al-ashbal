@@ -4,32 +4,44 @@ import styles from './MenuPage.module.css';
 export default function MenuPage({ onStart, onSettings, onTutorial, onOnline }) {
   return (
     <div className={styles.page}>
-      <div className={styles.content}>
-        <div className={styles.logo}>
-          <img src="/cards/back.webp" alt="حي الأشبال" className={styles.logoImg} />
-        </div>
 
-        <div className={styles.tagline}>
-          <p>اقرأ اللاعبين · اخدع خصومك · ابقَ آخر صامد</p>
+      <div className={styles.logoBadge}>
+        <div className={styles.logoLeaves}>
+          <span className={styles.leafLeft}>🌿</span>
+          <span className={styles.leafRight}>🌿</span>
         </div>
-
-        <div className={styles.buttons}>
-          <button className={styles.startBtn} onClick={() => { SFX.confirmOk(); onStart(); }}>
-            ابدأ اللعب
-          </button>
-          <button className={styles.onlineBtn} onClick={() => { SFX.confirmOk(); onOnline?.(); }}>
-            🌐 العب أونلاين
-          </button>
-          <button className={styles.tutorialBtn} onClick={() => { SFX.buttonClick(); onTutorial?.(); }}>
-            📖 كيف ألعب؟
-          </button>
-          <button className={styles.settingsBtn} onClick={() => { SFX.buttonClick(); onSettings(); }}>
-            ⚙ الملف الشخصي
-          </button>
-        </div>
-
-        <p className={styles.players}>2 — 4 لاعبين · أونلاين · ضد AI · Pass &amp; Play</p>
+        <h1 className={styles.logoText}>حي الأشبال</h1>
       </div>
+
+      <div className={styles.panel}>
+        <button className={styles.startBtn} onClick={() => { SFX.confirmOk(); onStart(); }}>
+          <img src="/icons/i-play.webp" alt="" className={styles.btnIcon} />
+          <span>ابدأ اللعب</span>
+          <span className={styles.arrow}>›</span>
+        </button>
+
+        <div className={styles.row2}>
+          <button className={styles.onlineBtn} onClick={() => { SFX.confirmOk(); onOnline?.(); }}>
+            <img src="/icons/i-online.webp" alt="" className={styles.btnIconSm} />
+            <span>اللعب أونلاين</span>
+            <span className={styles.arrowSm}>›</span>
+          </button>
+          <button className={styles.guideBtn} onClick={() => { SFX.buttonClick(); onTutorial?.(); }}>
+            <img src="/icons/i-guide.webp" alt="" className={styles.btnIconSm} />
+            <span>كيف تلعب؟</span>
+            <span className={styles.arrowSm}>›</span>
+          </button>
+        </div>
+
+        <button className={styles.settingsBtn} onClick={() => { SFX.buttonClick(); onSettings(); }}>
+          <img src="/icons/i-settings.webp" alt="" className={styles.btnIconSm} />
+          <span>الملف الشخصي</span>
+          <span className={styles.arrowSm}>›</span>
+        </button>
+
+        <p className={styles.welcome}>مرحباً بك في حي الأشبال!</p>
+      </div>
+
     </div>
   );
 }
