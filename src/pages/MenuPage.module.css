@@ -6,28 +6,34 @@
   justify-content: flex-end;
   background: url('/bg-back.webp') center top / cover no-repeat;
   background-color: #c8dff0;
-  position: relative;
-  overflow: hidden;
 }
 
-/* ── Front characters — bottom of image locked to top of panel ── */
+/* ── Wrapper that anchors the front image to the panel top ── */
+.bottom {
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Front girls: bottom of image = top of panel, always ── */
 .front {
   position: absolute;
-  bottom: var(--panel-h, 260px);
+  bottom: 100%;          /* exactly at panel top edge */
   left: 50%;
   transform: translateX(-50%);
-  width: 75%;
-  max-width: 320px;
+  width: 78%;
+  max-width: 310px;
   pointer-events: none;
   z-index: 3;
-  display: block;
+  mix-blend-mode: multiply; /* makes white bg transparent over bg-back */
 }
 
 /* ── Bottom panel ── */
 .panel {
   width: 100%;
-  max-width: 420px;
-  background: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.93);
   backdrop-filter: blur(14px);
   border-radius: 28px 28px 0 0;
   padding: 20px 20px max(env(safe-area-inset-bottom, 16px), 20px);
