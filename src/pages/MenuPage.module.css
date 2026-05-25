@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  background: url('/bg-back.webp') center -10px / cover no-repeat;
+  background: url('/bg-back.webp') center 40px / cover no-repeat;
   background-color: #c8dff0;
 }
 
@@ -20,7 +20,7 @@
 /* ── Front girls: bottom of image = top of panel, always ── */
 .front {
   position: absolute;
-  bottom: calc(100% - 28px);
+  bottom: calc(100% - 8px);
   left: 50%;
   transform: translateX(-50%);
   width: 65%;
@@ -149,8 +149,8 @@
 }
 
 /* ── Icons ── */
-.btnIcon   { width: 50px; height: 50px; object-fit: contain; flex-shrink: 0; }
-.btnIconSm { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+.btnIcon   { width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; }
+.btnIconSm { width: 54px; height: 54px; object-fit: contain; flex-shrink: 0; }
 
 /* ── Arrows ── */
 .arrow   { font-size: 1.4rem; color: #1F3D5A; opacity: 0.5; flex-shrink: 0; line-height: 1; }
