@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  background: url('/bg-back.webp') center 40px / cover no-repeat;
+  background: url('/bg-back.webp') center 0px / cover no-repeat;
   background-color: #c8dff0;
 }
 
@@ -149,8 +149,8 @@
 }
 
 /* ── Icons ── */
-.btnIcon   { width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; }
-.btnIconSm { width: 54px; height: 54px; object-fit: contain; flex-shrink: 0; }
+.btnIcon   { width: 74px; height: 74px; object-fit: contain; flex-shrink: 0; }
+.btnIconSm { width: 62px; height: 62px; object-fit: contain; flex-shrink: 0; }
 
 /* ── Arrows ── */
 .arrow   { font-size: 1.4rem; color: #1F3D5A; opacity: 0.5; flex-shrink: 0; line-height: 1; }
