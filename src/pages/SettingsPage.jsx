@@ -62,7 +62,7 @@ export default function SettingsPage({ onBack }) {
               }}
               onClick={() => { SFX.cardSelect(); update('cardImageId', id); }}
             >
-              <img src={`/cards/${id}.png`} alt={id} className={styles.avatarThumb} />
+              <img src={`/cards/${id}.webp`} alt={id} className={styles.avatarThumb} />
             </button>
           ))}
         </div>

@@ -6,7 +6,7 @@ export default function MenuPage({ onStart, onSettings, onTutorial, onOnline }) 
     <div className={styles.page}>
       <div className={styles.content}>
         <div className={styles.logo}>
-          <img src="/cards/back.png" alt="حي الأشبال" className={styles.logoImg} />
+          <img src="/cards/back.webp" alt="حي الأشبال" className={styles.logoImg} />
         </div>
 
         <div className={styles.tagline}>

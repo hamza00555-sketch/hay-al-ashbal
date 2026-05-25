@@ -39,7 +39,7 @@ function useTilt(ref, enabled) {
 export function CardBack({ size = 'normal' }) {
   return (
     <div className={`${styles.cardWrap} ${styles[size]}`}>
-      <img src="/cards/back.png" alt="ظهر الكرت" className={styles.cardImg} draggable={false} />
+      <img src="/cards/back.webp" alt="ظهر الكرت" className={styles.cardImg} draggable={false} />
     </div>
   );
 }
@@ -71,11 +71,11 @@ export function CardFace({ card, size = 'normal', dimmed = false, selected = fal
       onClick={onClick}
     >
       <img
-        src={`/cards/${card.image ?? card.id}.png`}
+        src={`/cards/${card.image ?? card.id}.webp`}
         alt={card.name}
         className={styles.cardImg}
         draggable={false}
-        onError={e => { e.currentTarget.src = `/cards/${card.id}.png`; }}
+        onError={e => { e.currentTarget.src = `/cards/${card.id}.webp`; }}
       />
     </div>
   );
@@ -94,15 +94,15 @@ export function FlipCard({ card, size = 'normal', onDone }) {
     <div className={`${styles.flipOuter} ${styles[size]}`}>
       <div className={`${styles.flipInner} ${flipped ? styles.flipped : ''}`}>
         <div className={styles.flipFront}>
-          <img src="/cards/back.png" alt="" className={styles.cardImg} draggable={false} />
+          <img src="/cards/back.webp" alt="" className={styles.cardImg} draggable={false} />
         </div>
         <div className={styles.flipBack}>
           <img
-        src={`/cards/${card.image ?? card.id}.png`}
+        src={`/cards/${card.image ?? card.id}.webp`}
         alt={card.name}
         className={styles.cardImg}
         draggable={false}
-        onError={e => { e.currentTarget.src = `/cards/${card.id}.png`; }}
+        onError={e => { e.currentTarget.src = `/cards/${card.id}.webp`; }}
       />
         </div>
       </div>

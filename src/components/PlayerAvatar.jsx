@@ -14,7 +14,7 @@ export default function PlayerAvatar({
     >
       <div className={[styles.avatar, styles[`shape_${frameShape}`], styles[`size_${size}`]].join(' ')}>
         <img
-          src={`/cards/${cardImageId}.png`}
+          src={`/cards/${cardImageId}.webp`}
           alt={name ?? ''}
           className={styles.img}
           draggable={false}

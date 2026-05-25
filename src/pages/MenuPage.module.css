@@ -5,7 +5,7 @@
   justify-content: center;
   background:
     linear-gradient(to bottom, transparent 40%, rgba(11,27,45,0.55) 65%, rgba(11,27,45,0.90) 100%),
-    url('/bg-menu.jpg') center top / cover no-repeat;
+    url('/bg-menu.webp') center top / cover no-repeat;
   background-color: #EAF2FB;
 }
 
