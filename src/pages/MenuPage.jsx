@@ -31,8 +31,6 @@ export default function MenuPage({ onStart, onSettings, onTutorial, onOnline }) 
             <span>الملف الشخصي</span>
             <span className={styles.arrowSm}>›</span>
           </button>
-
-          <p className={styles.welcome}>مرحباً بك في حي الأشبال!</p>
         </div>
       </div>
     </div>

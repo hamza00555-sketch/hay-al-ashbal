@@ -35,10 +35,10 @@
   background: rgba(255,255,255,0.93);
   backdrop-filter: blur(14px);
   border-radius: 28px 28px 0 0;
-  padding: 20px 20px max(env(safe-area-inset-bottom, 16px), 20px);
+  padding: 10px 14px max(env(safe-area-inset-bottom, 10px), 10px);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   box-shadow: 0 -4px 32px rgba(86,130,178,0.15);
   position: relative;
   z-index: 2;
@@ -52,7 +52,7 @@
   background: #FFC83D;
   border: none;
   border-radius: 18px;
-  padding: 14px 18px;
+  padding: 11px 16px;
   cursor: pointer;
   width: 100%;
   box-shadow: 0 6px 20px rgba(255,200,61,0.4);
@@ -84,7 +84,7 @@
   background: #EAF6FF;
   border: 1.5px solid rgba(86,184,255,0.35);
   border-radius: 16px;
-  padding: 12px;
+  padding: 9px 10px;
   cursor: pointer;
   width: 100%;
   transition: background 0.12s, transform 0.12s;
@@ -108,7 +108,7 @@
   background: #EDFAF0;
   border: 1.5px solid rgba(86,185,120,0.35);
   border-radius: 16px;
-  padding: 12px;
+  padding: 9px 10px;
   cursor: pointer;
   width: 100%;
   transition: background 0.12s, transform 0.12s;
@@ -132,7 +132,7 @@
   background: #F3EEFF;
   border: 1.5px solid rgba(160,100,220,0.25);
   border-radius: 16px;
-  padding: 12px 14px;
+  padding: 9px 12px;
   cursor: pointer;
   width: 100%;
   transition: background 0.12s, transform 0.12s;
@@ -149,18 +149,10 @@
 }
 
 /* ── Icons ── */
-.btnIcon   { width: 56px; height: 56px; object-fit: contain; flex-shrink: 0; }
-.btnIconSm { width: 46px; height: 46px; object-fit: contain; flex-shrink: 0; }
+.btnIcon   { width: 50px; height: 50px; object-fit: contain; flex-shrink: 0; }
+.btnIconSm { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
 
 /* ── Arrows ── */
 .arrow   { font-size: 1.4rem; color: #1F3D5A; opacity: 0.5; flex-shrink: 0; line-height: 1; }
 .arrowSm { font-size: 1.1rem; color: #555;    opacity: 0.4; flex-shrink: 0; line-height: 1; }
 
-/* ── Welcome text ── */
-.welcome {
-  font-family: 'Zanjabeel', sans-serif;
-  font-size: 0.82rem;
-  color: #5682B2;
-  text-align: center;
-  margin: 2px 0 0;
-}
