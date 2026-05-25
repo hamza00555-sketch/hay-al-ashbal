@@ -132,7 +132,7 @@
   background: linear-gradient(135deg, #1a3d5c, #0d2235);
   border: 1.5px solid rgba(255,215,0,0.4);
   border-radius: 16px;
-  padding: 9px 12px;
+  padding: 9px 10px;
   cursor: pointer;
   width: 100%;
   transition: background 0.12s, transform 0.12s;
@@ -142,13 +142,13 @@
 .storeBtn span:nth-child(2) {
   flex: 1;
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 0.95rem; font-weight: 700;
+  font-size: 0.88rem; font-weight: 700;
   color: #FFD700; text-align: right;
 }
 .storeCoin {
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 0.78rem; font-weight: 700;
-  color: rgba(255,215,0,0.75);
+  font-size: 0.72rem; font-weight: 700;
+  color: rgba(255,215,0,0.7);
   flex-shrink: 0;
 }
 

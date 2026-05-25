@@ -28,17 +28,18 @@ export default function MenuPage({ onStart, onSettings, onTutorial, onOnline, on
             </button>
           </div>
 
-          <button className={styles.storeBtn} onClick={() => { SFX.confirmOk(); onStore?.(); }}>
-            <img src="/icons/i-store.webp" alt="" className={styles.btnIconSm} />
-            <span>المتجر</span>
-            <span className={styles.storeCoin}>⭐ {coins.toLocaleString('ar-SA')}</span>
-          </button>
-
-          <button className={styles.settingsBtn} onClick={() => { SFX.buttonClick(); onSettings(); }}>
-            <img src="/icons/i-settings.webp" alt="" className={styles.btnIconSm} />
-            <span>الملف الشخصي</span>
-            <span className={styles.arrowSm}>›</span>
-          </button>
+          <div className={styles.row2}>
+            <button className={styles.storeBtn} onClick={() => { SFX.confirmOk(); onStore?.(); }}>
+              <img src="/icons/i-store.webp" alt="" className={styles.btnIconSm} />
+              <span>المتجر</span>
+              <span className={styles.storeCoin}>⭐ {coins.toLocaleString('ar-SA')}</span>
+            </button>
+            <button className={styles.settingsBtn} onClick={() => { SFX.buttonClick(); onSettings(); }}>
+              <img src="/icons/i-settings.webp" alt="" className={styles.btnIconSm} />
+              <span>ملفي</span>
+              <span className={styles.arrowSm}>›</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
