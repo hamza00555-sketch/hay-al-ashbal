@@ -10,16 +10,17 @@
   overflow: hidden;
 }
 
-/* ── Front characters image — sits just above the panel ── */
+/* ── Front characters — bottom of image locked to top of panel ── */
 .front {
   position: absolute;
-  bottom: calc(var(--panel-h, 260px) - 20px);
+  bottom: var(--panel-h, 260px);
   left: 50%;
   transform: translateX(-50%);
-  width: 58%;
-  max-width: 260px;
+  width: 75%;
+  max-width: 320px;
   pointer-events: none;
   z-index: 3;
+  display: block;
 }
 
 /* ── Bottom panel ── */
