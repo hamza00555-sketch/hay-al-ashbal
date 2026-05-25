@@ -3,7 +3,7 @@ import { SFX } from '../utils/sounds';
 import styles from './ResultPage.module.css';
 
 export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, onMenu }) {
-  const { winner, players } = result;
+  const { winner, players, coinsEarned = 0, rewardBreakdown = [] } = result;
   const isDraw = !winner;
 
   return (
@@ -42,6 +42,19 @@ export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, on
             );
           })}
         </div>
+
+        {coinsEarned > 0 && (
+          <div className={styles.rewardBox}>
+            <p className={styles.rewardTitle}>مكافأة الجولة</p>
+            {rewardBreakdown.map((b, i) => (
+              <div key={i} className={styles.rewardRow}>
+                <span>{b.label}</span>
+                <span className={styles.rewardAmt}>+{b.amount} ⭐</span>
+              </div>
+            ))}
+            <div className={styles.rewardTotal}>المجموع: {coinsEarned} ⭐</div>
+          </div>
+        )}
 
         <div className={styles.buttons}>
           <button className={styles.playAgain} onClick={() => { SFX.confirmOk(); onNewMatch(); }}>

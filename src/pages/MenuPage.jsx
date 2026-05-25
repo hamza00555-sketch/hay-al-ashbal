@@ -1,7 +1,9 @@
 import { SFX } from '../utils/sounds';
+import { loadProfile } from '../utils/playerProfile';
 import styles from './MenuPage.module.css';
 
-export default function MenuPage({ onStart, onSettings, onTutorial, onOnline }) {
+export default function MenuPage({ onStart, onSettings, onTutorial, onOnline, onStore }) {
+  const coins = loadProfile().coins ?? 0;
   return (
     <div className={styles.page}>
       <div className={styles.bottom}>
@@ -25,6 +27,12 @@ export default function MenuPage({ onStart, onSettings, onTutorial, onOnline }) 
               <span className={styles.arrowSm}>›</span>
             </button>
           </div>
+
+          <button className={styles.storeBtn} onClick={() => { SFX.confirmOk(); onStore?.(); }}>
+            <img src="/icons/i-store.webp" alt="" className={styles.btnIconSm} />
+            <span>المتجر</span>
+            <span className={styles.storeCoin}>⭐ {coins.toLocaleString('ar-SA')}</span>
+          </button>
 
           <button className={styles.settingsBtn} onClick={() => { SFX.buttonClick(); onSettings(); }}>
             <img src="/icons/i-settings.webp" alt="" className={styles.btnIconSm} />

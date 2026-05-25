@@ -12,10 +12,13 @@ import LoginPage       from './pages/LoginPage';
 import OnlineLobbyPage from './pages/OnlineLobbyPage';
 import WaitingRoomPage from './pages/WaitingRoomPage';
 import LoadingScreen from './components/LoadingScreen';
+import StorePage from './pages/StorePage';
 import { isTutorialDone } from './tutorial/tutorialStorage';
 import { startMenuMusic, stopMenuMusic, stopMusic } from './utils/sounds';
 import { createInitialState } from './engine/gameEngine';
 import { listenRoom, sanitizeGs, writeRoundStart } from './services/gameRoom';
+import { calcMatchReward, applyMatchReward } from './utils/economy';
+import { loadProfile, saveProfile } from './utils/playerProfile';
 
 export default function App() {
   const [screen,       setScreen]       = useState('menu');
@@ -94,12 +97,28 @@ export default function App() {
     }
     setTokens(newTokens);
 
+    // Award coins for vsai mode only
+    let coinsEarned = 0;
+    let rewardBreakdown = [];
+    if (gameConfig?.mode === 'vsai') {
+      const humanWon = !!result.winner && result.winner.id === 0;
+      const diff = gameConfig.difficulty ?? 'medium';
+      const reward = calcMatchReward(diff, humanWon);
+      coinsEarned = reward.coins;
+      rewardBreakdown = reward.breakdown;
+      if (coinsEarned > 0) {
+        applyMatchReward(coinsEarned, diff, humanWon, reward.isFirstWin);
+        const prof = loadProfile();
+        saveProfile({ ...prof, coins: (prof.coins ?? 0) + coinsEarned });
+      }
+    }
+
     const matchWon = result.winner && (newTokens[result.winner.id] ?? 0) >= twn;
     if (matchWon) {
-      setFinalResult({ ...result, tokens: newTokens, tokensToWin: twn });
+      setFinalResult({ ...result, tokens: newTokens, tokensToWin: twn, coinsEarned, rewardBreakdown });
       setScreen('result');
     } else {
-      setRoundResult({ ...result, tokens: newTokens, tokensToWin: twn });
+      setRoundResult({ ...result, tokens: newTokens, tokensToWin: twn, coinsEarned, rewardBreakdown });
       setScreen('round_over');
     }
   }
@@ -175,11 +194,15 @@ export default function App() {
           onRetry={() => { setScreen('menu'); setTimeout(() => setScreen('tutorial'), 50); }}
         />
       )}
+      {screen === 'store' && (
+        <StorePage onBack={() => setScreen('menu')} />
+      )}
       {screen === 'menu' && (
         <MenuPage
           onStart={() => setScreen('lobby')}
           onSettings={() => setScreen('settings')}
           onTutorial={() => setScreen('tutorial')}
+          onStore={() => setScreen('store')}
           onOnline={() => {
             if (user) setScreen('online_lobby');
             else      setScreen('login');

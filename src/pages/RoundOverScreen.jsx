@@ -3,7 +3,7 @@ import { SFX } from '../utils/sounds';
 import styles from './RoundOverScreen.module.css';
 
 export default function RoundOverScreen({ result, config, tokens, tokensToWin, onNextRound, onMenu, isOnlineGuest = false }) {
-  const { winner, players } = result;
+  const { winner, players, coinsEarned = 0 } = result;
   const isDraw = !winner;
 
   return (
@@ -48,6 +48,12 @@ export default function RoundOverScreen({ result, config, tokens, tokensToWin, o
             })}
           </div>
         </div>
+
+        {coinsEarned > 0 && (
+          <div className={styles.coinEarned}>
+            +{coinsEarned} ⭐ نجمة
+          </div>
+        )}
 
         <div className={styles.buttons}>
           {isOnlineGuest ? (

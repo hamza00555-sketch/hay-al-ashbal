@@ -77,7 +77,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
         profile: i === 0 ? humanProfile : getAIProfile(i - 1),
       }));
     }
-    onStartGame({ mode, players: finalPlayers, tokensToWin });
+    onStartGame({ mode, players: finalPlayers, tokensToWin, difficulty });
   }
 
   const canStart = mode === 'vsai' || players.length >= 2;

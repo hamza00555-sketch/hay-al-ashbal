@@ -19,6 +19,8 @@ export const DEFAULT_PROFILE = {
   cardImageId: '1',
   frameShape:  'circle',
   frameColor:  '#60b8ff',
+  coins:       0,
+  inventory:   [],
 };
 
 export function loadProfile() {
