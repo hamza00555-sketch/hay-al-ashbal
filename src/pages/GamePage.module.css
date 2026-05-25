@@ -390,7 +390,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  transform: scale(1.45);
+  transform: scale(2.2);
 }
 
 .portraitEmoji { font-size: 2.4rem; line-height: 1; }
