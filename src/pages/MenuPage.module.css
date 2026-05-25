@@ -4,56 +4,29 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  background:
-    url('/bg-menu.webp') center top / cover no-repeat;
+  background: url('/bg-back.webp') center top / cover no-repeat;
   background-color: #c8dff0;
   position: relative;
+  overflow: hidden;
 }
 
-/* ── Logo badge ── */
-.logoBadge {
+/* ── Front characters image — sits just above the panel ── */
+.front {
   position: absolute;
-  top: max(env(safe-area-inset-top, 0px), 12px);
+  bottom: calc(var(--panel-h, 260px) - 20px);
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(255,255,255,0.82);
-  backdrop-filter: blur(10px);
-  border-radius: 50px;
-  padding: 10px 28px 12px;
-  box-shadow: 0 4px 24px rgba(86,130,178,0.25);
-  border: 1.5px solid rgba(255,255,255,0.9);
-  min-width: 150px;
-  text-align: center;
-  z-index: 2;
-}
-
-.logoLeaves {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: -2px;
-}
-.leafLeft  { font-size: 1rem; transform: scaleX(-1); display: inline-block; opacity: 0.85; }
-.leafRight { font-size: 1rem; opacity: 0.85; }
-
-.logoText {
-  font-family: 'Zanjabeel', sans-serif;
-  font-size: 1.7rem;
-  font-weight: 900;
-  color: #1F3D5A;
-  margin: 0;
-  line-height: 1.2;
-  white-space: nowrap;
+  width: 58%;
+  max-width: 260px;
+  pointer-events: none;
+  z-index: 3;
 }
 
 /* ── Bottom panel ── */
 .panel {
   width: 100%;
   max-width: 420px;
-  background: rgba(255,255,255,0.88);
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(14px);
   border-radius: 28px 28px 0 0;
   padding: 20px 20px max(env(safe-area-inset-bottom, 16px), 20px);
@@ -175,7 +148,7 @@
 
 /* ── Arrows ── */
 .arrow   { font-size: 1.4rem; color: #1F3D5A; opacity: 0.5; flex-shrink: 0; line-height: 1; }
-.arrowSm { font-size: 1.1rem; color: #555; opacity: 0.4; flex-shrink: 0; line-height: 1; }
+.arrowSm { font-size: 1.1rem; color: #555;    opacity: 0.4; flex-shrink: 0; line-height: 1; }
 
 /* ── Welcome text ── */
 .welcome {

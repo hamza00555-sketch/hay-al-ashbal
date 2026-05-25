@@ -1,19 +1,28 @@
+import { useEffect, useRef } from 'react';
 import { SFX } from '../utils/sounds';
 import styles from './MenuPage.module.css';
 
 export default function MenuPage({ onStart, onSettings, onTutorial, onOnline }) {
+  const panelRef = useRef(null);
+  const pageRef  = useRef(null);
+
+  useEffect(() => {
+    function update() {
+      if (!panelRef.current || !pageRef.current) return;
+      const h = panelRef.current.offsetHeight;
+      pageRef.current.style.setProperty('--panel-h', `${h}px`);
+    }
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
   return (
-    <div className={styles.page}>
+    <div className={styles.page} ref={pageRef}>
 
-      <div className={styles.logoBadge}>
-        <div className={styles.logoLeaves}>
-          <span className={styles.leafLeft}>🌿</span>
-          <span className={styles.leafRight}>🌿</span>
-        </div>
-        <h1 className={styles.logoText}>حي الأشبال</h1>
-      </div>
+      <img src="/bg-front.webp" alt="" className={styles.front} />
 
-      <div className={styles.panel}>
+      <div className={styles.panel} ref={panelRef}>
         <button className={styles.startBtn} onClick={() => { SFX.confirmOk(); onStart(); }}>
           <img src="/icons/i-play.webp" alt="" className={styles.btnIcon} />
           <span>ابدأ اللعب</span>
