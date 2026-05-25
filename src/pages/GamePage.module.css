@@ -354,45 +354,28 @@
 }
 
 .portrait {
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--char-color, #fff) 10%, var(--char-bg, #111));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  display: inline-flex;
   flex-shrink: 0;
-  border: 2px solid rgba(86,130,178,0.3);
-  transition: border-color 0.3s, box-shadow 0.3s;
   position: relative;
+  border-radius: 50%;
 }
 
-.portrait_seat  { width: 80px; height: 80px; }
-.portrait_human { width: 96px; height: 96px; }
+.portrait_seat  { }
+.portrait_human { }
 
 .portraitActive {
-  border-color: var(--char-color, #FFC83D);
-  box-shadow: 0 0 0 2px var(--char-color, #FFC83D),
-              0 0 16px color-mix(in srgb, var(--char-color, #FFC83D) 50%, transparent);
+  filter: drop-shadow(0 0 6px var(--char-color, #FFC83D))
+          drop-shadow(0 0 14px color-mix(in srgb, var(--char-color, #FFC83D) 60%, transparent));
   animation: portraitPulse 1.5s ease-in-out infinite alternate;
 }
 
 @keyframes portraitPulse {
-  from { box-shadow: 0 0 0 2px var(--char-color, #FFC83D), 0 0 12px color-mix(in srgb, var(--char-color, #FFC83D) 40%, transparent); }
-  to   { box-shadow: 0 0 0 3px var(--char-color, #FFC83D), 0 0 24px color-mix(in srgb, var(--char-color, #FFC83D) 65%, transparent); }
+  from { filter: drop-shadow(0 0 4px var(--char-color, #FFC83D)) drop-shadow(0 0 10px color-mix(in srgb, var(--char-color, #FFC83D) 40%, transparent)); }
+  to   { filter: drop-shadow(0 0 8px var(--char-color, #FFC83D)) drop-shadow(0 0 22px color-mix(in srgb, var(--char-color, #FFC83D) 65%, transparent)); }
 }
 
 .portraitDead { filter: grayscale(1); opacity: 0.5; }
 
-.portraitImg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  transform: scale(4.0);
-  object-position: center 30%;
-}
 
 .portraitEmoji { font-size: 2.4rem; line-height: 1; }
 .portrait_human .portraitEmoji { font-size: 3rem; }

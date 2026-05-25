@@ -48,7 +48,7 @@ function assignSeats(players, humanId) {
 
 // ── Player portrait using card-face avatar ───────────────────────
 function Portrait({ profile, size = 'seat', isActive, isEliminated }) {
-  const avSize = size === 'human' ? 'lg' : 'md';
+  const avSize = size === 'human' ? 'human' : 'seat';
   return (
     <div
       className={[
