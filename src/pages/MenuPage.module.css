@@ -20,14 +20,13 @@
 /* ── Front girls: bottom of image = top of panel, always ── */
 .front {
   position: absolute;
-  bottom: 100%;          /* exactly at panel top edge */
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  width: 78%;
-  max-width: 310px;
+  width: 86%;
+  max-width: 340px;
   pointer-events: none;
   z-index: 3;
-  mix-blend-mode: multiply; /* makes white bg transparent over bg-back */
 }
 
 /* ── Bottom panel ── */

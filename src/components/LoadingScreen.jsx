@@ -17,12 +17,6 @@ export default function LoadingScreen() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.clouds}>
-        <div className={styles.cloud1} />
-        <div className={styles.cloud2} />
-        <div className={styles.cloud3} />
-      </div>
-
       <div className={styles.center}>
         <div className={styles.signWrap}>
           <div className={styles.sign}>

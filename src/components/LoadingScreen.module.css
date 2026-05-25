@@ -1,4 +1,3 @@
-/* ── Page ── */
 .page {
   min-height: 100dvh;
   background: linear-gradient(180deg, #a8d8f0 0%, #c8e8f8 45%, #dff2fc 100%);
@@ -8,52 +7,6 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-}
-
-/* ── CSS Clouds ── */
-.clouds { position: absolute; inset: 0; pointer-events: none; }
-
-.cloud1, .cloud2, .cloud3 {
-  position: absolute;
-  background: rgba(255,255,255,0.85);
-  border-radius: 50px;
-}
-.cloud1::before, .cloud1::after,
-.cloud2::before, .cloud2::after,
-.cloud3::before, .cloud3::after {
-  content: '';
-  position: absolute;
-  background: inherit;
-  border-radius: 50%;
-}
-
-.cloud1 {
-  width: 110px; height: 36px;
-  top: 7%; left: 5%;
-  animation: drift 14s ease-in-out infinite alternate;
-}
-.cloud1::before { width: 55px; height: 55px; top: -28px; left: 15px; }
-.cloud1::after  { width: 40px; height: 40px; top: -18px; right: 12px; }
-
-.cloud2 {
-  width: 80px; height: 28px;
-  top: 12%; right: 8%;
-  animation: drift 18s ease-in-out infinite alternate-reverse;
-}
-.cloud2::before { width: 42px; height: 42px; top: -22px; left: 10px; }
-.cloud2::after  { width: 30px; height: 30px; top: -14px; right: 8px;  }
-
-.cloud3 {
-  width: 60px; height: 22px;
-  top: 5%; left: 42%;
-  animation: drift 12s ease-in-out infinite alternate;
-}
-.cloud3::before { width: 32px; height: 32px; top: -18px; left: 8px; }
-.cloud3::after  { width: 24px; height: 24px; top: -10px; right: 6px; }
-
-@keyframes drift {
-  from { transform: translateX(-8px); }
-  to   { transform: translateX(8px);  }
 }
 
 /* ── Center block ── */
@@ -77,14 +30,14 @@
   align-items: center;
 }
 
-/* ── Girls image: positioned above the sign, overlapping its top ── */
+/* ── Girls image: sits above sign with arms resting on it ── */
 .girls {
   position: absolute;
-  bottom: 62%;      /* overlaps sign top */
+  bottom: 60%;
   left: 50%;
   transform: translateX(-50%);
-  width: 82%;
-  max-width: 280px;
+  width: 96%;
+  max-width: 310px;
   pointer-events: none;
   z-index: 3;
 }
@@ -102,7 +55,7 @@
   text-align: center;
   position: relative;
   z-index: 2;
-  margin-top: 80px;   /* space for the girls sitting above */
+  margin-top: 80px;
 }
 
 .title {
@@ -153,23 +106,16 @@
   white-space: nowrap;
 }
 
-/* ── Town silhouette at the bottom ── */
+/* ── Town silhouette ── */
 .townSilhouette {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 22%;
-  background:
-    /* house left */
-    radial-gradient(ellipse 6px 6px at 60px 0, transparent 5px, rgba(178,212,232,0.55) 6px) no-repeat,
-    /* clock tower */
-    linear-gradient(rgba(178,212,232,0.55), rgba(178,212,232,0.55));
-  /* Simple solid color silhouette */
   background: rgba(178,212,232,0.45);
   clip-path: polygon(
-    0% 100%,
-    0% 55%,
+    0% 100%, 0% 55%,
     4% 55%, 4% 38%, 6% 38%, 6% 30%, 8% 30%, 8% 38%, 10% 38%, 10% 55%,
     14% 55%, 14% 42%, 20% 42%, 20% 55%,
     25% 55%, 25% 35%, 27% 35%, 27% 25%, 29% 25%, 29% 35%, 31% 35%, 31% 55%,
