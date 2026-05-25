@@ -30,6 +30,7 @@ export default function App() {
   // Auth
   const [user,         setUser]         = useState(null);
   const [authReady,    setAuthReady]    = useState(false);
+  const [showLoading,  setShowLoading]  = useState(true);
 
   // Online mode
   const [roomInfo,     setRoomInfo]     = useState(null); // { code, isHost, myUid, ... }
@@ -44,6 +45,13 @@ export default function App() {
       setAuthReady(true);
     });
   }, []);
+
+  // Give LoadingScreen 600ms to animate to 100% before hiding
+  useEffect(() => {
+    if (!authReady) return;
+    const t = setTimeout(() => setShowLoading(false), 600);
+    return () => clearTimeout(t);
+  }, [authReady]);
 
   // Start menu music the moment the user first taps anywhere
   useEffect(() => {
@@ -138,7 +146,7 @@ export default function App() {
     return () => unsub();
   }, [screen, onlineGame?.roomCode, onlineGame?.isHost]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!authReady) return <LoadingScreen />;
+  if (showLoading) return <LoadingScreen complete={authReady} />;
 
   return (
     <div dir="rtl">

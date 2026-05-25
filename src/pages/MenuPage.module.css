@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  background: url('/bg-back.webp') center -60px / cover no-repeat;
+  background: url('/bg-back.webp') center -20px / cover no-repeat;
   background-color: #c8dff0;
 }
 

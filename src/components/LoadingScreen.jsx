@@ -1,19 +1,29 @@
 import { useState, useEffect } from 'react';
 import styles from './LoadingScreen.module.css';
 
-const STEPS = [18, 35, 52, 68, 80, 90];
+// Slow steps that stop at 88% — jump to 100% when complete
+const STEPS = [6, 14, 23, 33, 43, 53, 62, 70, 77, 83, 88];
+const INTERVAL_MS = 550;
 
-export default function LoadingScreen() {
+export default function LoadingScreen({ complete = false }) {
   const [pct, setPct] = useState(0);
 
   useEffect(() => {
     let i = 0;
     const t = setInterval(() => {
-      if (i < STEPS.length) setPct(STEPS[i++]);
-      else clearInterval(t);
-    }, 320);
+      if (i < STEPS.length) {
+        setPct(STEPS[i++]);
+      } else {
+        clearInterval(t);
+      }
+    }, INTERVAL_MS);
     return () => clearInterval(t);
   }, []);
+
+  // When Firebase is ready, jump to 100%
+  useEffect(() => {
+    if (complete) setPct(100);
+  }, [complete]);
 
   return (
     <div className={styles.page}>
