@@ -366,8 +366,8 @@
   position: relative;
 }
 
-.portrait_seat  { width: 44px; height: 44px; }
-.portrait_human { width: 52px; height: 52px; }
+.portrait_seat  { width: 64px; height: 64px; }
+.portrait_human { width: 76px; height: 76px; }
 
 .portraitActive {
   border-color: var(--char-color, #FFC83D);
@@ -392,8 +392,8 @@
   border-radius: 50%;
 }
 
-.portraitEmoji { font-size: 1.4rem; line-height: 1; }
-.portrait_human .portraitEmoji { font-size: 1.7rem; }
+.portraitEmoji { font-size: 2rem; line-height: 1; }
+.portrait_human .portraitEmoji { font-size: 2.4rem; }
 
 /* ── Human portrait row ──────────────────────────────────────── */
 .humanPortraitRow {
