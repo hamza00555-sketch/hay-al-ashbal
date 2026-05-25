@@ -33,11 +33,11 @@
 /* ── Girls image: sits above sign with arms resting on it ── */
 .girls {
   position: absolute;
-  bottom: 60%;
+  bottom: 52%;
   left: 50%;
   transform: translateX(-50%);
-  width: 96%;
-  max-width: 310px;
+  width: 80%;
+  max-width: 260px;
   pointer-events: none;
   z-index: 3;
 }
