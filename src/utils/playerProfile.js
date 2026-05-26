@@ -21,6 +21,7 @@ export const DEFAULT_PROFILE = {
   frameColor:  '#60b8ff',
   coins:       0,
   inventory:   [],
+  packs:       {},
 };
 
 export function loadProfile() {
