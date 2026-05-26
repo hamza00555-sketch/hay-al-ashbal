@@ -7,27 +7,20 @@ export default function PlayerAvatar({
   size         = 'md',
   name,
 }) {
-  const hasPngFrame = !!frameImageId;
-
-  if (hasPngFrame) {
-    return (
-      <div className={[styles.outerWrap, styles[`size_${size}`]].join(' ')}>
-        <img
-          src={`/cards/${cardImageId}_${frameImageId}.webp`}
-          alt={name ?? ''}
-          className={styles.compositeImg}
-          draggable={false}
-        />
-      </div>
-    );
-  }
-
   return (
     <div
       className={[styles.outerWrap, styles[`size_${size}`]].join(' ')}
       style={{ '--frame-color': frameColor }}
     >
-      <div className={[styles.avatar, styles.shape_rounded].join(' ')}>
+      {frameImageId && (
+        <img
+          src={`/frames/${frameImageId}.webp`}
+          alt=""
+          className={styles.frameBack}
+          draggable={false}
+        />
+      )}
+      <div className={styles.avatar}>
         <img
           src={`/cards/${cardImageId}.webp`}
           alt={name ?? ''}
