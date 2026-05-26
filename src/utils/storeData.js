@@ -6,38 +6,38 @@ export const RARITY_CONFIG = {
 };
 
 export const STORE_ITEMS = [
-  // ── Common Avatars (350⭐) ──
-  { id: 'av_c1', type: 'avatar', rarity: 'common',    price: 350,  name: 'الجريئة',       cardImageId: '1b' },
-  { id: 'av_c2', type: 'avatar', rarity: 'common',    price: 350,  name: 'المرشد',        cardImageId: '2b' },
-  { id: 'av_c3', type: 'avatar', rarity: 'common',    price: 350,  name: 'الشجاع',        cardImageId: '3b' },
-  { id: 'av_c4', type: 'avatar', rarity: 'common',    price: 350,  name: 'الحارس',        cardImageId: '4b' },
+  // ── Common Avatars — حصرية الباكسات (c01–c15) ──
+  { id: 'av_c01', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ١',  cardImageId: 'c01' },
+  { id: 'av_c02', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ٢',  cardImageId: 'c02' },
+  { id: 'av_c03', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ٣',  cardImageId: 'c03' },
+  { id: 'av_c04', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ٤',  cardImageId: 'c04' },
+  { id: 'av_c05', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ٥',  cardImageId: 'c05' },
+  { id: 'av_c06', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ٦',  cardImageId: 'c06' },
+  { id: 'av_c07', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ٧',  cardImageId: 'c07' },
+  { id: 'av_c08', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ٨',  cardImageId: 'c08' },
+  { id: 'av_c09', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ٩',  cardImageId: 'c09' },
+  { id: 'av_c10', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ١٠', cardImageId: 'c10' },
+  { id: 'av_c11', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ١١', cardImageId: 'c11' },
+  { id: 'av_c12', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ١٢', cardImageId: 'c12' },
+  { id: 'av_c13', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ١٣', cardImageId: 'c13' },
+  { id: 'av_c14', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ١٤', cardImageId: 'c14' },
+  { id: 'av_c15', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ١٥', cardImageId: 'c15' },
 
-  // ── Rare Avatars (1000⭐) ──
-  { id: 'av_r1', type: 'avatar', rarity: 'rare',      price: 1000, name: 'الفارسة',       cardImageId: '1c' },
-  { id: 'av_r2', type: 'avatar', rarity: 'rare',      price: 1000, name: 'الراهن',        cardImageId: '1d' },
-  { id: 'av_r3', type: 'avatar', rarity: 'rare',      price: 1000, name: 'سيد الأوراق',   cardImageId: '5b' },
-
-  // ── Epic Avatars (2200⭐) ──
-  { id: 'av_e1', type: 'avatar', rarity: 'epic',      price: 2200, name: 'الحكيم الخفي',  cardImageId: '1e' },
-  { id: 'av_e2', type: 'avatar', rarity: 'epic',      price: 2200, name: 'ملكة الحي',     cardImageId: '6' },
-
-  // ── Legendary Avatar (4500⭐) ──
-  { id: 'av_l1', type: 'avatar', rarity: 'legendary', price: 4500, name: 'أسطورة الأشبال', cardImageId: '7' },
-
-  // ── Common Frames (500⭐) ──
-  { id: 'fr_c1', type: 'frame', rarity: 'common',    price: 500,  name: 'الدائرة الذهبية',   frameShape: 'circle',  frameColor: '#FFD700' },
-  { id: 'fr_c2', type: 'frame', rarity: 'common',    price: 500,  name: 'الدائرة الحمراء',   frameShape: 'circle',  frameColor: '#ff7777' },
-  { id: 'fr_c3', type: 'frame', rarity: 'common',    price: 500,  name: 'المستدير الأخضر',   frameShape: 'rounded', frameColor: '#77ddaa' },
-
-  // ── Rare Frames (1400⭐) ──
-  { id: 'fr_r1', type: 'frame', rarity: 'rare',      price: 1400, name: 'السداسي الأزرق',    frameShape: 'hexagon', frameColor: '#60b8ff' },
-  { id: 'fr_r2', type: 'frame', rarity: 'rare',      price: 1400, name: 'البنفسجي الملكي',   frameShape: 'rounded', frameColor: '#bb77ff' },
-  { id: 'fr_r3', type: 'frame', rarity: 'rare',      price: 1400, name: 'البرتقالي المتوهج', frameShape: 'circle',  frameColor: '#ff9944' },
-
-  // ── Epic Frames (3000⭐) ──
-  { id: 'fr_e1', type: 'frame', rarity: 'epic',      price: 3000, name: 'السداسي الذهبي',    frameShape: 'hexagon', frameColor: '#FFD700' },
-  { id: 'fr_e2', type: 'frame', rarity: 'epic',      price: 3000, name: 'الفيروزي',          frameShape: 'rounded', frameColor: '#00CED1' },
-
-  // ── Legendary Frame (6000⭐) ──
-  { id: 'fr_l1', type: 'frame', rarity: 'legendary', price: 6000, name: 'تاج الأشبال',       frameShape: 'hexagon', frameColor: '#FFD700', animated: true },
+  // ── Legendary Avatars — حصرية الباكسات (l01–l16) ──
+  { id: 'av_l01', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١',  cardImageId: 'l01' },
+  { id: 'av_l02', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٢',  cardImageId: 'l02' },
+  { id: 'av_l03', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٣',  cardImageId: 'l03' },
+  { id: 'av_l04', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٤',  cardImageId: 'l04' },
+  { id: 'av_l05', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٥',  cardImageId: 'l05' },
+  { id: 'av_l06', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٦',  cardImageId: 'l06' },
+  { id: 'av_l07', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٧',  cardImageId: 'l07' },
+  { id: 'av_l08', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٨',  cardImageId: 'l08' },
+  { id: 'av_l09', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٩',  cardImageId: 'l09' },
+  { id: 'av_l10', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١٠', cardImageId: 'l10' },
+  { id: 'av_l11', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١١', cardImageId: 'l11' },
+  { id: 'av_l12', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١٢', cardImageId: 'l12' },
+  { id: 'av_l13', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١٣', cardImageId: 'l13' },
+  { id: 'av_l14', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١٤', cardImageId: 'l14' },
+  { id: 'av_l15', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١٥', cardImageId: 'l15' },
+  { id: 'av_l16', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١٦', cardImageId: 'l16' },
 ];

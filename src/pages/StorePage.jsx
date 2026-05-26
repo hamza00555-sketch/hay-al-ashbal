@@ -122,8 +122,7 @@ export default function StorePage({ onBack }) {
           <div className={styles.packBody}>
             <span className={styles.packName}>{PACK_DEFS.basic.name}</span>
             <div className={styles.packOdds}>
-              <span style={{ color: RARITY_CONFIG.common.color }}>شائع 70%</span>
-              <span style={{ color: RARITY_CONFIG.rare.color }}>نادر 30%</span>
+              <span style={{ color: RARITY_CONFIG.common.color }}>شخصية شائعة مضمونة</span>
             </div>
           </div>
           <button
@@ -144,9 +143,7 @@ export default function StorePage({ onBack }) {
           <div className={styles.packBody}>
             <span className={styles.packName}>{PACK_DEFS.legendary.name}</span>
             <div className={styles.packOdds}>
-              <span style={{ color: RARITY_CONFIG.rare.color }}>نادر 55%</span>
-              <span style={{ color: RARITY_CONFIG.epic.color }}>ملحمي 35%</span>
-              <span style={{ color: RARITY_CONFIG.legendary.color }}>أسطوري 10%</span>
+              <span style={{ color: RARITY_CONFIG.legendary.color }}>شخصية أسطورية حصرية</span>
             </div>
             {/* Pity tracker */}
             <div className={styles.pityRow}>
