@@ -1,38 +1,53 @@
-import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { useState, useLayoutEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { UNIQUE_CARDS } from '../constants/cards';
 import { CardFace, CardBack } from '../components/Card';
-import STEPS from '../tutorial/tutorialSteps';
 import { markTutorialDone } from '../tutorial/tutorialStorage';
 import styles from './TutorialPage.module.css';
 
-// ── Scripted data ─────────────────────────────────────────────────
-const PLAYER_HAND_CARD  = UNIQUE_CARDS.find(c => c.id === 2);
-const PLAYER_DRAWN_CARD = UNIQUE_CARDS.find(c => c.id === 3);
-const OPPONENT = { id: 99, name: 'خالد', hand: [UNIQUE_CARDS.find(c => c.id === 5)] };
-const RULE_CARDS = {
-  1: UNIQUE_CARDS.find(c => c.id === 1),
-  4: UNIQUE_CARDS.find(c => c.id === 4),
-  7: UNIQUE_CARDS.find(c => c.id === 7),
-  8: UNIQUE_CARDS.find(c => c.id === 8),
+// ── Step IDs ───────────────────────────────────────────────────────
+const S = {
+  WELCOME:       0,
+  ROUND_WIN:     1,
+  START_TURN:    2,
+  DRAW_RESULT:   3,
+  PLAY_CAFE:     4,
+  CHOOSE_TARGET: 5,
+  GUESS_CARD:    6,
+  GUESS_RESULT:  7,
+  INFO_CARD:     8,
+  PROTECTION:    9,
+  FORCED_RULE:   10,
+  DANGER_STAR:   11,
+  MINI_TEST:     12,
+  REWARD:        13,
 };
+const TOTAL = 14;
 
-// ── useRect: get element bounding rect by data-tut attr ───────────
-function useRect(target) {
+// ── Scripted cards ─────────────────────────────────────────────────
+const C       = id => UNIQUE_CARDS.find(c => c.id === id);
+const MAQHA   = C(1);
+const MAKTABA = C(2);
+const TAJIR   = C(3);
+const JARA    = C(4);
+const MUHAND  = C(5);
+const BUSTAN  = C(7);
+const NAJMA   = C(8);
+
+// ── Helpers ────────────────────────────────────────────────────────
+function useRect(key) {
   const [rect, setRect] = useState(null);
   useLayoutEffect(() => {
-    if (!target) { setRect(null); return; }
-    const el = document.querySelector(`[data-tut="${target}"]`);
-    if (el) setRect(el.getBoundingClientRect());
-    else setRect(null);
-  }, [target]);
+    if (!key) { setRect(null); return; }
+    const el = document.querySelector(`[data-tut="${key}"]`);
+    setRect(el ? el.getBoundingClientRect() : null);
+  }, [key]);
   return rect;
 }
 
-// ── SpotHole: visual-only golden ring + dim (pointer-events:none) ─
-function SpotHole({ target }) {
-  const rect = useRect(target);
-  if (!target || !rect) return null;
+function SpotHole({ k }) {
+  const rect = useRect(k);
+  if (!k || !rect) return null;
   return (
     <div
       className={styles.spotHole}
@@ -41,10 +56,9 @@ function SpotHole({ target }) {
   );
 }
 
-// ── SpotClickTarget: portal above overlay, intercepts correct tap ─
-function SpotClickTarget({ target, onClick }) {
-  const rect = useRect(target);
-  if (!target || !rect) return null;
+function SpotClick({ k, onClick }) {
+  const rect = useRect(k);
+  if (!k || !rect) return null;
   return createPortal(
     <div
       className={styles.spotTarget}
@@ -55,26 +69,21 @@ function SpotClickTarget({ target, onClick }) {
   );
 }
 
-// ── TutArrow: bouncing arrow pointing at target ───────────────────
-function TutArrow({ target }) {
-  const rect = useRect(target);
-  if (!target || !rect) return null;
-  const aboveTarget = rect.top > window.innerHeight * 0.5;
+function Arrow({ k }) {
+  const rect = useRect(k);
+  if (!k || !rect) return null;
+  const above = rect.top > window.innerHeight * 0.5;
   return (
     <div
       className={styles.arrow}
-      style={{
-        top:  aboveTarget ? rect.top - 60 : rect.bottom + 10,
-        left: rect.left + rect.width / 2 - 20,
-      }}
+      style={{ top: above ? rect.top - 60 : rect.bottom + 10, left: rect.left + rect.width / 2 - 20 }}
     >
-      {aboveTarget ? '▼' : '▲'}
+      {above ? '▼' : '▲'}
     </div>
   );
 }
 
-// ── TutBubble: coach speech bubble ───────────────────────────────
-function TutBubble({ text, pos, showTapHint }) {
+function Bubble({ text, pos = 'bottom', tapAny = false }) {
   const cls = [
     styles.bubble,
     pos === 'top'    ? styles.bubbleTop    :
@@ -86,40 +95,24 @@ function TutBubble({ text, pos, showTapHint }) {
         <span className={styles.lionAvatar}>🦁</span>
         <p className={styles.bubbleText}>{text}</p>
       </div>
-      {showTapHint && <p className={styles.tapHint}>اضغط في أي مكان للمتابعة ▼</p>}
+      {tapAny && <p className={styles.tapHint}>اضغط في أي مكان للمتابعة ▼</p>}
     </div>
   );
 }
 
-// ── WrongToast: gentle "wrong area" message ───────────────────────
-function WrongToast({ show }) {
-  if (!show) return null;
-  return (
-    <div className={styles.wrongToast}>
-      ✨ اضغط على المكان المضيء!
-    </div>
-  );
-}
-
-// ── ProgressDots ─────────────────────────────────────────────────
-function ProgressDots({ stepIdx }) {
+function Dots({ step }) {
   return (
     <div className={styles.progress}>
-      {STEPS.map((s, i) => (
+      {Array.from({ length: TOTAL }, (_, i) => (
         <div
-          key={s.id}
-          className={[
-            styles.dot,
-            i < stepIdx  ? styles.dotDone    : '',
-            i === stepIdx ? styles.dotCurrent : '',
-          ].join(' ')}
+          key={i}
+          className={[styles.dot, i < step ? styles.dotDone : '', i === step ? styles.dotCurrent : ''].join(' ')}
         />
       ))}
     </div>
   );
 }
 
-// ── RewardScreen ─────────────────────────────────────────────────
 function RewardScreen({ onComplete, onRetry }) {
   return (
     <div className={styles.rewardScreen}>
@@ -132,149 +125,79 @@ function RewardScreen({ onComplete, onRetry }) {
       <h1 className={styles.rewardTitle}>أحسنت يا شبل!</h1>
       <p className={styles.rewardText}>أنت الآن جاهز للعب مع الأصحاب 🎉</p>
       <div className={styles.rewardStars}>⭐⭐⭐</div>
-      <button className={styles.rewardPlayBtn} onClick={onComplete}>
-        العب الآن! 🎮
-      </button>
-      <button className={styles.rewardRetryBtn} onClick={onRetry}>
-        أعد التدريب
-      </button>
+      <button className={styles.rewardPlayBtn} onClick={onComplete}>العب الآن! 🎮</button>
+      <button className={styles.rewardRetryBtn} onClick={onRetry}>أعد التدريب</button>
     </div>
   );
 }
 
-// ── PracticeMode ─────────────────────────────────────────────────
-function PracticeMode({ onDone }) {
-  const [sub, setSub]       = useState(0);
-  const [drawn, setDrawn]   = useState(false);
-  const [taps, setTaps]     = useState(0);
-  const [result, setResult] = useState(false);
-
-  const onDoneCb = useCallback(onDone, []); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (sub !== 3) return;
-    setResult(true);
-    const t = setTimeout(onDoneCb, 1600);
-    return () => clearTimeout(t);
-  }, [sub, onDoneCb]);
-
-  const texts = [
-    'اسحب من الكومة! 👇',
-    'اضغط على البطاقة مرتين للعبها 👆',
-    'اضغط على خالد! 👆',
-    'أحسنت! 🎉',
+// ── Hand cards per step ────────────────────────────────────────────
+function getHandCards(step) {
+  if (step === S.FORCED_RULE) return [
+    { card: BUSTAN, tutKey: 'garden-card', playable: true  },
+    { card: MUHAND, tutKey: null,          playable: false },
   ];
-
-  return (
-    <div className={styles.practiceWrap}>
-      <div className={styles.practiceBubble}>
-        <span className={styles.lionAvatar}>🦁</span>
-        <p className={styles.bubbleText}>{texts[Math.min(sub, 3)]}</p>
-      </div>
-
-      {result ? (
-        <div className={styles.practiceResult}>
-          <p className={styles.practiceResultText}>نظرت في كرت خالد! 👀</p>
-          <CardFace card={OPPONENT.hand[0]} size="large" />
-        </div>
-      ) : (
-        <div className={styles.practiceBoard}>
-          {/* Opponent */}
-          <div
-            className={`${styles.practiceOpponent} ${sub === 2 ? styles.practiceTarget : ''}`}
-            onClick={() => sub === 2 && setSub(3)}
-          >
-            <CardBack size="small" />
-            <span className={styles.practiceName}>{OPPONENT.name}</span>
-            {sub === 2 && <span className={styles.tapMeLabel}>اضغط! 👆</span>}
-          </div>
-
-          {/* Deck */}
-          <div
-            className={`${styles.practiceDeck} ${sub === 0 ? styles.practiceTarget : ''}`}
-            onClick={() => { if (sub === 0) { setDrawn(true); setSub(1); } }}
-          >
-            {drawn
-              ? <div className={styles.deckEmpty}>—</div>
-              : <CardBack size="small" />}
-            <span className={styles.deckLabel}>الكومة</span>
-            {sub === 0 && <span className={styles.tapMeLabel}>اضغط! 👇</span>}
-          </div>
-
-          {/* Hand */}
-          <div className={styles.practiceHand}>
-            <div
-              className={`${styles.practiceHandCard} ${sub === 1 ? styles.practiceTarget : ''}`}
-              onClick={() => {
-                if (sub !== 1) return;
-                const n = taps + 1;
-                setTaps(n);
-                if (n >= 2) setSub(2);
-              }}
-            >
-              <CardFace card={PLAYER_HAND_CARD} size="normal" />
-              {sub === 1 && <span className={styles.tapMeLabel}>اضغط مرتين! 👆</span>}
-            </div>
-            {drawn && (
-              <div className={styles.practiceHandCard}>
-                <CardFace card={PLAYER_DRAWN_CARD} size="normal" dimmed />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  if (step === S.DANGER_STAR) return [
+    { card: NAJMA, tutKey: 'najma-card', playable: false },
+    { card: TAJIR, tutKey: 'safe-card',  playable: true  },
+  ];
+  if (step === S.PROTECTION) return [
+    { card: JARA,    tutKey: null, playable: false },
+  ];
+  if (step === S.INFO_CARD) return [
+    { card: MAKTABA, tutKey: null, playable: false },
+  ];
+  if (step >= S.CHOOSE_TARGET) return [
+    { card: MAKTABA, tutKey: null, playable: false },
+  ];
+  if (step === S.PLAY_CAFE) return [
+    { card: MAKTABA, tutKey: null,        playable: false },
+    { card: MAQHA,   tutKey: 'cafe-card', playable: true  },
+  ];
+  if (step === S.DRAW_RESULT) return [
+    { card: MAKTABA, tutKey: null, playable: false },
+    { card: MAQHA,   tutKey: null, playable: false },
+  ];
+  // START_TURN
+  return [{ card: MAKTABA, tutKey: null, playable: false }];
 }
 
-// ── Main TutorialPage ─────────────────────────────────────────────
+// ── Main component ─────────────────────────────────────────────────
 export default function TutorialPage({ onComplete, onSkip, onRetry }) {
-  const [stepIdx,    setStepIdx]    = useState(0);
-  const [drawn,      setDrawn]      = useState(false);
-  const [focused,    setFocused]    = useState(false);
-  const [wrongTap,   setWrongTap]   = useState(false);
-  const [showReward, setShowReward] = useState(false);
+  const [step,     setStep]     = useState(0);
+  const [wrongTap, setWrongTap] = useState(false);
+  const [starWarn, setStarWarn] = useState(false);
 
-  const step = STEPS[stepIdx];
+  const advance = useCallback(() => setStep(s => s + 1), []);
 
-  const advance = useCallback(() => {
-    if (stepIdx >= STEPS.length - 1) {
-      markTutorialDone();
-      setShowReward(true);
-      return;
-    }
-    setStepIdx(i => i + 1);
-  }, [stepIdx]);
-
-  // Auto-advance for REWARD step
-  useEffect(() => {
-    if (step?.isReward) { markTutorialDone(); setShowReward(true); }
-  }, [step?.isReward]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function wrongTapFx() {
+  function wrongFx() {
     setWrongTap(true);
     setTimeout(() => setWrongTap(false), 700);
   }
 
-  // Dim overlay click: advance if TAP_ANYWHERE, else show wrong tap
-  function handleOverlayClick() {
-    if (step?.trigger === 'TAP_ANYWHERE') advance();
-    else wrongTapFx();
+  function showStarWarn() {
+    setStarWarn(true);
+    setTimeout(() => setStarWarn(false), 1600);
   }
 
-  // Correct action when user taps the spotlighted element
-  function handleTargetClick() {
-    switch (step?.trigger) {
-      case 'TAP_ANYWHERE': advance(); break;
-      case 'TAP_DECK':     setDrawn(true); advance(); break;
-      case 'TAP_HAND':     setFocused(true); advance(); break;
-      case 'TAP_PLAY':     if (focused) advance(); break;
-      case 'TAP_CONFIRM':  advance(); break;
-      default:             advance();
-    }
+  // ── WELCOME ──────────────────────────────────────────────────────
+  if (step === S.WELCOME) {
+    return (
+      <div className={styles.board} dir="rtl">
+        <div className={styles.welcomeScreen}>
+          <div className={styles.welcomeLion}>🦁</div>
+          <h1 className={styles.welcomeTitle}>مرحباً بك في<br />حي الأشبال!</h1>
+          <p className={styles.welcomeText}>هدفك تبقى للنهاية أو تحتفظ بأعلى كرت!</p>
+          <button className={styles.startBtn} onClick={advance}>ابدأ التدريب ▶</button>
+          <button className={styles.skipLink} onClick={() => { markTutorialDone(); onSkip(); }}>تخطي التدريب</button>
+        </div>
+      </div>
+    );
   }
 
-  // ── Reward ──────────────────────────────────────────────────────
-  if (showReward || step?.isReward) {
+  // ── REWARD ───────────────────────────────────────────────────────
+  if (step === S.REWARD) {
+    markTutorialDone();
     return (
       <div className={styles.board} dir="rtl">
         <RewardScreen onComplete={onComplete} onRetry={onRetry} />
@@ -282,133 +205,180 @@ export default function TutorialPage({ onComplete, onSkip, onRetry }) {
     );
   }
 
-  // ── Rule card steps (8-11) ──────────────────────────────────────
-  if (step?.ruleCard) {
-    const card = RULE_CARDS[step.ruleCard.id];
+  // ── ROUND_WIN concept ────────────────────────────────────────────
+  if (step === S.ROUND_WIN) {
     return (
       <div className={styles.board} dir="rtl">
-        <button className={styles.skipBtn} onClick={() => { markTutorialDone(); onSkip(); }}>
-          تخطي
-        </button>
-        <ProgressDots stepIdx={stepIdx} />
-        <div className={styles.ruleScreen}>
-          <div className={styles.ruleCardWrap}>
-            <CardFace card={card} size="large" />
+        <button className={styles.skipBtn} onClick={() => { markTutorialDone(); onSkip(); }}>تخطي</button>
+        <Dots step={step} />
+        <div className={styles.dimOverlay} onClick={advance} />
+        <Bubble pos="top" text="تفوز بالجولة إذا بقيت الأخير، أو امتلكت أعلى كرت عند نفاد الورق" tapAny />
+        <div className={styles.conceptScene}>
+          <div className={styles.winPair}>
+            <div className={styles.winOption}>
+              <span className={styles.winIcon}>🏆</span>
+              <span className={styles.winLabel}>آخر لاعب متبقٍ</span>
+            </div>
+            <div className={styles.orBadge}>أو</div>
+            <div className={styles.winOption}>
+              <span className={styles.winIcon}>🃏</span>
+              <span className={styles.winLabel}>أعلى كرت عند نفاد الورق</span>
+            </div>
           </div>
-          <div className={styles.ruleBubble}>
-            <span className={styles.lionAvatar}>🦁</span>
-            <p className={styles.bubbleText}>{step.bubble.text}</p>
-          </div>
-          <button className={styles.nextBtn} onClick={advance}>التالي ▶</button>
         </div>
       </div>
     );
   }
 
-  // ── Practice mode (step 12) ─────────────────────────────────────
-  if (step?.isPractice) {
-    return (
-      <div className={styles.board} dir="rtl">
-        <button className={styles.skipBtn} onClick={() => { markTutorialDone(); onSkip(); }}>
-          تخطي
-        </button>
-        <ProgressDots stepIdx={stepIdx} />
-        <PracticeMode onDone={advance} />
-      </div>
-    );
-  }
+  // ── Board steps (2–12) ───────────────────────────────────────────
+  const spotMap = {
+    [S.START_TURN]:    'deck',
+    [S.PLAY_CAFE]:     'cafe-card',
+    [S.CHOOSE_TARGET]: 'opponent',
+    [S.FORCED_RULE]:   'garden-card',
+    [S.DANGER_STAR]:   'safe-card',
+  };
+  const spotKey   = spotMap[step] ?? null;
+  const tapAny    = [S.DRAW_RESULT, S.GUESS_RESULT, S.INFO_CARD, S.PROTECTION].includes(step);
+  const showHand  = ![S.GUESS_CARD, S.GUESS_RESULT, S.MINI_TEST].includes(step);
+  const handCards = getHandCards(step);
 
-  // ── Normal board steps (0–6) ────────────────────────────────────
-  const showDrawnCard = drawn && stepIdx >= 3; // show after DRAW step
+  function handleOverlay() {
+    if (tapAny) advance();
+    else wrongFx();
+  }
 
   return (
     <div className={styles.board} dir="rtl">
-      {/* Skip */}
-      <button className={styles.skipBtn} onClick={() => { markTutorialDone(); onSkip(); }}>
-        تخطي
-      </button>
-      <ProgressDots stepIdx={stepIdx} />
+      <button className={styles.skipBtn} onClick={() => { markTutorialDone(); onSkip(); }}>تخطي</button>
+      <Dots step={step} />
 
-      {/* Wrong-tap toast */}
-      <WrongToast show={wrongTap} />
+      {wrongTap && <div className={styles.wrongToast}>✨ اضغط على المكان المضيء!</div>}
+      {starWarn && <div className={styles.starWarning}>⭐ خطر! النجمة تُقصيك إن رميتها!</div>}
 
-      {/*
-        DIM OVERLAY (z-index 997, pointer-events: all)
-        - Covers whole screen
-        - TAP_ANYWHERE → advance
-        - Other → showWrongTap
-      */}
-      <div className={styles.dimOverlay} onClick={handleOverlayClick} />
+      {/* Dim overlay — catches wrong taps, advances on tap-any steps */}
+      <div className={styles.dimOverlay} onClick={handleOverlay} />
 
-      {/*
-        SPOT HOLE (z-index 998, pointer-events: none)
-        - Visual cutout via box-shadow
-        - Pulsing gold border on target
-      */}
-      {step?.spot && <SpotHole target={step.spot} />}
+      {/* Spotlight hole */}
+      {spotKey && <SpotHole k={spotKey} />}
 
-      {/*
-        SPOT CLICK TARGET (portal, z-index 1001)
-        - Transparent div positioned exactly over the target
-        - Intercepts the correct tap
-      */}
-      {step?.spot && <SpotClickTarget target={step.spot} onClick={handleTargetClick} />}
+      {/* Spotlight click targets */}
+      {spotKey && step !== S.DANGER_STAR && <SpotClick k={spotKey} onClick={advance} />}
+      {step === S.DANGER_STAR && <>
+        <SpotClick k="safe-card"  onClick={advance}      />
+        <SpotClick k="najma-card" onClick={showStarWarn} />
+      </>}
 
-      {/* Arrow (z-index 1003) */}
-      {step?.arrow && <TutArrow target={step.arrow} />}
+      {/* Arrow pointing at spotlit element */}
+      {spotKey && step !== S.GUESS_CARD && <Arrow k={spotKey} />}
 
-      {/* Bubble (z-index 1005) */}
-      {step?.bubble && (
-        <TutBubble
-          text={step.bubble.text}
-          pos={step.bubble.pos}
-          showTapHint={step.trigger === 'TAP_ANYWHERE'}
-        />
+      {/* ── Speech bubbles ────────────────────────────────────── */}
+      {step === S.START_TURN    && <Bubble pos="top"    text="هذا دورك! اسحب من الكومة 👇" />}
+      {step === S.DRAW_RESULT   && <Bubble pos="bottom" text="سحبت كرتاً جديداً! لديك الآن كرتان — اختر أيهما تلعب" tapAny />}
+      {step === S.PLAY_CAFE     && <Bubble pos="bottom" text="العب صاحبة المقهى ☕ — ستخمّن كرت خالد!" />}
+      {step === S.CHOOSE_TARGET && <Bubble pos="top"    text="الآن اختر خالد هدفاً 👆" />}
+      {step === S.GUESS_CARD    && <Bubble pos="top"    text="ماذا يحمل خالد؟ اختر الكرت الصحيح" />}
+      {step === S.GUESS_RESULT  && <Bubble pos="top"    text="أصبت! خالد كان يحمل مهندسة الكهرباء — خرج من الجولة! 🎉" tapAny />}
+      {step === S.INFO_CARD     && <Bubble pos="bottom" text="أمينة المكتبة 📚 — تشاهد كرت لاعب آخر سراً" tapAny />}
+      {step === S.PROTECTION    && <Bubble pos="top"    text="الجارة اليقظة 🛡️ تحميك من تأثيرات الآخرين حتى دورك القادم" tapAny />}
+      {step === S.FORCED_RULE   && <Bubble pos="bottom" text="تحذير! معك مهندس الكهرباء — يجب رمي البستان 🌿" />}
+      {step === S.DANGER_STAR   && <Bubble pos="bottom" text="خطر! النجمة ⭐ تُقصيك إن رميتها — العب التاجرة بدلاً منها!" />}
+      {step === S.MINI_TEST     && <Bubble pos="top"    text="اختبار! أيهما تلعب لتخمّن كرت خالد وتُقصيه؟" />}
+
+      {/* ── Guess options (step 6) ───────────────────────────── */}
+      {step === S.GUESS_CARD && (
+        <div className={styles.guessScene}>
+          {[TAJIR, MUHAND, JARA].map(card => (
+            <button
+              key={card.id}
+              className={styles.guessBtn}
+              onClick={e => { e.stopPropagation(); card.id === MUHAND.id ? advance() : wrongFx(); }}
+            >
+              <CardFace card={card} size="small" />
+              <span className={styles.guessLabel}>{card.role}</span>
+            </button>
+          ))}
+        </div>
       )}
 
-      {/* ── Board layout ── */}
-      <div className={styles.boardInner}>
-        {/* Opponent seat */}
-        <div className={styles.opponentSeat} data-tut="opponent">
+      {/* ── Guess result (step 7) ────────────────────────────── */}
+      {step === S.GUESS_RESULT && (
+        <div className={styles.revealScene}>
+          <p className={styles.revealLabel}>كرت خالد كان:</p>
+          <CardFace card={MUHAND} size="large" />
+          <p className={styles.revealResult}>خالد خرج! 💀</p>
+          <button className={styles.confirmBtn} onClick={e => { e.stopPropagation(); advance(); }}>
+            فهمت ✓
+          </button>
+        </div>
+      )}
+
+      {/* ── Info card (step 8) ───────────────────────────────── */}
+      {step === S.INFO_CARD && (
+        <div className={styles.infoScene}>
+          <CardFace card={MAKTABA} size="large" />
+          <p className={styles.infoAbility}>{MAKTABA.ability}</p>
+        </div>
+      )}
+
+      {/* ── Protection demo (step 9) ─────────────────────────── */}
+      {step === S.PROTECTION && (
+        <div className={styles.protectionScene}>
+          <div className={styles.shieldTarget}>
+            <CardBack size="small" />
+            <span className={styles.shieldName}>خالد</span>
+            <span className={styles.shieldBadge}>🛡️ محمي</span>
+          </div>
+          <div className={styles.shieldArrow}>←</div>
+          <div className={styles.shieldAttack}>
+            <span className={styles.shieldBlock}>✗</span>
+            <span className={styles.shieldBlockTxt}>مُعاق</span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Mini test (step 12) ──────────────────────────────── */}
+      {step === S.MINI_TEST && (
+        <div className={styles.testScene}>
+          <button className={styles.testCard} onClick={e => { e.stopPropagation(); advance(); }}>
+            <CardFace card={MAQHA} size="normal" playable />
+            <span className={styles.testLabel}>{MAQHA.role}</span>
+          </button>
+          <button className={styles.testCard} onClick={e => { e.stopPropagation(); wrongFx(); }}>
+            <CardFace card={MAKTABA} size="normal" />
+            <span className={styles.testLabel}>{MAKTABA.role}</span>
+          </button>
+        </div>
+      )}
+
+      {/* ── Game board (background, always shown for steps 2–12) */}
+      <div className={styles.gameBoard}>
+        {/* Opponent */}
+        <div className={styles.oppRow} data-tut="opponent">
           <CardBack size="small" />
-          <span className={styles.seatName}>{OPPONENT.name}</span>
+          <span className={styles.oppName}>خالد</span>
         </div>
 
-        {/* Arena: deck */}
-        <div className={styles.arena}>
-          <div className={styles.deckStack} data-tut="deck">
+        {/* Arena / deck */}
+        <div className={styles.arenaRow}>
+          <div className={styles.deckSlot} data-tut="deck">
             <CardBack size="normal" />
-            <span className={styles.deckCount}>الكومة</span>
+            <span className={styles.deckLbl}>الكومة</span>
           </div>
         </div>
 
         {/* Player hand */}
-        <div className={styles.humanZone}>
-          <div className={styles.hand} data-tut="hand-area">
-            {/* Hand card (always visible) */}
-            <div className={styles.cardSlot} data-tut="hand-card">
-              <CardFace
-                card={PLAYER_HAND_CARD}
-                size="normal"
-                focused={focused && step?.id === 'PLAY_CARD'}
-              />
-            </div>
-            {/* Drawn card (appears after step 3) */}
-            {showDrawnCard && (
-              <div className={styles.cardSlot} data-tut="drawn-card">
-                <CardFace card={PLAYER_DRAWN_CARD} size="normal" dimmed />
+        {showHand && (
+          <div className={styles.handRow}>
+            {handCards.map(({ card, tutKey, playable }, i) => (
+              <div
+                key={i}
+                className={styles.handSlot}
+                {...(tutKey ? { 'data-tut': tutKey } : {})}
+              >
+                <CardFace card={card} size="normal" playable={playable} />
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Confirm area: only for SEE_RESULT */}
-        {step?.id === 'SEE_RESULT' && (
-          <div className={styles.confirmArea} data-tut="confirm">
-            <div className={styles.resultMessage}>نظرت في كرت خالد! 👀</div>
-            <button className={styles.confirmBtn} onClick={e => { e.stopPropagation(); advance(); }}>
-              حسناً ✓
-            </button>
+            ))}
           </div>
         )}
       </div>

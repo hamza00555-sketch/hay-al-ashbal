@@ -91,7 +91,7 @@
   pointer-events: none;
   border-radius: 18px;
   box-shadow:
-    0 0 0 2000px rgba(0, 0, 0, 0.65),
+    0 0 0 2000px rgba(0, 0, 0, 0.45),
     0 0 0 3px rgba(255, 215, 0, 0.9),
     0 0 24px rgba(255, 215, 0, 0.5);
   animation: spotPulse 1.6s ease-in-out infinite;
@@ -125,8 +125,8 @@
 }
 
 @keyframes spotPulse {
-  0%, 100% { box-shadow: 0 0 0 2000px rgba(0,0,0,0.65), 0 0 0 3px rgba(255,215,0,0.9), 0 0 16px rgba(255,215,0,0.4); }
-  50%       { box-shadow: 0 0 0 2000px rgba(0,0,0,0.65), 0 0 0 4px rgba(255,215,0,1.0), 0 0 32px rgba(255,215,0,0.8); }
+  0%, 100% { box-shadow: 0 0 0 2000px rgba(0,0,0,0.45), 0 0 0 3px rgba(255,215,0,0.9), 0 0 16px rgba(255,215,0,0.4); }
+  50%       { box-shadow: 0 0 0 2000px rgba(0,0,0,0.45), 0 0 0 4px rgba(255,215,0,1.0), 0 0 32px rgba(255,215,0,0.8); }
 }
 
 @keyframes toastFade {
@@ -695,4 +695,437 @@
 @keyframes confettiFall {
   0%   { transform: translateY(0)     rotate(0deg);                    opacity: 1; }
   100% { transform: translateY(110vh) rotate(calc(var(--i) * 55deg));  opacity: 0; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   NEW TUTORIAL (14-step rebuild)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Star warning toast ──────────────────────────────────────────── */
+.starWarning {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1010;
+  background: rgba(220, 60, 60, 0.95);
+  color: #fff;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.05rem;
+  padding: 14px 28px;
+  border-radius: 20px;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: toastFade 1.6s ease forwards;
+  box-shadow: 0 4px 20px rgba(220,60,60,0.4);
+}
+
+/* ── Welcome screen ──────────────────────────────────────────────── */
+.welcomeScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  gap: 18px;
+  padding: 48px 28px;
+  text-align: center;
+  background: linear-gradient(160deg, #1F3D5A 0%, #2d5a8a 100%);
+}
+
+.welcomeLion {
+  font-size: 5rem;
+  line-height: 1;
+  animation: rewardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.welcomeTitle {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #FFC83D;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.welcomeText {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  color: rgba(255,255,255,0.85);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 280px;
+}
+
+.startBtn {
+  background: #FFC83D;
+  border: none;
+  border-radius: 20px;
+  color: #1F3D5A;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  padding: 16px 48px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 280px;
+  box-shadow: 0 6px 24px rgba(255,200,61,0.45);
+  margin-top: 8px;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.startBtn:hover  { opacity: 0.92; transform: translateY(-2px); }
+.startBtn:active { transform: scale(0.97); }
+
+.skipLink {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.45);
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  text-decoration: underline;
+}
+
+/* ── Concept screen (ROUND_WIN) ──────────────────────────────────── */
+.conceptScene {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1008;
+}
+
+.winPair {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.97);
+  border: 2px solid rgba(96,184,255,0.3);
+  border-radius: 24px;
+  padding: 28px 32px;
+  box-shadow: 0 8px 40px rgba(31,61,90,0.18);
+}
+
+.winOption {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.winIcon {
+  font-size: 2rem;
+}
+
+.winLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  color: #1F3D5A;
+  font-weight: 700;
+}
+
+.orBadge {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.85rem;
+  color: #fff;
+  background: #5682B2;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* ── Game board layout (steps 2–12) ──────────────────────────────── */
+.gameBoard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100svh;
+  padding: 64px 16px max(24px, env(safe-area-inset-bottom));
+  justify-content: space-between;
+  position: relative;
+  z-index: 0;
+}
+
+.oppRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
+  padding: 8px;
+}
+
+.oppName {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.85rem;
+  color: #1F3D5A;
+  font-weight: 700;
+}
+
+.arenaRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deckSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.deckLbl {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: #2d3e52;
+}
+
+.handRow {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-end;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(86,130,178,0.15);
+  border-radius: 20px 20px 0 0;
+  padding: 14px 24px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 -4px 20px rgba(86,130,178,0.1);
+}
+
+.handSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Guess scene (step 6) ────────────────────────────────────────── */
+.guessScene {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1010;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.guessBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.96);
+  border: 2px solid rgba(86,130,178,0.25);
+  border-radius: 16px;
+  padding: 10px 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(31,61,90,0.15);
+  transition: transform 0.12s, border-color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.guessBtn:hover  { transform: translateY(-4px); border-color: rgba(96,184,255,0.6); }
+.guessBtn:active { transform: scale(0.97); }
+
+.guessLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.72rem;
+  color: #1F3D5A;
+  font-weight: 700;
+  text-align: center;
+  max-width: 80px;
+}
+
+/* ── Reveal scene (step 7) ───────────────────────────────────────── */
+.revealScene {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1010;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,0.97);
+  border: 2px solid rgba(96,184,255,0.3);
+  border-radius: 24px;
+  padding: 28px 32px;
+  box-shadow: 0 8px 40px rgba(31,61,90,0.2);
+  text-align: center;
+}
+
+.revealLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.95rem;
+  color: #5682B2;
+  margin: 0;
+}
+
+.revealResult {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1.1rem;
+  color: #c0392b;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* ── Info scene (step 8) ─────────────────────────────────────────── */
+.infoScene {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1010;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  pointer-events: none;
+}
+
+.infoAbility {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.95rem;
+  color: #fff;
+  background: rgba(31,61,90,0.85);
+  border-radius: 14px;
+  padding: 10px 18px;
+  margin: 0;
+  text-align: center;
+  max-width: 260px;
+  line-height: 1.5;
+  backdrop-filter: blur(6px);
+}
+
+/* ── Protection scene (step 9) ───────────────────────────────────── */
+.protectionScene {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1010;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(255,255,255,0.97);
+  border: 2px solid rgba(96,184,255,0.3);
+  border-radius: 24px;
+  padding: 24px 28px;
+  box-shadow: 0 8px 40px rgba(31,61,90,0.18);
+  pointer-events: none;
+}
+
+.shieldTarget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.shieldName {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  color: #1F3D5A;
+  font-weight: 700;
+}
+
+.shieldBadge {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  background: rgba(107,61,174,0.12);
+  color: #6B3DAE;
+  border: 1px solid rgba(107,61,174,0.3);
+  border-radius: 10px;
+  padding: 3px 10px;
+  font-weight: 700;
+}
+
+.shieldArrow {
+  font-size: 1.8rem;
+  color: #5682B2;
+}
+
+.shieldAttack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.shieldBlock {
+  font-size: 2rem;
+  color: #c0392b;
+  font-weight: 900;
+}
+
+.shieldBlockTxt {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  color: #c0392b;
+  font-weight: 700;
+}
+
+/* ── Mini test scene (step 12) ───────────────────────────────────── */
+.testScene {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1010;
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.testCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s;
+}
+.testCard:hover  { transform: translateY(-4px); }
+.testCard:active { transform: scale(0.97); }
+
+.testLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  max-width: 90px;
+  background: rgba(31,61,90,0.7);
+  border-radius: 8px;
+  padding: 3px 8px;
+  backdrop-filter: blur(4px);
+}
+
+/* ── bubbleSub (secondary bubble text) ───────────────────────────── */
+.bubbleSub {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  color: #5682B2;
+  margin: 6px 0 0 0;
+  text-align: center;
+  padding-right: 40px;
 }
