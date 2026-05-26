@@ -27,7 +27,7 @@ function AvatarRow({ players, actorId, targetId }) {
           cardImageId={ap.cardImageId}
           frameShape={ap.frameShape}
           frameColor={ap.frameColor}
-          size="md"
+          size="narr"
           name={actor.name}
         />
         <span className={styles.avatarLabel} style={{ color: ap.frameColor ?? '#60b8ff' }}>
@@ -42,7 +42,7 @@ function AvatarRow({ players, actorId, targetId }) {
               cardImageId={tp.cardImageId}
               frameShape={tp.frameShape}
               frameColor={tp.frameColor}
-              size="md"
+              size="narr"
               name={target.name}
             />
             <span className={styles.avatarLabel} style={{ color: tp.frameColor ?? '#60b8ff' }}>
@@ -244,7 +244,7 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
                   cardImageId={ep.cardImageId}
                   frameShape={ep.frameShape}
                   frameColor="#888"
-                  size="lg"
+                  size="elim"
                   name={elim.name}
                 />
               )}

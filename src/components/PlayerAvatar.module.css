@@ -12,6 +12,8 @@
 .size_xl    { width: 88px;  height: 88px; }
 .size_seat  { width: 80px;  height: 80px; }
 .size_human { width: 96px;  height: 96px; }
+.size_narr  { width: 104px; height: 104px; }  /* 2× md — narrative actor/target */
+.size_elim  { width: 136px; height: 136px; }  /* 2× lg — elimination beat */
 
 /* frame image sits behind avatar */
 .frameBack {
