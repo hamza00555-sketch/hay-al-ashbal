@@ -11,7 +11,8 @@ CSS simulation:
 from PIL import Image
 import os, pathlib
 
-CANVAS = 512
+CANVAS    = 512
+CHAR_SIZE = 440   # character crop placed centered; shrunk 72px from 512
 
 # Pre-calculated: frame_size = CANVAS * 0.75 / min(hole_w_pct, hole_h_pct)
 FRAME_SIZES = {
@@ -52,7 +53,7 @@ def make_char_crop(char_id: str) -> Image.Image:
     x0 = (w - crop_size) // 2
     y0 = (h - crop_size) // 2
     img = img.crop((x0, y0, x0 + crop_size, y0 + crop_size))
-    img = img.resize((CANVAS, CANVAS), Image.LANCZOS)
+    img = img.resize((CHAR_SIZE, CHAR_SIZE), Image.LANCZOS)
     return img
 
 
@@ -68,7 +69,8 @@ def composite(char_id: str, frame_id: str) -> Image.Image:
     frame_img  = make_frame_overlay(frame_id)
 
     result = Image.new('RGBA', (CANVAS, CANVAS), (0, 0, 0, 0))
-    result.paste(char_img, (0, 0))  # character fills canvas
+    offset = (CANVAS - CHAR_SIZE) // 2  # = 36px each side
+    result.paste(char_img, (offset, offset))
 
     fs = FRAME_SIZES[frame_id]
     fx = (CANVAS - fs) // 2
