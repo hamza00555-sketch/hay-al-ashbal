@@ -160,6 +160,56 @@
   transform: scale(1.15);
 }
 
+/* ── Frames grid ───────────────────────────────────────────────── */
+.framesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  gap: 10px;
+}
+
+.frameBtn {
+  background: rgba(255,255,255,0.8);
+  border: 2px solid rgba(86,130,178,0.15);
+  border-radius: 14px;
+  padding: 8px 4px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(86,130,178,0.06);
+}
+.frameBtn:hover { transform: scale(1.04); }
+.frameActive {
+  border-color: #FFC83D;
+  box-shadow: 0 0 0 2px rgba(255,200,61,0.3), 0 4px 12px rgba(255,200,61,0.2);
+}
+
+.frameThumbWrap {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frameThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.frameLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.62rem;
+  color: #1F3D5A;
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
 /* ── Volume sliders ─────────────────────────────────────────────── */
 .volRow {
   display: flex;

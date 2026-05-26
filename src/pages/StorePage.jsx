@@ -3,14 +3,32 @@ import { PACK_DEFS, getLegendaryInfo, openPack } from '../utils/packSystem';
 import { RARITY_CONFIG, STORE_ITEMS } from '../utils/storeData';
 import { loadProfile, saveProfile } from '../utils/playerProfile';
 import { getDailyProgress } from '../utils/economy';
-import PlayerAvatar from '../components/PlayerAvatar';
 import { SFX } from '../utils/sounds';
 import styles from './StorePage.module.css';
 
+function ItemPreview({ item }) {
+  if (item.type === 'avatar') {
+    return (
+      <img
+        src={`/cards/${item.cardImageId}.webp`}
+        alt={item.name}
+        className={styles.previewImg}
+      />
+    );
+  }
+  return (
+    <img
+      src={`/frames/${item.frameImageId}.webp`}
+      alt={item.name}
+      className={styles.previewFrame}
+    />
+  );
+}
+
 export default function StorePage({ onBack }) {
   const [profile, setProfile] = useState(() => loadProfile());
-  const [result,  setResult]  = useState(null);
-  const [phase,   setPhase]   = useState('idle'); // 'idle' | 'flip' | 'show'
+  const [results, setResults] = useState(null); // array of 3 slot results
+  const [phase,   setPhase]   = useState('idle');
   const [toast,   setToast]   = useState(null);
 
   const daily         = getDailyProgress();
@@ -29,22 +47,25 @@ export default function StorePage({ onBack }) {
     }
     SFX.confirmOk();
     const res = openPack(packId, profile);
-    if (!res) return;
+    if (!res || res.items.length === 0) return;
 
-    const earned = res.isDuplicate ? res.coinsCompensation : 0;
+    // Update inventory and coins
+    const totalComp = res.items.reduce((s, r) => s + r.coinsCompensation, 0);
+    const newInv = [...(profile.inventory ?? [])];
+    res.items.forEach(r => {
+      if (!r.isDuplicate && !newInv.includes(r.item.id)) newInv.push(r.item.id);
+    });
     const next = {
       ...profile,
-      coins:     (profile.coins ?? 0) - price + earned,
-      inventory: res.isDuplicate
-        ? (profile.inventory ?? [])
-        : [...(profile.inventory ?? []), res.item.id],
-      packs: res.newPacksState,
+      coins:     (profile.coins ?? 0) - price + totalComp,
+      inventory: newInv,
+      packs:     res.newPacksState,
     };
     setProfile(next);
     saveProfile(next);
-    setResult(res);
+    setResults(res.items);
     setPhase('flip');
-    setTimeout(() => setPhase('show'), 1000);
+    setTimeout(() => setPhase('show'), 1100);
   }
 
   function handleEquip(item) {
@@ -54,11 +75,10 @@ export default function StorePage({ onBack }) {
     setProfile(next);
     saveProfile(next);
     showToast(`تم تجهيز "${item.name}" ✓`);
-    closeResult();
   }
 
   function closeResult() {
-    setResult(null);
+    setResults(null);
     setPhase('idle');
   }
 
@@ -67,14 +87,6 @@ export default function StorePage({ onBack }) {
       ? profile.cardImageId === item.cardImageId
       : profile.frameImageId === item.frameImageId;
 
-  function avatarProps(item) {
-    return {
-      cardImageId:  item.type === 'avatar' ? item.cardImageId  : (profile.cardImageId  ?? '1'),
-      frameImageId: item.type === 'frame'  ? item.frameImageId : (profile.frameImageId ?? null),
-    };
-  }
-
-  // Pity label: "X باقي للضمان"
   const pityRemain = legendaryInfo.isPity ? 0 : (4 - legendaryInfo.posInCycle);
 
   return (
@@ -118,8 +130,9 @@ export default function StorePage({ onBack }) {
           </div>
           <div className={styles.packBody}>
             <span className={styles.packName}>{PACK_DEFS.basic.name}</span>
+            <span className={styles.packSub}>{PACK_DEFS.basic.subtitle}</span>
             <div className={styles.packOdds}>
-              <span style={{ color: RARITY_CONFIG.common.color }}>شخصية شائعة مضمونة</span>
+              <span style={{ color: RARITY_CONFIG.common.color }}>شائع</span>
             </div>
           </div>
           <button
@@ -137,23 +150,24 @@ export default function StorePage({ onBack }) {
           </div>
           <div className={styles.packBody}>
             <span className={styles.packName}>{PACK_DEFS.legendary.name}</span>
+            <span className={styles.packSub}>{PACK_DEFS.legendary.subtitle}</span>
             <div className={styles.packOdds}>
-              <span style={{ color: RARITY_CONFIG.legendary.color }}>شخصية أسطورية حصرية</span>
+              <span style={{ color: RARITY_CONFIG.rare.color }}>نادر</span>
+              <span style={{ color: RARITY_CONFIG.legendary.color }}>أسطوري</span>
             </div>
-            {/* Pity tracker */}
             <div className={styles.pityRow}>
               <div className={styles.pityDots}>
                 {[0, 1, 2, 3].map(i => (
                   <span
                     key={i}
-                    className={`${styles.pityDot} ${i < legendaryInfo.posInCycle ? styles.pityDotFilled : ''} ${legendaryInfo.isPity && i === 3 ? styles.pityDotPity : ''}`}
+                    className={`${styles.pityDot}
+                      ${i < legendaryInfo.posInCycle ? styles.pityDotFilled : ''}
+                      ${legendaryInfo.isPity && i === 3 ? styles.pityDotPity : ''}`}
                   />
                 ))}
               </div>
               <span className={styles.pityLabel}>
-                {legendaryInfo.isPity
-                  ? '🎁 الرابع مضمون أسطوري!'
-                  : `${pityRemain} باقي للضمان`}
+                {legendaryInfo.isPity ? '🎁 الرابع مضمون أسطوري!' : `${pityRemain} باقي للضمان`}
               </span>
             </div>
           </div>
@@ -161,9 +175,7 @@ export default function StorePage({ onBack }) {
             className={`${styles.packBtn} ${styles.packBtnLegendary} ${(profile.coins ?? 0) < legendaryInfo.price ? styles.packBtnOff : ''}`}
             onClick={() => handleOpenPack('legendary')}
           >
-            {legendaryInfo.isPity
-              ? '🎁 مجاني!'
-              : `⭐ ${legendaryInfo.price.toLocaleString('ar-SA')}`}
+            {legendaryInfo.isPity ? '🎁 مجاني!' : `⭐ ${legendaryInfo.price.toLocaleString('ar-SA')}`}
           </button>
         </div>
       </div>
@@ -175,44 +187,52 @@ export default function StorePage({ onBack }) {
 
             {phase === 'flip' && (
               <div className={styles.flipWrap}>
-                <div className={styles.flipCard}>
-                  <div className={styles.flipBack}>📦</div>
-                </div>
+                <div className={styles.flipCard} />
                 <p className={styles.flipText}>جاري الفتح...</p>
               </div>
             )}
 
-            {phase === 'show' && result && (() => {
-              const item = result.item;
-              const rc   = RARITY_CONFIG[item.rarity];
-              return (
-                <>
-                  <div className={`${styles.resultGlow} ${styles[`glow_${item.rarity}`]}`} />
-                  <p className={styles.resultRarity} style={{ color: rc.color }}>
-                    {rc.label}!
-                  </p>
-                  <div className={styles.resultAvatar}>
-                    <PlayerAvatar {...avatarProps(item)} size="xl" />
-                  </div>
-                  <h3 className={styles.resultName}>{item.name}</h3>
-                  {result.isDuplicate ? (
-                    <p className={styles.dupNote}>
-                      لديك هذا الكرت! حصلت على {result.coinsCompensation.toLocaleString('ar-SA')} ⭐ تعويضاً
-                    </p>
-                  ) : (
-                    <p className={styles.newNote}>كرت جديد في مجموعتك! 🎉</p>
-                  )}
-                  <div className={styles.resultBtns}>
-                    {!result.isDuplicate && !isEquipped(item) && (
-                      <button className={styles.equipNowBtn} onClick={() => handleEquip(item)}>
-                        تجهيز الآن
-                      </button>
-                    )}
-                    <button className={styles.closeBtn} onClick={closeResult}>حسناً</button>
-                  </div>
-                </>
-              );
-            })()}
+            {phase === 'show' && results && (
+              <>
+                <p className={styles.revealTitle}>حصلت على</p>
+
+                <div className={styles.itemsRow}>
+                  {results.map((slot, idx) => {
+                    const { item, isDuplicate, coinsCompensation } = slot;
+                    const rc = RARITY_CONFIG[item.rarity];
+                    const equipped = isEquipped(item);
+                    return (
+                      <div
+                        key={idx}
+                        className={styles.itemCard}
+                        style={{
+                          '--rc': rc.color,
+                          animationDelay: `${idx * 0.12}s`,
+                        }}
+                      >
+                        <div className={`${styles.itemGlow} ${styles[`glow_${item.rarity}`]}`} />
+                        <span className={styles.itemRarity} style={{ color: rc.color }}>{rc.label}</span>
+                        <div className={styles.itemImgWrap}>
+                          <ItemPreview item={item} />
+                        </div>
+                        <span className={styles.itemName}>{item.name}</span>
+                        {isDuplicate ? (
+                          <span className={styles.dupTag}>+{coinsCompensation} ⭐</span>
+                        ) : equipped ? (
+                          <span className={styles.equippedTag}>✓ مجهز</span>
+                        ) : (
+                          <button className={styles.equipSmBtn} onClick={() => handleEquip(item)}>
+                            تجهيز
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <button className={styles.closeBtn} onClick={closeResult}>حسناً</button>
+              </>
+            )}
           </div>
         </div>
       )}

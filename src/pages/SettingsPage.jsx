@@ -3,6 +3,7 @@ import {
   AVATAR_IMAGE_IDS, FRAME_SHAPES, FRAME_COLORS,
   loadProfile, saveProfile,
 } from '../utils/playerProfile';
+import { STORE_ITEMS, RARITY_CONFIG } from '../utils/storeData';
 import PlayerAvatar from '../components/PlayerAvatar';
 import { SFX, getMusicVol, getSFXVol, setMusicVol, setSFXVol } from '../utils/sounds';
 import styles from './SettingsPage.module.css';
@@ -11,6 +12,10 @@ export default function SettingsPage({ onBack }) {
   const [profile,   setProfile]   = useState(() => loadProfile());
   const [musicVol,  setMusicVolState]  = useState(() => getMusicVol());
   const [sfxVol,    setSFXVolState]    = useState(() => getSFXVol());
+
+  const ownedFrames = STORE_ITEMS.filter(
+    item => item.type === 'frame' && (profile.inventory ?? []).includes(item.id)
+  );
 
   function handleMusicVol(v) {
     setMusicVolState(v);
@@ -41,6 +46,7 @@ export default function SettingsPage({ onBack }) {
           cardImageId={profile.cardImageId}
           frameShape={profile.frameShape}
           frameColor={profile.frameColor}
+          frameImageId={profile.frameImageId ?? null}
           size="xl"
         />
       </div>
@@ -120,6 +126,49 @@ export default function SettingsPage({ onBack }) {
           ))}
         </div>
       </section>
+
+      {ownedFrames.length > 0 && (
+        <section className={styles.section}>
+          <p className={styles.label}>الإطارات المكتسبة</p>
+          <div className={styles.framesGrid}>
+            <button
+              className={[styles.frameBtn, !profile.frameImageId ? styles.frameActive : ''].join(' ')}
+              onClick={() => { SFX.cardSelect(); update('frameImageId', null); }}
+            >
+              <div className={styles.frameThumbWrap}>
+                <PlayerAvatar
+                  cardImageId={profile.cardImageId}
+                  frameShape={profile.frameShape}
+                  frameColor={profile.frameColor}
+                  size="sm"
+                />
+              </div>
+              <span className={styles.frameLabel}>بدون</span>
+            </button>
+            {ownedFrames.map(frame => (
+              <button
+                key={frame.id}
+                className={[styles.frameBtn, profile.frameImageId === frame.frameImageId ? styles.frameActive : ''].join(' ')}
+                onClick={() => { SFX.cardSelect(); update('frameImageId', frame.frameImageId); }}
+              >
+                <div className={styles.frameThumbWrap}>
+                  <img
+                    src={`/frames/${frame.frameImageId}.webp`}
+                    alt={frame.name}
+                    className={styles.frameThumbImg}
+                  />
+                </div>
+                <span
+                  className={styles.frameLabel}
+                  style={{ color: RARITY_CONFIG[frame.rarity]?.color }}
+                >
+                  {frame.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className={styles.section}>
         <p className={styles.label}>مستوى الصوت</p>

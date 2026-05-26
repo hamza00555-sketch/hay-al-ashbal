@@ -4,23 +4,25 @@ export const PACK_DEFS = {
   basic: {
     id: 'basic',
     name: 'باكس الحي',
-    subtitle: 'شخصية أو إطار شائع',
-    desc: 'شخصية شائعة أو إطار شائع عشوائي حصري.',
+    subtitle: '٢ شخصية + ١ إطار شائع',
     price: 150,
     image: '/packs/pack-basic.webp',
-    rarities: ['common'],
-    weights:  [100],
+    avatarRarities: ['common'],
+    avatarWeights:  [100],
+    frameRarities:  ['common'],
+    frameWeights:   [100],
   },
   legendary: {
     id: 'legendary',
     name: 'باكس الأسطورة',
-    subtitle: 'نادر أو أسطوري — الرابع مضمون أسطوري',
-    desc: 'إطار نادر أو شخصية/إطار أسطوري. كل 4 باكسات تضمن أسطوري!',
+    subtitle: '٢ شخصية + ١ إطار — الرابع مضمون أسطوري',
     prices: [100, 200, 400, 0],
     image: '/packs/pack-legendary.webp',
-    rarities:    ['rare', 'legendary'],
-    weights:     [70, 30],
-    pityWeights: [0, 100],
+    avatarRarities:    ['legendary'],
+    avatarWeights:     [100],
+    avatarPityWeights: [100],
+    frameRarities:  ['rare', 'legendary'],
+    frameWeights:   [70, 30],
   },
 };
 
@@ -32,7 +34,7 @@ function monthKey() {
 export function getLegendaryInfo(packs = {}) {
   const mk = monthKey();
   const purchases = packs.month === mk ? (packs.legendary ?? 0) : 0;
-  const posInCycle = purchases % 4; // 0-2 normal, 3 = pity
+  const posInCycle = purchases % 4;
   const isPity = posInCycle === 3;
   const price = isPity ? 0 : PACK_DEFS.legendary.prices[posInCycle];
   return { price, isPity, purchases, posInCycle };
@@ -48,35 +50,61 @@ function weightedPick(rarities, weights) {
   return rarities[rarities.length - 1];
 }
 
+const COMP_RATES = { common: 0.2, rare: 0.3, epic: 0.4, legendary: 0.5 };
+
+function drawItem(pool, owned) {
+  if (pool.length === 0) return null;
+  const unowned = pool.filter(i => !owned.includes(i.id));
+  const source = unowned.length > 0 ? unowned : pool;
+  const item = source[Math.floor(Math.random() * source.length)];
+  const isDuplicate = owned.includes(item.id);
+  const coinsCompensation = isDuplicate
+    ? Math.round(item.price * (COMP_RATES[item.rarity] ?? 0.2))
+    : 0;
+  return { item, isDuplicate, coinsCompensation };
+}
+
+// Returns { items: [av1, av2, frame], newPacksState }
+// Each slot: { item, isDuplicate, coinsCompensation }
 export function openPack(packId, profile) {
   const pack = PACK_DEFS[packId];
   const owned = profile.inventory ?? [];
   const packs = profile.packs ?? {};
 
-  let weights = pack.weights;
+  let avatarWeights = pack.avatarWeights;
   let newPacksState = { ...packs };
 
   if (packId === 'legendary') {
     const { isPity } = getLegendaryInfo(packs);
-    if (isPity) weights = pack.pityWeights;
+    if (isPity) avatarWeights = pack.avatarPityWeights;
     const mk = monthKey();
     const prev = packs.month === mk ? (packs.legendary ?? 0) : 0;
     newPacksState = { ...packs, month: mk, legendary: prev + 1 };
   }
 
-  const rarity = weightedPick(pack.rarities, weights);
-  const pool = STORE_ITEMS.filter(i => i.rarity === rarity);
-  if (pool.length === 0) return null;
+  // Draw 2 avatars
+  const avatarPool = (rarity) =>
+    STORE_ITEMS.filter(i => i.type === 'avatar' && i.rarity === rarity);
 
-  const unowned = pool.filter(i => !owned.includes(i.id));
-  const source = unowned.length > 0 ? unowned : pool;
-  const item = source[Math.floor(Math.random() * source.length)];
+  const av1Rarity = weightedPick(pack.avatarRarities, avatarWeights);
+  const av1 = drawItem(avatarPool(av1Rarity), owned);
 
-  const isDuplicate = owned.includes(item.id);
-  const compRates = { common: 0.2, rare: 0.3, epic: 0.4, legendary: 0.5 };
-  const coinsCompensation = isDuplicate
-    ? Math.round(item.price * (compRates[item.rarity] ?? 0.2))
-    : 0;
+  // For 2nd avatar, exclude 1st if possible
+  const ownedAfterAv1 = av1 && !av1.isDuplicate ? [...owned, av1.item.id] : owned;
+  const av2Rarity = weightedPick(pack.avatarRarities, avatarWeights);
+  const av2 = drawItem(avatarPool(av2Rarity), ownedAfterAv1);
 
-  return { item, isDuplicate, coinsCompensation, newPacksState };
+  // Draw 1 frame
+  const framePool = (rarity) =>
+    STORE_ITEMS.filter(i => i.type === 'frame' && i.rarity === rarity);
+  const frRarity = weightedPick(pack.frameRarities, pack.frameWeights);
+  const fr = drawItem(framePool(frRarity), owned);
+
+  const items = [av1, av2, fr].filter(Boolean);
+  return { items, newPacksState };
 }
+
+// All store avatar IDs for AI random picks
+export const STORE_AVATAR_IDS = STORE_ITEMS
+  .filter(i => i.type === 'avatar')
+  .map(i => i.cardImageId);
