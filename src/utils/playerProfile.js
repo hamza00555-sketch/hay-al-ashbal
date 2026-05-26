@@ -39,16 +39,20 @@ export function saveProfile(profile) {
   } catch {}
 }
 
-// Store avatar IDs for AI random picks (imported lazily to avoid circular dep)
-const STORE_IDS = [
-  'c01','c02','c03','c04','c05','c06','c07','c08','c09','c10','c11','c12','c13','c14','c15',
-  'l01','l02','l03','l04','l05','l06','l07','l08','l09','l10','l11','l12','l13','l14','l15','l16',
+const AI_MALE_IDS = [
+  'c04','c05','c06','c07','c09','c13',
+  'l02','l05','l06','l08','l09','l13',
+];
+const AI_FEMALE_IDS = [
+  'c01','c02','c03','c08','c10','c11','c12','c14','c15',
+  'l01','l03','l04','l07','l10','l11','l12','l14','l15','l16',
 ];
 
 const AI_COLORS = ['#ff9944', '#bb77ff', '#ff7777'];
 
+// aiIndex 0=خالد(m), 1=سارة(f), 2=علي(m)
 export function getAIProfile(aiIndex) {
-  // Random store avatar every call — changes each game for marketing visibility
-  const cardImageId = STORE_IDS[Math.floor(Math.random() * STORE_IDS.length)];
+  const pool = aiIndex === 1 ? AI_FEMALE_IDS : AI_MALE_IDS;
+  const cardImageId = pool[Math.floor(Math.random() * pool.length)];
   return { cardImageId, frameShape: 'circle', frameColor: AI_COLORS[aiIndex % AI_COLORS.length] };
 }
