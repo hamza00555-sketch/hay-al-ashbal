@@ -15,13 +15,14 @@ export const FRAME_COLORS = [
 ];
 
 export const DEFAULT_PROFILE = {
-  name:        '',
-  cardImageId: '1',
-  frameShape:  'circle',
-  frameColor:  '#60b8ff',
-  coins:       0,
-  inventory:   [],
-  packs:       {},
+  name:         '',
+  cardImageId:  '1',
+  frameShape:   'circle',
+  frameColor:   '#60b8ff',
+  frameImageId: null,
+  coins:        0,
+  inventory:    [],
+  packs:        {},
 };
 
 export function loadProfile() {

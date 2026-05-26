@@ -23,7 +23,19 @@ export const STORE_ITEMS = [
   { id: 'av_c14', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ١٤', cardImageId: 'c14' },
   { id: 'av_c15', type: 'avatar', rarity: 'common', price: 350, name: 'شخصية شائعة ١٥', cardImageId: 'c15' },
 
-  // ── Legendary Avatars — حصرية الباكسات (l01–l16) ──
+  // ── Common Frames (fr_c1–fr_c4) ──
+  { id: 'fr_c1', type: 'frame', rarity: 'common', price: 350, name: 'إطار شائع ١', frameImageId: 'fr_c1' },
+  { id: 'fr_c2', type: 'frame', rarity: 'common', price: 350, name: 'إطار شائع ٢', frameImageId: 'fr_c2' },
+  { id: 'fr_c3', type: 'frame', rarity: 'common', price: 350, name: 'إطار شائع ٣', frameImageId: 'fr_c3' },
+  { id: 'fr_c4', type: 'frame', rarity: 'common', price: 350, name: 'إطار شائع ٤', frameImageId: 'fr_c4' },
+
+  // ── Rare Frames (fr_r1–fr_r4) ──
+  { id: 'fr_r1', type: 'frame', rarity: 'rare', price: 1400, name: 'إطار نادر ١', frameImageId: 'fr_r1' },
+  { id: 'fr_r2', type: 'frame', rarity: 'rare', price: 1400, name: 'إطار نادر ٢', frameImageId: 'fr_r2' },
+  { id: 'fr_r3', type: 'frame', rarity: 'rare', price: 1400, name: 'إطار نادر ٣', frameImageId: 'fr_r3' },
+  { id: 'fr_r4', type: 'frame', rarity: 'rare', price: 1400, name: 'إطار نادر ٤', frameImageId: 'fr_r4' },
+
+  // ── Legendary Avatars (l01–l16) ──
   { id: 'av_l01', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١',  cardImageId: 'l01' },
   { id: 'av_l02', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٢',  cardImageId: 'l02' },
   { id: 'av_l03', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ٣',  cardImageId: 'l03' },
@@ -40,4 +52,10 @@ export const STORE_ITEMS = [
   { id: 'av_l14', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١٤', cardImageId: 'l14' },
   { id: 'av_l15', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١٥', cardImageId: 'l15' },
   { id: 'av_l16', type: 'avatar', rarity: 'legendary', price: 4500, name: 'شخصية أسطورية ١٦', cardImageId: 'l16' },
+
+  // ── Legendary Frames (fr_l1–fr_l4) ──
+  { id: 'fr_l1', type: 'frame', rarity: 'legendary', price: 6000, name: 'إطار أسطوري ١', frameImageId: 'fr_l1' },
+  { id: 'fr_l2', type: 'frame', rarity: 'legendary', price: 6000, name: 'إطار أسطوري ٢', frameImageId: 'fr_l2' },
+  { id: 'fr_l3', type: 'frame', rarity: 'legendary', price: 6000, name: 'إطار أسطوري ٣', frameImageId: 'fr_l3' },
+  { id: 'fr_l4', type: 'frame', rarity: 'legendary', price: 6000, name: 'إطار أسطوري ٤', frameImageId: 'fr_l4' },
 ];

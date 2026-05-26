@@ -102,29 +102,17 @@
 }
 
 .packImgWrap {
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   flex-shrink: 0;
   border-radius: 14px;
-  background: rgba(255,255,255,0.07);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
   overflow: hidden;
 }
 .packImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  position: absolute;
-  inset: 0;
-}
-.packImgPlaceholder {
-  font-size: 2.4rem;
-  line-height: 1;
-  position: relative;
-  z-index: 1;
+  display: block;
 }
 
 .packBody {

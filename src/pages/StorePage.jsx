@@ -50,7 +50,7 @@ export default function StorePage({ onBack }) {
   function handleEquip(item) {
     const next = { ...profile };
     if (item.type === 'avatar') next.cardImageId = item.cardImageId;
-    else { next.frameShape = item.frameShape; next.frameColor = item.frameColor; }
+    else next.frameImageId = item.frameImageId;
     setProfile(next);
     saveProfile(next);
     showToast(`تم تجهيز "${item.name}" ✓`);
@@ -65,13 +65,12 @@ export default function StorePage({ onBack }) {
   const isEquipped = item =>
     item.type === 'avatar'
       ? profile.cardImageId === item.cardImageId
-      : profile.frameShape === item.frameShape && profile.frameColor === item.frameColor;
+      : profile.frameImageId === item.frameImageId;
 
   function avatarProps(item) {
     return {
-      cardImageId: item.type === 'avatar' ? item.cardImageId : (profile.cardImageId ?? '1'),
-      frameShape:  item.type === 'frame'  ? item.frameShape  : (profile.frameShape  ?? 'circle'),
-      frameColor:  item.type === 'frame'  ? item.frameColor  : (profile.frameColor  ?? '#60b8ff'),
+      cardImageId:  item.type === 'avatar' ? item.cardImageId  : (profile.cardImageId  ?? '1'),
+      frameImageId: item.type === 'frame'  ? item.frameImageId : (profile.frameImageId ?? null),
     };
   }
 
@@ -115,9 +114,7 @@ export default function StorePage({ onBack }) {
         {/* Basic Pack */}
         <div className={styles.packCard}>
           <div className={styles.packImgWrap}>
-            <img src={PACK_DEFS.basic.image} alt="" className={styles.packImg}
-              onError={e => { e.currentTarget.style.display = 'none'; }} />
-            <div className={styles.packImgPlaceholder}>📦</div>
+            <img src={PACK_DEFS.basic.image} alt="" className={styles.packImg} />
           </div>
           <div className={styles.packBody}>
             <span className={styles.packName}>{PACK_DEFS.basic.name}</span>
@@ -136,9 +133,7 @@ export default function StorePage({ onBack }) {
         {/* Legendary Pack */}
         <div className={`${styles.packCard} ${styles.packCardLegendary}`}>
           <div className={styles.packImgWrap}>
-            <img src={PACK_DEFS.legendary.image} alt="" className={styles.packImg}
-              onError={e => { e.currentTarget.style.display = 'none'; }} />
-            <div className={styles.packImgPlaceholder}>✨</div>
+            <img src={PACK_DEFS.legendary.image} alt="" className={styles.packImg} />
           </div>
           <div className={styles.packBody}>
             <span className={styles.packName}>{PACK_DEFS.legendary.name}</span>

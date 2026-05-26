@@ -6,11 +6,12 @@
 
 .avatar {
   border: 2.5px solid var(--frame-color, #5682B2);
-  overflow: hidden;
+  overflow: visible;
   background: #EAF2FB;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .size_sm    { width: 38px; height: 38px; }
@@ -34,4 +35,19 @@
   object-fit: cover;
   object-position: center 25%;
   pointer-events: none;
+}
+
+.noBorder {
+  border: none;
+  background: transparent;
+}
+
+.frameOverlay {
+  position: absolute;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;
 }

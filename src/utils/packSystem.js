@@ -4,8 +4,8 @@ export const PACK_DEFS = {
   basic: {
     id: 'basic',
     name: 'باكس الحي',
-    subtitle: 'شخصية شائعة عشوائية',
-    desc: 'يعطيك شخصية شائعة عشوائية حصرية.',
+    subtitle: 'شخصية أو إطار شائع',
+    desc: 'شخصية شائعة أو إطار شائع عشوائي حصري.',
     price: 150,
     image: '/packs/pack-basic.webp',
     rarities: ['common'],
@@ -14,13 +14,13 @@ export const PACK_DEFS = {
   legendary: {
     id: 'legendary',
     name: 'باكس الأسطورة',
-    subtitle: 'أسطوري مضمون في الرابع',
-    desc: 'شخصية أسطورية حصرية. كل 4 باكسات تضمن واحدة!',
+    subtitle: 'نادر أو أسطوري — الرابع مضمون أسطوري',
+    desc: 'إطار نادر أو شخصية/إطار أسطوري. كل 4 باكسات تضمن أسطوري!',
     prices: [100, 200, 400, 0],
     image: '/packs/pack-legendary.webp',
-    rarities:    ['legendary'],
-    weights:     [100],
-    pityWeights: [100],
+    rarities:    ['rare', 'legendary'],
+    weights:     [70, 30],
+    pityWeights: [0, 100],
   },
 };
 
