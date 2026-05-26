@@ -14,7 +14,6 @@ export default function PlayerAvatar({
       className={[styles.outerWrap, styles[`size_${size}`]].join(' ')}
       style={{ '--frame-color': hasPngFrame ? 'transparent' : frameColor }}
     >
-      {/* character image — clipped to rounded rectangle always */}
       <div className={[
         styles.avatar,
         styles.shape_rounded,
@@ -27,14 +26,16 @@ export default function PlayerAvatar({
           draggable={false}
         />
       </div>
-      {/* PNG frame overlay — sits outside the clip */}
+
       {hasPngFrame && (
-        <img
-          src={`/frames/${frameImageId}.webp`}
-          alt=""
-          className={styles.frameOverlay}
-          draggable={false}
-        />
+        <div className={styles.frameMask}>
+          <img
+            src={`/frames/${frameImageId}.webp`}
+            alt=""
+            className={styles.frameOverlay}
+            draggable={false}
+          />
+        </div>
       )}
     </div>
   );
