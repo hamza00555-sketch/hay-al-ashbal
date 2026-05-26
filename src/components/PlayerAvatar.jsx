@@ -28,14 +28,12 @@ export default function PlayerAvatar({
       </div>
 
       {hasPngFrame && (
-        <div className={styles.frameMask}>
-          <img
-            src={`/frames/${frameImageId}.webp`}
-            alt=""
-            className={styles.frameOverlay}
-            draggable={false}
-          />
-        </div>
+        <img
+          src={`/frames/${frameImageId}.webp`}
+          alt=""
+          className={styles.frameOverlay}
+          draggable={false}
+        />
       )}
     </div>
   );
