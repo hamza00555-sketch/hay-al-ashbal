@@ -17,7 +17,7 @@ export const FRAME_COLORS = [
 export const DEFAULT_PROFILE = {
   name:         '',
   cardImageId:  '1',
-  frameShape:   'circle',
+  frameShape:   'rounded',
   frameColor:   '#60b8ff',
   frameImageId: null,
   coins:        0,

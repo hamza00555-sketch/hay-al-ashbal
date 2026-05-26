@@ -2,7 +2,6 @@ import styles from './PlayerAvatar.module.css';
 
 export default function PlayerAvatar({
   cardImageId  = '1',
-  frameShape   = 'circle',
   frameColor   = '#60b8ff',
   frameImageId = null,
   size         = 'md',
@@ -15,10 +14,10 @@ export default function PlayerAvatar({
       className={[styles.outerWrap, styles[`size_${size}`]].join(' ')}
       style={{ '--frame-color': hasPngFrame ? 'transparent' : frameColor }}
     >
-      {/* character image — clipped to shape */}
+      {/* character image — clipped to rounded rectangle */}
       <div className={[
         styles.avatar,
-        hasPngFrame ? styles.shape_circle : styles[`shape_${frameShape}`],
+        hasPngFrame ? styles.shape_circle : styles.shape_rounded,
         hasPngFrame ? styles.noBorder : '',
       ].join(' ')}>
         <img

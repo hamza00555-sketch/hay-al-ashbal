@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  AVATAR_IMAGE_IDS, FRAME_SHAPES, FRAME_COLORS,
+  AVATAR_IMAGE_IDS, FRAME_COLORS,
   loadProfile, saveProfile,
 } from '../utils/playerProfile';
 import { STORE_ITEMS, RARITY_CONFIG } from '../utils/storeData';
@@ -81,30 +81,6 @@ export default function SettingsPage({ onBack }) {
               onClick={() => { SFX.cardSelect(); update('cardImageId', id); }}
             >
               <img src={`/cards/${id}.webp`} alt={id} className={styles.avatarThumb} />
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <p className={styles.label}>شكل الإطار</p>
-        <div className={styles.shapeRow}>
-          {FRAME_SHAPES.map(s => (
-            <button
-              key={s.id}
-              className={[
-                styles.shapeBtn,
-                profile.frameShape === s.id ? styles.shapeActive : '',
-              ].join(' ')}
-              onClick={() => { SFX.cardSelect(); update('frameShape', s.id); }}
-            >
-              <PlayerAvatar
-                cardImageId={profile.cardImageId}
-                frameShape={s.id}
-                frameColor={profile.frameColor}
-                size="sm"
-              />
-              <span className={styles.shapeLabel}>{s.label}</span>
             </button>
           ))}
         </div>
