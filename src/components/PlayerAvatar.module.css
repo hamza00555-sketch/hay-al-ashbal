@@ -46,7 +46,7 @@
 /* PNG frame — overlaid on outerWrap, extends beyond avatar */
 .frameOverlay {
   position: absolute;
-  inset: -22%;
+  inset: -14%;
   object-fit: contain;
   pointer-events: none;
   z-index: 2;
