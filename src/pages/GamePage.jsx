@@ -60,6 +60,7 @@ function Portrait({ profile, size = 'seat', isActive, isEliminated }) {
     >
       <PlayerAvatar
         cardImageId={profile?.cardImageId ?? '1'}
+        frameImageId={isEliminated ? null : (profile?.frameImageId ?? null)}
         frameShape={profile?.frameShape ?? 'circle'}
         frameColor={isEliminated ? '#555' : (profile?.frameColor ?? '#60b8ff')}
         size={avSize}
@@ -864,7 +865,7 @@ export default function GamePage({
         <div className={styles.announceCard}>
           <Portrait
             profile={turnAnnounce.profile}
-            size="human"
+            size="seat"
             isActive={false}
             isEliminated={false}
           />

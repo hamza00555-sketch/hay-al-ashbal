@@ -4,7 +4,7 @@ export default function PlayerAvatar({
   cardImageId  = '1',
   frameShape   = 'circle',
   frameColor   = '#60b8ff',
-  frameImageId = null,   // PNG overlay frame e.g. 'fr_c1'
+  frameImageId = null,
   size         = 'md',
   name,
 }) {
@@ -12,13 +12,13 @@ export default function PlayerAvatar({
 
   return (
     <div
-      className={styles.outerWrap}
+      className={[styles.outerWrap, styles[`size_${size}`]].join(' ')}
       style={{ '--frame-color': hasPngFrame ? 'transparent' : frameColor }}
     >
+      {/* character image — clipped to shape */}
       <div className={[
         styles.avatar,
         hasPngFrame ? styles.shape_circle : styles[`shape_${frameShape}`],
-        styles[`size_${size}`],
         hasPngFrame ? styles.noBorder : '',
       ].join(' ')}>
         <img
@@ -27,15 +27,16 @@ export default function PlayerAvatar({
           className={styles.img}
           draggable={false}
         />
-        {hasPngFrame && (
-          <img
-            src={`/frames/${frameImageId}.webp`}
-            alt=""
-            className={styles.frameOverlay}
-            draggable={false}
-          />
-        )}
       </div>
+      {/* PNG frame overlay — sits outside the clip */}
+      {hasPngFrame && (
+        <img
+          src={`/frames/${frameImageId}.webp`}
+          alt=""
+          className={styles.frameOverlay}
+          draggable={false}
+        />
+      )}
     </div>
   );
 }

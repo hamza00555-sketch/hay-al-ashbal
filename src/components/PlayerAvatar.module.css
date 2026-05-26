@@ -1,25 +1,29 @@
 .outerWrap {
   display: inline-flex;
   flex-shrink: 0;
+  position: relative;
   filter: drop-shadow(0 0 7px color-mix(in srgb, var(--frame-color, #60b8ff) 55%, transparent));
 }
 
+/* sizes on outerWrap */
+.size_sm    { width: 38px;  height: 38px; }
+.size_md    { width: 52px;  height: 52px; }
+.size_lg    { width: 68px;  height: 68px; }
+.size_xl    { width: 88px;  height: 88px; }
+.size_seat  { width: 80px;  height: 80px; }
+.size_human { width: 96px;  height: 96px; }
+
+/* avatar fills the outerWrap */
 .avatar {
+  width: 100%;
+  height: 100%;
   border: 2.5px solid var(--frame-color, #5682B2);
-  overflow: visible;
+  overflow: hidden;
   background: #EAF2FB;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
-
-.size_sm    { width: 38px; height: 38px; }
-.size_md    { width: 52px; height: 52px; }
-.size_lg    { width: 68px; height: 68px; }
-.size_xl    { width: 88px; height: 88px; }
-.size_seat  { width: 80px; height: 80px; }
-.size_human { width: 96px; height: 96px; }
 
 .shape_circle  { border-radius: 50%; }
 .shape_rounded { border-radius: 12px; }
@@ -29,6 +33,8 @@
   border: none;
 }
 
+.noBorder { border: none; background: transparent; }
+
 .img {
   width: 160%;
   height: 160%;
@@ -37,16 +43,12 @@
   pointer-events: none;
 }
 
-.noBorder {
-  border: none;
-  background: transparent;
-}
-
+/* PNG frame — overlaid on outerWrap, extends slightly beyond */
 .frameOverlay {
   position: absolute;
-  inset: -8%;
-  width: 116%;
-  height: 116%;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
   object-fit: contain;
   pointer-events: none;
   z-index: 2;
