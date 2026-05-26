@@ -13,7 +13,7 @@
 .size_seat  { width: 80px;  height: 80px; }
 .size_human { width: 96px;  height: 96px; }
 
-/* avatar — z-index:1 يخليه تحت الإطار */
+/* plain avatar (no PNG frame) */
 .avatar {
   width: 100%;
   height: 100%;
@@ -24,11 +24,9 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  z-index: 1;
 }
 
 .shape_rounded { border-radius: 12px; }
-.noBorder { border: none; background: transparent; }
 
 .img {
   width: 160%;
@@ -38,19 +36,11 @@
   pointer-events: none;
 }
 
-/*
-  الإطار فوق الأفاتار (z-index:2).
-  الثقب الشفاف في الـ PNG يكشف الأفاتار من تحت بشكل طبيعي.
-
-  inset:-38% → الإطار يصبح 1.76× حجم الأفاتار.
-  هذا يضمن أن ثقب الإطار (51-67% من الصورة) يتطابق مع الأفاتار:
-    • أصغر ثقب (51%) × 1.76 × 88px = 79px → يغطي 4px فقط من حواف الأفاتار
-    • أكبر ثقب (67%) × 1.76 × 88px = 104px → الثقب أكبر من الأفاتار (ممتاز)
-*/
-.frameOverlay {
-  position: absolute;
-  inset: -38%;
-  object-fit: contain;
+/* pre-composited char+frame image — fills outerWrap directly */
+.compositeImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   pointer-events: none;
-  z-index: 2;
+  display: block;
 }

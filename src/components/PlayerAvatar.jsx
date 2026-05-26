@@ -9,16 +9,25 @@ export default function PlayerAvatar({
 }) {
   const hasPngFrame = !!frameImageId;
 
+  if (hasPngFrame) {
+    return (
+      <div className={[styles.outerWrap, styles[`size_${size}`]].join(' ')}>
+        <img
+          src={`/cards/${cardImageId}_${frameImageId}.webp`}
+          alt={name ?? ''}
+          className={styles.compositeImg}
+          draggable={false}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       className={[styles.outerWrap, styles[`size_${size}`]].join(' ')}
-      style={{ '--frame-color': hasPngFrame ? 'transparent' : frameColor }}
+      style={{ '--frame-color': frameColor }}
     >
-      <div className={[
-        styles.avatar,
-        styles.shape_rounded,
-        hasPngFrame ? styles.noBorder : '',
-      ].join(' ')}>
+      <div className={[styles.avatar, styles.shape_rounded].join(' ')}>
         <img
           src={`/cards/${cardImageId}.webp`}
           alt={name ?? ''}
@@ -26,15 +35,6 @@ export default function PlayerAvatar({
           draggable={false}
         />
       </div>
-
-      {hasPngFrame && (
-        <img
-          src={`/frames/${frameImageId}.webp`}
-          alt=""
-          className={styles.frameOverlay}
-          draggable={false}
-        />
-      )}
     </div>
   );
 }
