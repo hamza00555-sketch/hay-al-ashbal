@@ -48,7 +48,7 @@ function assignSeats(players, humanId) {
 
 // ── Player portrait using card-face avatar ───────────────────────
 function Portrait({ profile, size = 'seat', isActive, isEliminated }) {
-  const avSize = size === 'human' ? 'human' : 'seat';
+  const avSize = size === 'human' ? 'human' : size === 'announce' ? 'announce' : 'seat';
   return (
     <div
       className={[
@@ -865,7 +865,7 @@ export default function GamePage({
         <div className={styles.announceCard}>
           <Portrait
             profile={turnAnnounce.profile}
-            size="seat"
+            size="announce"
             isActive={false}
             isEliminated={false}
           />
