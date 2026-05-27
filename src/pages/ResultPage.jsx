@@ -2,6 +2,7 @@ import { CardFace } from '../components/Card';
 import { SFX } from '../utils/sounds';
 import CoinCounter from '../components/CoinCounter';
 import CoinIcon from '../components/CoinIcon';
+import PlayerAvatar from '../components/PlayerAvatar';
 import styles from './ResultPage.module.css';
 
 export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, onMenu }) {
@@ -13,6 +14,19 @@ export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, on
       <div className={styles.content}>
         <CoinCounter total={coinsEarned} size="large" />
         <p className={styles.eyebrow}>{isDraw ? 'تعادل في المباراة!' : 'فائز المباراة'}</p>
+
+        {!isDraw && winner?.profile && (
+          <div className={styles.winnerAvatar}>
+            <PlayerAvatar
+              cardImageId={winner.profile.cardImageId ?? '1'}
+              frameImageId={winner.profile.frameImageId ?? null}
+              frameShape={winner.profile.frameShape ?? 'circle'}
+              frameColor={winner.profile.frameColor ?? '#60b8ff'}
+              size="human"
+            />
+          </div>
+        )}
+
         <h1 className={styles.title}>
           {isDraw ? 'تعادل!' : `${winner.name}!`}
         </h1>
