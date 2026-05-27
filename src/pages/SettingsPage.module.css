@@ -105,6 +105,30 @@
   border-radius: 9px;
 }
 
+.rarityDot {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.avatarBtn {
+  position: relative;
+}
+
+.emptyHint {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.82rem;
+  color: #5682B2;
+  opacity: 0.7;
+  text-align: center;
+  padding: 8px 0;
+  margin: 0;
+}
+
 .shapeRow {
   display: flex;
   gap: 12px;

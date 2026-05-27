@@ -13,8 +13,13 @@ export default function SettingsPage({ onBack }) {
   const [musicVol,  setMusicVolState]  = useState(() => getMusicVol());
   const [sfxVol,    setSFXVolState]    = useState(() => getSFXVol());
 
+  const inventory = profile.inventory ?? [];
+
+  const ownedAvatars = STORE_ITEMS.filter(
+    item => item.type === 'avatar' && inventory.includes(item.id)
+  );
   const ownedFrames = STORE_ITEMS.filter(
-    item => item.type === 'frame' && (profile.inventory ?? []).includes(item.id)
+    item => item.type === 'frame' && inventory.includes(item.id)
   );
 
   function handleMusicVol(v) {
@@ -63,6 +68,7 @@ export default function SettingsPage({ onBack }) {
         />
       </section>
 
+      {/* ── الشخصيات الافتراضية ── */}
       <section className={styles.section}>
         <p className={styles.label}>الشخصية (صورة البطاقة)</p>
         <div className={styles.avatarGrid}>
@@ -86,6 +92,37 @@ export default function SettingsPage({ onBack }) {
         </div>
       </section>
 
+      {/* ── الشخصيات المكتسبة من المتجر ── */}
+      <section className={styles.section}>
+        <p className={styles.label}>شخصياتك المكتسبة</p>
+        {ownedAvatars.length === 0 ? (
+          <p className={styles.emptyHint}>لم تحصل على شخصيات بعد — افتح الباكسات من المتجر!</p>
+        ) : (
+          <div className={styles.avatarGrid}>
+            {ownedAvatars.map(item => (
+              <button
+                key={item.id}
+                className={[
+                  styles.avatarBtn,
+                  profile.cardImageId === item.cardImageId ? styles.avatarSelected : '',
+                ].join(' ')}
+                style={{
+                  '--frame-color': profile.cardImageId === item.cardImageId
+                    ? profile.frameColor
+                    : 'rgba(255,255,255,0.15)',
+                  borderColor: RARITY_CONFIG[item.rarity]?.color,
+                }}
+                onClick={() => { SFX.cardSelect(); update('cardImageId', item.cardImageId); }}
+              >
+                <img src={`/cards/${item.cardImageId}.webp`} alt={item.name} className={styles.avatarThumb} />
+                <span className={styles.rarityDot} style={{ background: RARITY_CONFIG[item.rarity]?.color }} />
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ── لون الإطار ── */}
       <section className={styles.section}>
         <p className={styles.label}>لون الإطار</p>
         <div className={styles.colorRow}>
@@ -103,9 +140,12 @@ export default function SettingsPage({ onBack }) {
         </div>
       </section>
 
-      {ownedFrames.length > 0 && (
-        <section className={styles.section}>
-          <p className={styles.label}>الإطارات المكتسبة</p>
+      {/* ── الإطارات المكتسبة ── */}
+      <section className={styles.section}>
+        <p className={styles.label}>إطاراتك المكتسبة</p>
+        {ownedFrames.length === 0 ? (
+          <p className={styles.emptyHint}>لم تحصل على إطارات بعد — افتح الباكسات من المتجر!</p>
+        ) : (
           <div className={styles.framesGrid}>
             <button
               className={[styles.frameBtn, !profile.frameImageId ? styles.frameActive : ''].join(' ')}
@@ -143,8 +183,8 @@ export default function SettingsPage({ onBack }) {
               </button>
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       <section className={styles.section}>
         <p className={styles.label}>مستوى الصوت</p>
