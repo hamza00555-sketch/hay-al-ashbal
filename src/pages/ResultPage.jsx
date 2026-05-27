@@ -15,28 +15,29 @@ export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, on
         <CoinCounter total={coinsEarned} size="large" />
         <p className={styles.eyebrow}>{isDraw ? 'تعادل في المباراة!' : 'فائز المباراة'}</p>
 
-        {!isDraw && winner?.profile && (
-          <div className={styles.winnerAvatar}>
-            <PlayerAvatar
-              cardImageId={winner.profile.cardImageId ?? '1'}
-              frameImageId={winner.profile.frameImageId ?? null}
-              frameShape={winner.profile.frameShape ?? 'circle'}
-              frameColor={winner.profile.frameColor ?? '#60b8ff'}
-              size="human"
-            />
-          </div>
-        )}
-
         <h1 className={styles.title}>
           {isDraw ? 'تعادل!' : `${winner.name}!`}
         </h1>
 
-        {winner?.hand?.[0] && (
-          <div className={styles.winCard}>
-            <p className={styles.winCardLabel}>الكرت الفائز</p>
-            <CardFace card={winner.hand[0]} size="large" />
-          </div>
-        )}
+        <div className={styles.winnerRow}>
+          {!isDraw && winner?.profile && (
+            <div className={styles.winnerAvatar}>
+              <PlayerAvatar
+                cardImageId={winner.profile.cardImageId ?? '1'}
+                frameImageId={winner.profile.frameImageId ?? null}
+                frameShape={winner.profile.frameShape ?? 'circle'}
+                frameColor={winner.profile.frameColor ?? '#60b8ff'}
+                size="human"
+              />
+            </div>
+          )}
+          {winner?.hand?.[0] && (
+            <div className={styles.winCard}>
+              <p className={styles.winCardLabel}>الكرت الفائز</p>
+              <CardFace card={winner.hand[0]} size="large" />
+            </div>
+          )}
+        </div>
 
         <div className={styles.standings}>
           <p className={styles.standingsTitle}>الأوسمة النهائية</p>

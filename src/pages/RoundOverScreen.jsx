@@ -16,27 +16,28 @@ export default function RoundOverScreen({ result, config, tokens, tokensToWin, o
 
         <CoinCounter total={coinsEarned} size="normal" />
 
-        {!isDraw && winner?.profile && (
-          <div className={styles.winnerAvatar}>
-            <PlayerAvatar
-              cardImageId={winner.profile.cardImageId ?? '1'}
-              frameImageId={winner.profile.frameImageId ?? null}
-              frameShape={winner.profile.frameShape ?? 'circle'}
-              frameColor={winner.profile.frameColor ?? '#60b8ff'}
-              size="human"
-            />
-          </div>
-        )}
-
         <h2 className={styles.title}>
           {isDraw ? 'تعادل!' : `فاز ${winner.name}!`}
         </h2>
 
-        {winner?.hand?.[0] && (
-          <div className={styles.winCard}>
-            <CardFace card={winner.hand[0]} size="normal" />
-          </div>
-        )}
+        <div className={styles.winnerRow}>
+          {!isDraw && winner?.profile && (
+            <div className={styles.winnerAvatar}>
+              <PlayerAvatar
+                cardImageId={winner.profile.cardImageId ?? '1'}
+                frameImageId={winner.profile.frameImageId ?? null}
+                frameShape={winner.profile.frameShape ?? 'circle'}
+                frameColor={winner.profile.frameColor ?? '#60b8ff'}
+                size="human"
+              />
+            </div>
+          )}
+          {winner?.hand?.[0] && (
+            <div className={styles.winCard}>
+              <CardFace card={winner.hand[0]} size="normal" />
+            </div>
+          )}
+        </div>
 
         {/* Token track */}
         <div className={styles.tokenSection}>
