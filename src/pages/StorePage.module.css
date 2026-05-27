@@ -55,24 +55,25 @@
 .title {
   flex: 1;
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 3rem;
   font-weight: 900;
   color: #fff;
   margin: 0;
-  text-shadow: 0 2px 0 #2f6db5, 0 3px 6px rgba(0,0,0,0.25), 0 0 2px #2f6db5;
-  -webkit-text-stroke: 1px #2f6db5;
+  text-shadow: 0 3px 0 #2f6db5, 0 5px 9px rgba(0,0,0,0.28), 0 0 3px #2f6db5;
+  -webkit-text-stroke: 1.5px #2f6db5;
 }
 .coinBadge {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   background: linear-gradient(180deg, #2f3d5c, #1e2a44);
   border: 2px solid #fff;
-  border-radius: 22px;
-  padding: 4px 12px 4px 6px;
+  border-radius: 26px;
+  padding: 5px 14px 5px 8px;
   box-shadow: 0 3px 0 rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.18);
 }
-.coinAmt { font-size: 1.05rem; font-weight: 900; color: #ffd83d; }
+.coinBadge img { width: 40px; height: 40px; }
+.coinAmt { font-size: 1.25rem; font-weight: 900; color: #ffd83d; }
 
 /* ── Scroll area ── */
 .scroll {
@@ -98,7 +99,8 @@
   padding: 12px 14px;
   box-shadow: 0 4px 0 rgba(120,150,200,0.25), 0 8px 18px rgba(80,110,160,0.18);
 }
-.dailyGift { width: 56px; height: 56px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.18)); }
+.dailyGift { width: 82px; height: 82px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.18)); }
+.dailyCard > img:not(.dailyGift) { width: 52px; height: 52px; }
 .dailyMain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .dailyTitle { font-size: 0.85rem; font-weight: 700; color: #5a7196; text-align: center; }
 .dailyAmount {
@@ -171,8 +173,8 @@
 }
 
 .packImgWrap {
-  width: 92px;
-  height: 92px;
+  width: 132px;
+  height: 132px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
