@@ -145,9 +145,9 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   border-radius: 24px;
-  padding: 14px;
+  padding: 12px;
   border: 3px solid #fff;
 }
 .packBasic {
@@ -163,18 +163,18 @@
 .bestValue {
   position: absolute;
   top: -16px;
-  right: -8px;
+  left: -8px;
   width: 132px;
   height: auto;
   z-index: 4;
   pointer-events: none;
   filter: drop-shadow(0 3px 5px rgba(0,0,0,0.22));
-  transform: rotate(-4deg);
+  transform: rotate(4deg);
 }
 
 .packImgWrap {
-  width: 132px;
-  height: 132px;
+  width: 175px;
+  height: 175px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
