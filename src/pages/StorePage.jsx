@@ -34,6 +34,7 @@ export default function StorePage({ onBack }) {
 
   const daily         = getDailyProgress();
   const legendaryInfo = getLegendaryInfo(profile.packs ?? {});
+  const dailyRemain   = Math.max(0, daily.hardCap - daily.earned);
 
   function showToast(msg, type = 'success') {
     setToast({ msg, type });
@@ -89,72 +90,79 @@ export default function StorePage({ onBack }) {
       : profile.frameImageId === item.frameImageId;
 
   const pityRemain = legendaryInfo.isPity ? 0 : (4 - legendaryInfo.posInCycle);
+  const canBasic     = (profile.coins ?? 0) >= PACK_DEFS.basic.price;
+  const canLegendary = (profile.coins ?? 0) >= legendaryInfo.price;
 
   return (
     <div className={styles.page}>
+      <div className={styles.bgOverlay} />
 
       {/* ── Header ── */}
       <div className={styles.header}>
-        <button className={styles.back} onClick={() => { SFX.buttonClick(); onBack(); }}>‹ رجوع</button>
+        <button className={styles.back} onClick={() => { SFX.buttonClick(); onBack(); }} aria-label="رجوع">‹</button>
         <h2 className={styles.title}>المتجر</h2>
         <div className={styles.coinBadge}>
-          <CoinIcon size="lg" />
+          <CoinIcon size="md" />
           <span className={styles.coinAmt}>{(profile.coins ?? 0).toLocaleString('ar-SA')}</span>
         </div>
       </div>
 
-      {/* ── Daily bar ── */}
-      <div className={styles.dailyBar}>
-        <div className={styles.dailyLabel}>
-          <span>نجوم اليوم</span>
-          <span style={{ display:'flex', alignItems:'center', gap:'4px' }}>{daily.earned} / {daily.hardCap} <CoinIcon size="sm" /></span>
-        </div>
-        <div className={styles.dailyTrack}>
-          <div
-            className={styles.dailyFill}
-            style={{
-              width: `${Math.min(100, (daily.earned / daily.hardCap) * 100)}%`,
-              background: daily.earned >= daily.softCap ? '#ff9944' : '#60b8ff',
-            }}
-          />
-          <div className={styles.softCapMark} style={{ left: `${(daily.softCap / daily.hardCap) * 100}%` }} />
-        </div>
-      </div>
+      <div className={styles.scroll}>
 
-      {/* ── Pack cards ── */}
-      <div className={styles.packs}>
+        {/* ── Daily reward card ── */}
+        <div className={styles.dailyCard}>
+          <img src="/store/gift.webp" alt="" className={styles.dailyGift} />
+          <div className={styles.dailyMain}>
+            <span className={styles.dailyTitle}>نجوم اليوم</span>
+            <div className={styles.dailyAmount}>
+              <span className={styles.dailyNow}>{daily.earned.toLocaleString('ar-SA')}</span>
+              <span className={styles.dailySep}>/ {daily.hardCap.toLocaleString('ar-SA')}</span>
+            </div>
+            <div className={styles.dailyTrack}>
+              <div
+                className={styles.dailyFill}
+                style={{ width: `${Math.min(100, (daily.earned / daily.hardCap) * 100)}%` }}
+              />
+            </div>
+          </div>
+          <CoinIcon size="lg" />
+        </div>
+        <div className={styles.dailyPill}>
+          {dailyRemain > 0
+            ? `باقي ${dailyRemain.toLocaleString('ar-SA')} نجمة للحصول على المكافأة!`
+            : 'وصلت للحد الأقصى اليوم! ارجع غداً 🎉'}
+        </div>
 
-        {/* Basic Pack */}
-        <div className={styles.packCard}>
+        {/* ── Basic Pack ── */}
+        <div className={`${styles.packCard} ${styles.packBasic}`}>
           <div className={styles.packImgWrap}>
             <img src={PACK_DEFS.basic.image} alt="" className={styles.packImg} />
           </div>
           <div className={styles.packBody}>
             <span className={styles.packName}>{PACK_DEFS.basic.name}</span>
             <span className={styles.packSub}>{PACK_DEFS.basic.subtitle}</span>
-            <div className={styles.packOdds}>
-              <span style={{ color: RARITY_CONFIG.common.color }}>شائع</span>
-            </div>
+            <span className={styles.rarityTag} style={{ '--tag': RARITY_CONFIG.common.color }}>شائع</span>
+            <button
+              className={`${styles.priceBtn} ${styles.priceBtnBasic} ${!canBasic ? styles.priceBtnOff : ''}`}
+              onClick={() => handleOpenPack('basic')}
+            >
+              <CoinIcon size="sm" /> {PACK_DEFS.basic.price.toLocaleString('ar-SA')}
+            </button>
           </div>
-          <button
-            className={`${styles.packBtn} ${(profile.coins ?? 0) < PACK_DEFS.basic.price ? styles.packBtnOff : ''}`}
-            onClick={() => handleOpenPack('basic')}
-          >
-            <CoinIcon size="sm" /> {PACK_DEFS.basic.price.toLocaleString('ar-SA')}
-          </button>
         </div>
 
-        {/* Legendary Pack */}
-        <div className={`${styles.packCard} ${styles.packCardLegendary}`}>
+        {/* ── Legendary Pack ── */}
+        <div className={`${styles.packCard} ${styles.packLegendary}`}>
+          <img src="/store/best-value.webp" alt="أفضل قيمة" className={styles.bestValue} />
           <div className={styles.packImgWrap}>
             <img src={PACK_DEFS.legendary.image} alt="" className={styles.packImg} />
           </div>
           <div className={styles.packBody}>
-            <span className={styles.packName}>{PACK_DEFS.legendary.name}</span>
-            <span className={styles.packSub}>{PACK_DEFS.legendary.subtitle}</span>
-            <div className={styles.packOdds}>
-              <span style={{ color: RARITY_CONFIG.rare.color }}>نادر</span>
-              <span style={{ color: RARITY_CONFIG.legendary.color }}>أسطوري</span>
+            <span className={`${styles.packName} ${styles.packNameLegendary}`}>{PACK_DEFS.legendary.name}</span>
+            <span className={styles.packSub}>٢ شخصية + إطار عشوائي</span>
+            <div className={styles.tagRow}>
+              <span className={styles.rarityTag} style={{ '--tag': RARITY_CONFIG.legendary.color }}>فرصة أسطوري</span>
+              <span className={styles.rarityTag} style={{ '--tag': RARITY_CONFIG.rare.color }}>نادر مضمون</span>
             </div>
             <div className={styles.pityRow}>
               <div className={styles.pityDots}>
@@ -171,14 +179,28 @@ export default function StorePage({ onBack }) {
                 {legendaryInfo.isPity ? '🎁 الرابع مضمون أسطوري!' : `${pityRemain} باقي للضمان`}
               </span>
             </div>
+            <button
+              className={`${styles.priceBtn} ${styles.priceBtnLegendary} ${!canLegendary ? styles.priceBtnOff : ''}`}
+              onClick={() => handleOpenPack('legendary')}
+            >
+              {legendaryInfo.isPity ? '🎁 مجاني!' : <><CoinIcon size="sm" /> {legendaryInfo.price.toLocaleString('ar-SA')}</>}
+            </button>
           </div>
-          <button
-            className={`${styles.packBtn} ${styles.packBtnLegendary} ${(profile.coins ?? 0) < legendaryInfo.price ? styles.packBtnOff : ''}`}
-            onClick={() => handleOpenPack('legendary')}
-          >
-            {legendaryInfo.isPity ? '🎁 مجاني!' : <><CoinIcon size="sm" /> {legendaryInfo.price.toLocaleString('ar-SA')}</>}
-          </button>
         </div>
+
+        {/* ── Info image cards ── */}
+        <img src="/store/contents.webp" alt="محتويات محتملة" className={styles.infoCard} />
+        <img src="/store/how-to-earn.webp" alt="كيف تكسب العملات" className={styles.infoCard} />
+
+        {/* ── Coming soon banner ── */}
+        <div className={styles.soonBanner}>
+          <span className={styles.soonTag}>قريباً</span>
+          <div className={styles.soonText}>
+            <strong>عروض خاصة كل أسبوع!</strong>
+            <span>تابع المتجر ولا تفوتك العروض</span>
+          </div>
+        </div>
+
       </div>
 
       {/* ── Pack open overlay ── */}
