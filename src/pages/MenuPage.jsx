@@ -1,5 +1,6 @@
 import { SFX } from '../utils/sounds';
 import { loadProfile } from '../utils/playerProfile';
+import CoinIcon from '../components/CoinIcon';
 import styles from './MenuPage.module.css';
 
 export default function MenuPage({ onStart, onSettings, onTutorial, onOnline, onStore }) {
@@ -32,7 +33,7 @@ export default function MenuPage({ onStart, onSettings, onTutorial, onOnline, on
             <button className={styles.storeBtn} onClick={() => { SFX.confirmOk(); onStore?.(); }}>
               <img src="/icons/i-store.webp" alt="" className={styles.btnIconSm} />
               <span>المتجر</span>
-              <span className={styles.storeCoin}>⭐ {coins.toLocaleString('ar-SA')}</span>
+              <span className={styles.storeCoin}><CoinIcon size="md" /> {coins.toLocaleString('ar-SA')}</span>
             </button>
             <button className={styles.settingsBtn} onClick={() => { SFX.buttonClick(); onSettings(); }}>
               <img src="/icons/i-settings.webp" alt="" className={styles.btnIconSm} />

@@ -1,5 +1,6 @@
 import { CardFace } from '../components/Card';
 import { SFX } from '../utils/sounds';
+import CoinCounter from '../components/CoinCounter';
 import styles from './RoundOverScreen.module.css';
 
 export default function RoundOverScreen({ result, config, tokens, tokensToWin, onNextRound, onMenu, isOnlineGuest = false }) {
@@ -11,6 +12,8 @@ export default function RoundOverScreen({ result, config, tokens, tokensToWin, o
       <div className={styles.content}>
 
         <p className={styles.eyebrow}>نهاية الجولة</p>
+
+        <CoinCounter total={coinsEarned} size="normal" />
 
         <h2 className={styles.title}>
           {isDraw ? 'تعادل!' : `فاز ${winner.name}!`}
@@ -49,11 +52,6 @@ export default function RoundOverScreen({ result, config, tokens, tokensToWin, o
           </div>
         </div>
 
-        {coinsEarned > 0 && (
-          <div className={styles.coinEarned}>
-            +{coinsEarned} ⭐ نجمة
-          </div>
-        )}
 
         <div className={styles.buttons}>
           {isOnlineGuest ? (

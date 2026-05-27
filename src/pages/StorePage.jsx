@@ -4,6 +4,7 @@ import { RARITY_CONFIG, STORE_ITEMS } from '../utils/storeData';
 import { loadProfile, saveProfile } from '../utils/playerProfile';
 import { getDailyProgress } from '../utils/economy';
 import { SFX } from '../utils/sounds';
+import CoinIcon from '../components/CoinIcon';
 import styles from './StorePage.module.css';
 
 function ItemPreview({ item }) {
@@ -42,7 +43,7 @@ export default function StorePage({ onBack }) {
   function handleOpenPack(packId) {
     const price = packId === 'legendary' ? legendaryInfo.price : PACK_DEFS[packId].price;
     if ((profile.coins ?? 0) < price) {
-      showToast(`تحتاج ${(price - (profile.coins ?? 0)).toLocaleString('ar-SA')} ⭐ إضافية`, 'error');
+      showToast(`تحتاج ${(price - (profile.coins ?? 0)).toLocaleString('ar-SA')} عملة إضافية`, 'error');
       return;
     }
     SFX.confirmOk();
@@ -97,7 +98,7 @@ export default function StorePage({ onBack }) {
         <button className={styles.back} onClick={() => { SFX.buttonClick(); onBack(); }}>‹ رجوع</button>
         <h2 className={styles.title}>المتجر</h2>
         <div className={styles.coinBadge}>
-          <span className={styles.coinStar}>⭐</span>
+          <CoinIcon size="lg" />
           <span className={styles.coinAmt}>{(profile.coins ?? 0).toLocaleString('ar-SA')}</span>
         </div>
       </div>
@@ -106,7 +107,7 @@ export default function StorePage({ onBack }) {
       <div className={styles.dailyBar}>
         <div className={styles.dailyLabel}>
           <span>نجوم اليوم</span>
-          <span>{daily.earned} / {daily.hardCap} ⭐</span>
+          <span style={{ display:'flex', alignItems:'center', gap:'4px' }}>{daily.earned} / {daily.hardCap} <CoinIcon size="sm" /></span>
         </div>
         <div className={styles.dailyTrack}>
           <div
@@ -139,7 +140,7 @@ export default function StorePage({ onBack }) {
             className={`${styles.packBtn} ${(profile.coins ?? 0) < PACK_DEFS.basic.price ? styles.packBtnOff : ''}`}
             onClick={() => handleOpenPack('basic')}
           >
-            ⭐ {PACK_DEFS.basic.price.toLocaleString('ar-SA')}
+            <CoinIcon size="sm" /> {PACK_DEFS.basic.price.toLocaleString('ar-SA')}
           </button>
         </div>
 
@@ -175,7 +176,7 @@ export default function StorePage({ onBack }) {
             className={`${styles.packBtn} ${styles.packBtnLegendary} ${(profile.coins ?? 0) < legendaryInfo.price ? styles.packBtnOff : ''}`}
             onClick={() => handleOpenPack('legendary')}
           >
-            {legendaryInfo.isPity ? '🎁 مجاني!' : `⭐ ${legendaryInfo.price.toLocaleString('ar-SA')}`}
+            {legendaryInfo.isPity ? '🎁 مجاني!' : <><CoinIcon size="sm" /> {legendaryInfo.price.toLocaleString('ar-SA')}</>}
           </button>
         </div>
       </div>
@@ -217,7 +218,7 @@ export default function StorePage({ onBack }) {
                         </div>
                         <span className={styles.itemName}>{item.name}</span>
                         {isDuplicate ? (
-                          <span className={styles.dupTag}>+{coinsCompensation} ⭐</span>
+                          <span className={styles.dupTag}>+{coinsCompensation} <CoinIcon size="sm" /></span>
                         ) : equipped ? (
                           <span className={styles.equippedTag}>✓ مجهز</span>
                         ) : (

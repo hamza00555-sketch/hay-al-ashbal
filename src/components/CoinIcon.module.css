@@ -1,0 +1,11 @@
+.icon {
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.sm  { width: 16px; height: 16px; }
+.md  { width: 20px; height: 20px; }
+.lg  { width: 26px; height: 26px; }
+.xl  { width: 32px; height: 32px; }

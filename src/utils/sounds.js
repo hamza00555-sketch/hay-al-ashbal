@@ -287,6 +287,17 @@ export const SFX = {
     sweep(185, 155, 'sawtooth', 0.12, t+0.07, 0.10);
     noiseShot(0.06, 0.10, t+0.02, 100, 600);
   })); },
+
+  coinTick() { cd('tick', 35, () => safe(t => {
+    osc(1760, 'sine', 0.055, t, t + 0.055, { attack: 0.001, wet: 0.08 });
+  })); },
+
+  coinBurst() { safe(t => {
+    chord(1047, [0, 4, 7, 12], 'sine', 0.18, t, 0.55, 0.005);
+    [0, 0.10, 0.22].forEach((d, i) => {
+      osc(1047 * [1, 1.5, 2][i], 'sine', 0.07, t + d, t + d + 0.22, { attack: 0.001, wet: 0.55 });
+    });
+  }); },
 };
 
 // ── Background music (MP3 files) ─────────────────────────────────

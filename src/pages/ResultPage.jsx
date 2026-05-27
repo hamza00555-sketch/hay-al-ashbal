@@ -1,5 +1,7 @@
 import { CardFace } from '../components/Card';
 import { SFX } from '../utils/sounds';
+import CoinCounter from '../components/CoinCounter';
+import CoinIcon from '../components/CoinIcon';
 import styles from './ResultPage.module.css';
 
 export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, onMenu }) {
@@ -9,7 +11,7 @@ export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, on
   return (
     <div className={styles.page}>
       <div className={styles.content}>
-        <div className={styles.fireworks}>🏆</div>
+        <CoinCounter total={coinsEarned} size="large" />
         <p className={styles.eyebrow}>{isDraw ? 'تعادل في المباراة!' : 'فائز المباراة'}</p>
         <h1 className={styles.title}>
           {isDraw ? 'تعادل!' : `${winner.name}!`}
@@ -49,10 +51,10 @@ export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, on
             {rewardBreakdown.map((b, i) => (
               <div key={i} className={styles.rewardRow}>
                 <span>{b.label}</span>
-                <span className={styles.rewardAmt}>+{b.amount} ⭐</span>
+                <span className={styles.rewardAmt}>+{b.amount} <CoinIcon size="sm" /></span>
               </div>
             ))}
-            <div className={styles.rewardTotal}>المجموع: {coinsEarned} ⭐</div>
+            <div className={styles.rewardTotal}>المجموع: {coinsEarned} <CoinIcon size="sm" /></div>
           </div>
         )}
 
