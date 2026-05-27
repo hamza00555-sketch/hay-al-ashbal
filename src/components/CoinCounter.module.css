@@ -7,12 +7,11 @@
 }
 
 /* ── Sizes ── */
-.normal .img { width: 120px; height: 120px; }
-.large  .img { width: 150px; height: 150px; }
+.normal .img { width: 160px; height: 160px; }
+.large  .img { width: 200px; height: 200px; }
 
 .img {
   object-fit: contain;
-  filter: drop-shadow(0 6px 20px rgba(200, 150, 10, 0.55));
   display: block;
 }
 

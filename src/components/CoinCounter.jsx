@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { SFX } from '../utils/sounds';
-import CoinIcon from './CoinIcon';
 import styles from './CoinCounter.module.css';
 
 export default function CoinCounter({ total = 0, size = 'normal' }) {
@@ -40,8 +39,7 @@ export default function CoinCounter({ total = 0, size = 'normal' }) {
       </div>
       {total > 0 && (
         <div className={`${styles.counter} ${phase === 'float' ? styles.counterDone : ''}`}>
-          <span>+{count}</span>
-          <CoinIcon size="md" />
+          +{count}
         </div>
       )}
     </div>
