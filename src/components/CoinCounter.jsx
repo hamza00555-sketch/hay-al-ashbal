@@ -36,7 +36,7 @@ export default function CoinCounter({ total = 0, size = 'normal' }) {
   return (
     <div className={`${styles.wrap} ${styles[size]}`}>
       <div className={`${styles.coin} ${styles[phase]}`}>
-        <img src="/hay-coin.webp" alt="" draggable={false} className={styles.img} />
+        <img src="/hay-coin.gif" alt="" draggable={false} className={styles.img} />
       </div>
       {total > 0 && (
         <div className={`${styles.counter} ${phase === 'float' ? styles.counterDone : ''}`}>
