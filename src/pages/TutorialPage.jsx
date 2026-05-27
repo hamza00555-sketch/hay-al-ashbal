@@ -185,11 +185,13 @@ export default function TutorialPage({ onComplete, onSkip, onRetry }) {
     return (
       <div className={styles.board} dir="rtl">
         <div className={styles.welcomeScreen}>
-          <div className={styles.welcomeLion}>🦁</div>
-          <h1 className={styles.welcomeTitle}>مرحباً بك في<br />حي الأشبال!</h1>
-          <p className={styles.welcomeText}>هدفك تبقى للنهاية أو تحتفظ بأعلى كرت!</p>
-          <button className={styles.startBtn} onClick={advance}>ابدأ التدريب ▶</button>
-          <button className={styles.skipLink} onClick={() => { markTutorialDone(); onSkip(); }}>تخطي التدريب</button>
+          <div className={styles.welcomeCard}>
+            <div className={styles.welcomeLion}>🦁</div>
+            <h1 className={styles.welcomeTitle}>مرحباً بك في<br />حي الأشبال!</h1>
+            <p className={styles.welcomeText}>هدفك تبقى للنهاية أو تحتفظ بأعلى كرت!</p>
+            <button className={styles.startBtn} onClick={advance}>ابدأ التدريب ▶</button>
+            <button className={styles.skipLink} onClick={() => { markTutorialDone(); onSkip(); }}>تخطي التدريب</button>
+          </div>
         </div>
       </div>
     );
