@@ -1,7 +1,28 @@
 import { useState } from 'react';
 import { UNIQUE_CARDS } from '../constants/cards';
 import { CardFace } from './Card';
+import PlayerAvatar from './PlayerAvatar';
 import styles from './ActionModal.module.css';
+
+function TargetButton({ player, active, onClick }) {
+  return (
+    <button
+      className={`${styles.targetBtn} ${active ? styles.active : ''}`}
+      onClick={onClick}
+    >
+      <PlayerAvatar
+        cardImageId={player.profile?.cardImageId}
+        frameColor={player.profile?.frameColor}
+        frameImageId={player.profile?.frameImageId ?? null}
+        size="md"
+        name={player.name}
+      />
+      <span className={styles.targetName} style={{ color: player.profile?.frameColor ?? '#1F3D5A' }}>
+        {player.name}
+      </span>
+    </button>
+  );
+}
 
 function TargetModal({ prompt, players, currentPlayerId, onResolve, allowSelf = false }) {
   const targets = players.filter(p => {
@@ -28,9 +49,7 @@ function TargetModal({ prompt, players, currentPlayerId, onResolve, allowSelf = 
         <p className={styles.prompt}>{prompt}</p>
         <div className={styles.targets}>
           {targets.map(p => (
-            <button key={p.id} className={styles.targetBtn} onClick={() => onResolve({ targetId: p.id })}>
-              {p.name}
-            </button>
+            <TargetButton key={p.id} player={p} onClick={() => onResolve({ targetId: p.id })} />
           ))}
         </div>
       </div>
@@ -63,9 +82,7 @@ function GuessModal({ players, currentPlayerId, onResolve }) {
           <p className={styles.prompt}>اختر اللاعب اللي تبي تخمّن كرته</p>
           <div className={styles.targets}>
             {targets.map(p => (
-              <button key={p.id} className={styles.targetBtn} onClick={() => setTargetId(p.id)}>
-                {p.name}
-              </button>
+              <TargetButton key={p.id} player={p} onClick={() => setTargetId(p.id)} />
             ))}
           </div>
         </div>

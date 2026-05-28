@@ -47,13 +47,17 @@
 }
 
 .targetBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   background: rgba(255,255,255,0.9);
   border: 1.5px solid rgba(86,130,178,0.2);
-  border-radius: 12px;
+  border-radius: 14px;
   color: #1F3D5A;
   font-family: 'Zanjabeel', sans-serif;
   font-size: 1rem;
-  padding: 10px 20px;
+  padding: 10px 14px;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
   box-shadow: 0 2px 8px rgba(86,130,178,0.06);
@@ -62,6 +66,15 @@
   background: #fff;
   border-color: #5682B2;
   box-shadow: 0 4px 14px rgba(86,130,178,0.15);
+}
+.targetName {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cardGrid {
