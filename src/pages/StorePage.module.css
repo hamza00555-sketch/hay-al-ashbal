@@ -208,6 +208,31 @@
   line-height: 1.4;
 }
 
+.dropRatesBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dropRatesRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.dropRatesLabel {
+  font-size: 0.7rem;
+  color: #7a8aa6;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.dropRateChip {
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(0,0,0,0.05);
+  border-radius: 6px;
+  padding: 1px 5px;
+}
+
 .tagRow { display: flex; flex-wrap: wrap; gap: 6px; }
 .rarityTag {
   align-self: flex-start;

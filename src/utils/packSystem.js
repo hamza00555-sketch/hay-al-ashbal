@@ -4,13 +4,17 @@ export const PACK_DEFS = {
   basic: {
     id: 'basic',
     name: 'باكس الحي',
-    subtitle: '٢ شخصية + ١ إطار شائع',
+    subtitle: '٢ شخصية + ١ إطار',
     price: 150,
     image: '/packs/pack-basic.webp',
-    avatarRarities: ['common'],
-    avatarWeights:  [100],
-    frameRarities:  ['common'],
-    frameWeights:   [100],
+    avatarRarities: ['common', 'legendary'],
+    avatarWeights:  [75, 25],
+    frameRarities:  ['common', 'rare', 'legendary'],
+    frameWeights:   [65, 30, 5],
+    dropRates: [
+      { label: 'شخصية', rates: [{ rarity: 'common', pct: 75 }, { rarity: 'legendary', pct: 25 }] },
+      { label: 'إطار',  rates: [{ rarity: 'common', pct: 65 }, { rarity: 'rare', pct: 30 }, { rarity: 'legendary', pct: 5 }] },
+    ],
   },
   legendary: {
     id: 'legendary',
@@ -18,11 +22,15 @@ export const PACK_DEFS = {
     subtitle: '٢ شخصية + ١ إطار — الرابع مضمون أسطوري',
     prices: [100, 200, 400, 0],
     image: '/packs/pack-legendary.webp',
-    avatarRarities:    ['legendary'],
-    avatarWeights:     [100],
-    avatarPityWeights: [100],
-    frameRarities:  ['rare', 'legendary'],
-    frameWeights:   [70, 30],
+    avatarRarities:    ['common', 'legendary'],
+    avatarWeights:     [15, 85],
+    avatarPityWeights: [0, 100],
+    frameRarities:  ['common', 'rare', 'legendary'],
+    frameWeights:   [5, 55, 40],
+    dropRates: [
+      { label: 'شخصية', rates: [{ rarity: 'common', pct: 15 }, { rarity: 'legendary', pct: 85 }] },
+      { label: 'إطار',  rates: [{ rarity: 'common', pct: 5 }, { rarity: 'rare', pct: 55 }, { rarity: 'legendary', pct: 40 }] },
+    ],
   },
 };
 

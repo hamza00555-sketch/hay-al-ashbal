@@ -257,6 +257,18 @@ export default function StorePage({ onBack }) {
           <div className={styles.packBody}>
             <span className={styles.packName}>{PACK_DEFS.basic.name}</span>
             <span className={styles.packSub}>{PACK_DEFS.basic.subtitle}</span>
+            <div className={styles.dropRatesBlock}>
+              {PACK_DEFS.basic.dropRates.map(row => (
+                <div key={row.label} className={styles.dropRatesRow}>
+                  <span className={styles.dropRatesLabel}>{row.label}:</span>
+                  {row.rates.map(r => (
+                    <span key={r.rarity} className={styles.dropRateChip} style={{ color: RARITY_CONFIG[r.rarity]?.color }}>
+                      {RARITY_CONFIG[r.rarity]?.label} {r.pct}%
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
             <button
               className={`${styles.priceBtn} ${styles.priceBtnBasic} ${!canBasic ? styles.priceBtnOff : ''}`}
               onClick={() => handleOpenPack('basic')}
@@ -275,6 +287,18 @@ export default function StorePage({ onBack }) {
           <div className={styles.packBody}>
             <span className={`${styles.packName} ${styles.packNameLegendary}`}>{PACK_DEFS.legendary.name}</span>
             <span className={styles.packSub}>٢ شخصية + إطار — أسطوري مضمون كل ٤</span>
+            <div className={styles.dropRatesBlock}>
+              {PACK_DEFS.legendary.dropRates.map(row => (
+                <div key={row.label} className={styles.dropRatesRow}>
+                  <span className={styles.dropRatesLabel}>{row.label}:</span>
+                  {row.rates.map(r => (
+                    <span key={r.rarity} className={styles.dropRateChip} style={{ color: RARITY_CONFIG[r.rarity]?.color }}>
+                      {RARITY_CONFIG[r.rarity]?.label} {r.pct}%
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
             <div className={styles.pityRow}>
               <div className={styles.pityDots}>
                 {[0, 1, 2, 3].map(i => (
