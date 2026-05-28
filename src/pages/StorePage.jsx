@@ -337,7 +337,7 @@ export default function StorePage({ onBack }) {
                   </button>
                 ) : (
                   <button
-                    className={`${styles.priceBtn} ${styles.priceBtnLegendary} ${!canAfford ? styles.priceBtnOff : ''}`}
+                    className={`${styles.priceBtn} ${item.rarity === 'legendary' ? styles.priceBtnLegendary : styles.priceBtnBasic} ${!canAfford ? styles.priceBtnOff : ''}`}
                     onClick={() => handleBuyMusic(item)}
                   >
                     <CoinIcon size="sm" /> {item.price.toLocaleString('ar-SA')}

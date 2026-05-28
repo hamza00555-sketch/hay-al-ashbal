@@ -63,6 +63,24 @@ export const STORE_ITEMS = [
 // ── Music tracks (purchased separately from packs) ──────────────────
 export const MUSIC_ITEMS = [
   {
+    id:       'mu_anshooda',
+    type:     'music',
+    rarity:   'common',
+    price:    1000,
+    name:     'أنشودة الأشبال',
+    subtitle: 'موسيقى لطيفة تُشغَّل في القائمة الرئيسية',
+    file:     '/music/anshooda.mp3',
+  },
+  {
+    id:       'mu_zayna',
+    type:     'music',
+    rarity:   'rare',
+    price:    2000,
+    name:     'زينة ونحول',
+    subtitle: 'مقدمة مسلسل زينة ونحول',
+    file:     '/music/zayna.mp3',
+  },
+  {
     id:       'mu_anthem',
     type:     'music',
     rarity:   'legendary',
