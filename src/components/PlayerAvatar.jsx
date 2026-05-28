@@ -9,7 +9,7 @@ export default function PlayerAvatar({
 }) {
   return (
     <div
-      className={[styles.outerWrap, styles[`size_${size}`], frameImageId ? styles.hasFrame : ''].join(' ')}
+      className={[styles.outerWrap, styles[`size_${size}`]].join(' ')}
       style={{ '--frame-color': frameColor }}
     >
       {frameImageId && (
