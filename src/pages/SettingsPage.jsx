@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  AVATAR_IMAGE_IDS, FRAME_COLORS,
+  FRAME_COLORS,
   loadProfile, saveProfile,
 } from '../utils/playerProfile';
 import { redeemCode } from '../utils/redeemCodes';
@@ -137,30 +137,6 @@ export default function SettingsPage({ onBack }) {
             <span className={styles.statValueSm}>{formatDate(profile.registeredAt)}</span>
             <span className={styles.statLabel}>تاريخ التسجيل</span>
           </div>
-        </div>
-      </section>
-
-      {/* ── الشخصيات الافتراضية ── */}
-      <section className={styles.section}>
-        <p className={styles.label}>الشخصية (صورة البطاقة)</p>
-        <div className={styles.avatarGrid}>
-          {AVATAR_IMAGE_IDS.map(id => (
-            <button
-              key={id}
-              className={[
-                styles.avatarBtn,
-                profile.cardImageId === id ? styles.avatarSelected : '',
-              ].join(' ')}
-              style={{
-                '--frame-color': profile.cardImageId === id
-                  ? profile.frameColor
-                  : 'rgba(255,255,255,0.15)',
-              }}
-              onClick={() => { SFX.cardSelect(); update('cardImageId', id); }}
-            >
-              <img src={`/cards/${id}.webp`} alt={id} className={styles.avatarThumb} />
-            </button>
-          ))}
         </div>
       </section>
 

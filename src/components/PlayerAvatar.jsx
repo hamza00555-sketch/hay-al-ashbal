@@ -21,12 +21,16 @@ export default function PlayerAvatar({
         />
       )}
       <div className={styles.avatar}>
-        <img
-          src={`/cards/${cardImageId}.webp`}
-          alt={name ?? ''}
-          className={styles.img}
-          draggable={false}
-        />
+        {cardImageId ? (
+          <img
+            src={`/cards/${cardImageId}.webp`}
+            alt={name ?? ''}
+            className={styles.img}
+            draggable={false}
+          />
+        ) : (
+          <div className={styles.avatarDefault} role="img" aria-label={name ?? 'لاعب'} />
+        )}
       </div>
     </div>
   );

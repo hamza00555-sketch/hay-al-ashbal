@@ -1,9 +1,5 @@
 const STORAGE_KEY = 'hay_ashbal_profile';
 
-export const AVATAR_IMAGE_IDS = [
-  '1', '1b', '1c', '1d', '1e', '2', '2b', '3', '3b', '4', '4b', '5', '5b', '6', '7', '8',
-];
-
 export const FRAME_SHAPES = [
   { id: 'circle',  label: 'دائرة' },
   { id: 'rounded', label: 'مستدير' },
@@ -16,7 +12,7 @@ export const FRAME_COLORS = [
 
 export const DEFAULT_PROFILE = {
   name:         '',
-  cardImageId:  '1',
+  cardImageId:  null,
   frameShape:   'rounded',
   frameColor:   '#60b8ff',
   frameImageId: null,

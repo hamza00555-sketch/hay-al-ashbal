@@ -23,7 +23,7 @@ export default function ResultPage({ result, tokens, tokensToWin, onNewMatch, on
           {!isDraw && winner?.profile && (
             <div className={styles.winnerAvatar}>
               <PlayerAvatar
-                cardImageId={winner.profile.cardImageId ?? '1'}
+                cardImageId={winner.profile.cardImageId ?? null}
                 frameImageId={winner.profile.frameImageId ?? null}
                 frameShape={winner.profile.frameShape ?? 'circle'}
                 frameColor={winner.profile.frameColor ?? '#60b8ff'}
