@@ -671,17 +671,31 @@
 
 /* ── TurnHUD ─────────────────────────────────────────────────── */
 .turnHUD {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0;
   width: 100%;
-  padding: 8px 12px;
+  /* Right side reserved for the absolutely-positioned avatar.
+     Avatar wrapper is 80px; frame overflows ~18px past it; +12 buffer
+     leaves a ~24px gap between text and frame. */
+  padding: 8px 134px 8px 12px;
   border-radius: 14px;
   border: 1.5px solid rgba(86,130,178,0.15);
   background: rgba(255,255,255,0.6);
   backdrop-filter: blur(6px);
   transition: background 0.3s, border-color 0.3s;
   direction: rtl;
+  min-height: 92px;
+  overflow: visible;
+}
+
+.turnHUDPortrait {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
 }
 
 .turnHUDMine {
@@ -699,9 +713,9 @@
   flex-direction: column;
   gap: 2px;
   flex: 1;
-  padding-inline-start: 32px;
   text-align: center;
   min-width: 0;
+  z-index: 1;
 }
 
 .turnHUDName {

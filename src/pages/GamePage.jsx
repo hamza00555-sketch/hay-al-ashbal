@@ -1095,12 +1095,14 @@ export default function GamePage({
           styles.turnHUD,
           isMyTurn ? styles.turnHUDMine : styles.turnHUDAI,
         ].join(' ')}>
-          <Portrait
-            profile={currentPlayer.profile}
-            size="seat"
-            isActive
-            isEliminated={false}
-          />
+          <div className={styles.turnHUDPortrait}>
+            <Portrait
+              profile={currentPlayer.profile}
+              size="seat"
+              isActive
+              isEliminated={false}
+            />
+          </div>
           <div className={styles.turnHUDInfo}>
             <span className={styles.turnHUDName}>
               {isMyTurn
