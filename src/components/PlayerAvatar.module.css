@@ -16,13 +16,16 @@
 .size_elim    { width: 136px; height: 136px; }  /* 2× lg — elimination beat */
 .size_announce{ width: 160px; height: 160px; }  /* 2× seat — turn announce screen */
 
-/* frame image sits behind avatar */
+/* frame image sits behind avatar — scaled larger than the wrapper so the
+   decorative border extends around the avatar (the frame art has a wide
+   transparent square in its center; the avatar fits inside that hole). */
 .frameBack {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  object-fit: contain;
   z-index: 0;
   pointer-events: none;
 }
