@@ -59,3 +59,16 @@ export const STORE_ITEMS = [
   { id: 'fr_l3', type: 'frame', rarity: 'legendary', price: 6000, name: 'إطار أسطوري ٣', frameImageId: 'fr_l3' },
   { id: 'fr_l4', type: 'frame', rarity: 'legendary', price: 6000, name: 'إطار أسطوري ٤', frameImageId: 'fr_l4' },
 ];
+
+// ── Music tracks (purchased separately from packs) ──────────────────
+export const MUSIC_ITEMS = [
+  {
+    id:       'mu_anthem',
+    type:     'music',
+    rarity:   'legendary',
+    price:    8000,
+    name:     'نشيد حي الأشبال',
+    subtitle: 'موسيقى حصرية تُشغَّل في القائمة الرئيسية',
+    file:     '/music/anthem.mp3',
+  },
+];

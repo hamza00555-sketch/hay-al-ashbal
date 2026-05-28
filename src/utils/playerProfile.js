@@ -24,6 +24,7 @@ export const DEFAULT_PROFILE = {
   inventory:    [],
   packs:        {},
   turnSpeed:    'normal',  // 'slow' | 'normal' | 'fast'
+  menuTrackId:  null,      // ID of an equipped store music track (overrides default menu music)
 };
 
 // Multiplier applied to AI-turn auto-advance durations during play.

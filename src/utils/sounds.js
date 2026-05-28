@@ -1,6 +1,24 @@
 // Professional Web Audio API sound engine
 // Uses convolution reverb, multi-oscillator synthesis, FM, and chord-based music.
 
+import { MUSIC_ITEMS } from './storeData';
+
+// Cache decoded buffers per URL so users can switch their equipped menu track
+// without keeping every loaded mp3 in memory.
+const _menuBuffersByUrl = Object.create(null);
+function resolveMenuTrackUrl() {
+  try {
+    const raw = localStorage.getItem('hay_ashbal_profile');
+    if (!raw) return '/music-menu.mp3';
+    const p = JSON.parse(raw);
+    if (!p?.menuTrackId) return '/music-menu.mp3';
+    const m = MUSIC_ITEMS.find(x => x.id === p.menuTrackId);
+    return m?.file || '/music-menu.mp3';
+  } catch {
+    return '/music-menu.mp3';
+  }
+}
+
 let _ctx = null;
 let _rev = null;   // reverb convolver
 let _dry = null;   // dry gain → compressor → destination
@@ -343,8 +361,9 @@ export async function startMenuMusic() {
   stopMusic();
   try {
     const c   = ctx();
-    const buf = _menuBuffer || await loadBuffer('/music-menu.mp3');
-    _menuBuffer = buf;
+    const url = resolveMenuTrackUrl();
+    const buf = _menuBuffersByUrl[url] || await loadBuffer(url);
+    _menuBuffersByUrl[url] = buf;
     if (!_menuPlaying) return;
 
     _menuGain = c.createGain();

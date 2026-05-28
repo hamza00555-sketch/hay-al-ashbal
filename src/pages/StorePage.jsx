@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PACK_DEFS, getLegendaryInfo, openPack } from '../utils/packSystem';
-import { RARITY_CONFIG, STORE_ITEMS } from '../utils/storeData';
+import { RARITY_CONFIG, STORE_ITEMS, MUSIC_ITEMS } from '../utils/storeData';
 import { loadProfile, saveProfile } from '../utils/playerProfile';
 import { getDailyProgress } from '../utils/economy';
-import { SFX } from '../utils/sounds';
+import { SFX, getMusicVol, stopMenuMusic, startMenuMusic, isMenuMusicPlaying } from '../utils/sounds';
 import CoinIcon from '../components/CoinIcon';
 import styles from './StorePage.module.css';
 
@@ -31,6 +31,16 @@ export default function StorePage({ onBack }) {
   const [results, setResults] = useState(null); // array of 3 slot results
   const [phase,   setPhase]   = useState('idle');
   const [toast,   setToast]   = useState(null);
+  const [previewingId, setPreviewingId] = useState(null);
+  const previewAudioRef = useRef(null);
+
+  // Stop any preview audio when leaving the store.
+  useEffect(() => () => {
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current = null;
+    }
+  }, []);
 
   const daily         = getDailyProgress();
   const legendaryInfo = getLegendaryInfo(profile.packs ?? {});
@@ -82,6 +92,62 @@ export default function StorePage({ onBack }) {
   function closeResult() {
     setResults(null);
     setPhase('idle');
+  }
+
+  function stopPreview() {
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current = null;
+    }
+    setPreviewingId(null);
+  }
+
+  function togglePreview(item) {
+    if (previewingId === item.id) {
+      stopPreview();
+      return;
+    }
+    stopPreview();
+    const a = new Audio(item.file);
+    a.volume = Math.max(0.1, Math.min(1, getMusicVol() * 0.85));
+    a.play().catch(() => {});
+    a.addEventListener('ended', () => {
+      if (previewAudioRef.current === a) stopPreview();
+    });
+    previewAudioRef.current = a;
+    setPreviewingId(item.id);
+  }
+
+  function handleBuyMusic(item) {
+    if ((profile.coins ?? 0) < item.price) {
+      showToast(`تحتاج ${(item.price - (profile.coins ?? 0)).toLocaleString('ar-SA')} عملة إضافية`, 'error');
+      return;
+    }
+    SFX.confirmOk();
+    const next = {
+      ...profile,
+      coins: (profile.coins ?? 0) - item.price,
+      inventory: [...(profile.inventory ?? []), item.id],
+    };
+    setProfile(next);
+    saveProfile(next);
+    showToast(`تم شراء "${item.name}" ✓`);
+  }
+
+  function handleEquipMusic(item) {
+    SFX.confirmOk();
+    const isCurrent = profile.menuTrackId === item.id;
+    const next = { ...profile, menuTrackId: isCurrent ? null : item.id };
+    setProfile(next);
+    saveProfile(next);
+    // Stop the preview so the equipped track is what plays next.
+    stopPreview();
+    // If menu music is playing, restart so it picks up the new equipped track.
+    if (isMenuMusicPlaying()) {
+      stopMenuMusic();
+      setTimeout(() => startMenuMusic(), 200);
+    }
+    showToast(isCurrent ? 'تم إلغاء التجهيز' : `تم تجهيز "${item.name}" ✓`);
   }
 
   const isEquipped = item =>
@@ -186,6 +252,52 @@ export default function StorePage({ onBack }) {
               {legendaryInfo.isPity ? '🎁 مجاني!' : <><CoinIcon size="sm" /> {legendaryInfo.price.toLocaleString('ar-SA')}</>}
             </button>
           </div>
+        </div>
+
+        {/* ── Music store ── */}
+        <div className={styles.musicSection}>
+          <h3 className={styles.musicHeading}>🎵 الموسيقى</h3>
+          {MUSIC_ITEMS.map(item => {
+            const owned     = (profile.inventory ?? []).includes(item.id);
+            const equipped  = profile.menuTrackId === item.id;
+            const playing   = previewingId === item.id;
+            const rc        = RARITY_CONFIG[item.rarity];
+            const canAfford = (profile.coins ?? 0) >= item.price;
+            return (
+              <div key={item.id} className={styles.musicCard}>
+                <button
+                  className={styles.musicPlay}
+                  onClick={() => togglePreview(item)}
+                  aria-label={playing ? 'إيقاف المعاينة' : 'تجربة الموسيقى'}
+                >
+                  {playing ? '⏸' : '▶'}
+                </button>
+                <div className={styles.musicBody}>
+                  <span className={styles.musicName}>{item.name}</span>
+                  <span className={styles.musicSub}>{item.subtitle}</span>
+                  <span
+                    className={styles.rarityTag}
+                    style={{ '--tag': rc.color }}
+                  >{rc.label}</span>
+                </div>
+                {owned ? (
+                  <button
+                    className={`${styles.priceBtn} ${equipped ? styles.priceBtnEquipped : styles.priceBtnBasic}`}
+                    onClick={() => handleEquipMusic(item)}
+                  >
+                    {equipped ? '✓ مُجهَّز' : 'تجهيز'}
+                  </button>
+                ) : (
+                  <button
+                    className={`${styles.priceBtn} ${styles.priceBtnLegendary} ${!canAfford ? styles.priceBtnOff : ''}`}
+                    onClick={() => handleBuyMusic(item)}
+                  >
+                    <CoinIcon size="sm" /> {item.price.toLocaleString('ar-SA')}
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* ── Info image cards ── */}
