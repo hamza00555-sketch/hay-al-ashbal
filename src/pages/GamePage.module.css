@@ -678,23 +678,24 @@
   /* Right side reserved for the absolutely-positioned avatar.
      Avatar wrapper is 80px; frame overflows ~26px past it; +12 buffer
      leaves a ~24px gap between text and frame. */
-  padding: 14px 142px 14px 12px;
+  padding: 8px 134px 8px 12px;
   border-radius: 14px;
   border: 1.5px solid rgba(86,130,178,0.15);
   background: rgba(255,255,255,0.6);
   backdrop-filter: blur(6px);
   transition: background 0.3s, border-color 0.3s;
   direction: rtl;
-  /* Tall enough to fully contain the seat avatar (80px) + frame overflow (~26px each side). */
-  min-height: 140px;
+  min-height: 92px;
   overflow: visible;
 }
 
+/* Push the avatar slightly downward so the frame's top portion sits
+   outside the banner (visible) and the bottom doesn't stick out as much. */
 .turnHUDPortrait {
   position: absolute;
   right: 12px;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(calc(-50% + 14px));
   z-index: 2;
   pointer-events: none;
 }
@@ -717,6 +718,8 @@
   text-align: center;
   min-width: 0;
   z-index: 1;
+  /* Nudge the text right (toward the avatar) without overlapping the frame. */
+  transform: translateX(20px);
 }
 
 .turnHUDName {
