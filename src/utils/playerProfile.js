@@ -40,6 +40,11 @@ export function getTurnSpeedFactor() {
   return TURN_SPEED_FACTORS[speed] ?? 1;
 }
 
+// Old game-card IDs that were previously used as default avatars — no longer valid.
+const LEGACY_CARD_IDS = new Set([
+  '1','1b','1c','1d','1e','2','2b','3','3b','4','4b','5','5b','6','7','8',
+]);
+
 export function loadProfile() {
   let p;
   try {
@@ -53,8 +58,12 @@ export function loadProfile() {
   p.redeemedCodes = Array.isArray(p.redeemedCodes) ? p.redeemedCodes : [];
   if (!p.registeredAt) {
     p.registeredAt = Date.now();
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch {}
   }
+  // Migrate: clear legacy game-card avatars saved in old profiles.
+  if (LEGACY_CARD_IDS.has(p.cardImageId)) {
+    p.cardImageId = null;
+  }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch {}
   return p;
 }
 
