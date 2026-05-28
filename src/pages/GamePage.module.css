@@ -673,7 +673,7 @@
 .turnHUD {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0;
   width: 100%;
   padding: 8px 12px;
   border-radius: 14px;
@@ -681,6 +681,7 @@
   background: rgba(255,255,255,0.6);
   backdrop-filter: blur(6px);
   transition: background 0.3s, border-color 0.3s;
+  direction: rtl;
 }
 
 .turnHUDMine {
@@ -698,6 +699,9 @@
   flex-direction: column;
   gap: 2px;
   flex: 1;
+  padding-inline-start: 32px;
+  text-align: center;
+  min-width: 0;
 }
 
 .turnHUDName {
