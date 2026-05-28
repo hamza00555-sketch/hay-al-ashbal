@@ -21,12 +21,12 @@
    transparent square in its center; the avatar fits inside that hole). */
 .frameBack {
   position: absolute;
-  top: -5%;
-  left: -5%;
-  width: 110%;
-  height: 110%;
+  top: -8%;
+  left: -8%;
+  width: 116%;
+  height: 116%;
   object-fit: contain;
-  z-index: 0;
+  z-index: 2;
   pointer-events: none;
 }
 
