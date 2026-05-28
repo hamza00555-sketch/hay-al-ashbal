@@ -77,6 +77,25 @@
 }
 
 /* ── Online button ── */
+.onlineWrap {
+  position: relative;
+}
+.onlineDisabled {
+  pointer-events: none;
+  filter: saturate(0.85);
+  opacity: 0.92;
+}
+.soonOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-7deg);
+  width: 116%;
+  max-width: none;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.28));
+}
 .onlineBtn {
   display: flex;
   align-items: center;

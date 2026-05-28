@@ -17,11 +17,14 @@ export default function MenuPage({ onStart, onSettings, onTutorial, onOnline, on
           </button>
 
           <div className={styles.row2}>
-            <button className={styles.onlineBtn} onClick={() => { SFX.confirmOk(); onOnline?.(); }}>
-              <img src="/icons/i-online.webp" alt="" className={styles.btnIconSm} />
-              <span>اللعب أونلاين</span>
-              <span className={styles.arrowSm}>›</span>
-            </button>
+            <div className={styles.onlineWrap}>
+              <button className={`${styles.onlineBtn} ${styles.onlineDisabled}`} aria-disabled="true">
+                <img src="/icons/i-online.webp" alt="" className={styles.btnIconSm} />
+                <span>اللعب أونلاين</span>
+                <span className={styles.arrowSm}>›</span>
+              </button>
+              <img src="/under-construction.webp" alt="قيد الإنشاء" className={styles.soonOverlay} />
+            </div>
             <button className={styles.guideBtn} onClick={() => { SFX.buttonClick(); onTutorial?.(); }}>
               <img src="/icons/i-guide.webp" alt="" className={styles.btnIconSm} />
               <span>كيف تلعب؟</span>
