@@ -25,6 +25,7 @@ function AvatarRow({ players, actorId, targetId }) {
       <div className={styles.avatarCell}>
         <PlayerAvatar
           cardImageId={ap.cardImageId}
+          frameImageId={ap.frameImageId ?? null}
           frameShape={ap.frameShape}
           frameColor={ap.frameColor}
           size="narr"
@@ -40,6 +41,7 @@ function AvatarRow({ players, actorId, targetId }) {
           <div className={styles.avatarCell}>
             <PlayerAvatar
               cardImageId={tp.cardImageId}
+              frameImageId={tp.frameImageId ?? null}
               frameShape={tp.frameShape}
               frameColor={tp.frameColor}
               size="narr"
@@ -242,6 +244,7 @@ export default function NarrativeOverlay({ beat, onConfirm, players = [] }) {
               {ep && (
                 <PlayerAvatar
                   cardImageId={ep.cardImageId}
+                  frameImageId={ep.frameImageId ?? null}
                   frameShape={ep.frameShape}
                   frameColor="#888"
                   size="elim"
