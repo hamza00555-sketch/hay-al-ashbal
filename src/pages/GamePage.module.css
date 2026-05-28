@@ -417,7 +417,7 @@
 .humanPortraitRow {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 48px;
   padding-bottom: 6px;
 }
 
