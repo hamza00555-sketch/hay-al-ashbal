@@ -33,12 +33,17 @@ export default function StorePage({ onBack }) {
   const [toast,   setToast]   = useState(null);
   const [previewingId, setPreviewingId] = useState(null);
   const previewAudioRef = useRef(null);
+  const previewStopTimerRef = useRef(null);
 
   // Stop any preview audio when leaving the store.
   useEffect(() => () => {
     if (previewAudioRef.current) {
       previewAudioRef.current.pause();
       previewAudioRef.current = null;
+    }
+    if (previewStopTimerRef.current) {
+      clearTimeout(previewStopTimerRef.current);
+      previewStopTimerRef.current = null;
     }
   }, []);
 
@@ -95,6 +100,10 @@ export default function StorePage({ onBack }) {
   }
 
   function stopPreview() {
+    if (previewStopTimerRef.current) {
+      clearTimeout(previewStopTimerRef.current);
+      previewStopTimerRef.current = null;
+    }
     if (previewAudioRef.current) {
       previewAudioRef.current.pause();
       previewAudioRef.current = null;
@@ -110,7 +119,17 @@ export default function StorePage({ onBack }) {
     stopPreview();
     const a = new Audio(item.file);
     a.volume = Math.max(0.1, Math.min(1, getMusicVol() * 0.85));
-    a.play().catch(() => {});
+    const PREVIEW_SECONDS = 10;
+    a.addEventListener('loadedmetadata', () => {
+      // Start from the middle of the song.
+      const dur = isFinite(a.duration) ? a.duration : 0;
+      const start = Math.max(0, dur / 2);
+      try { a.currentTime = start; } catch {}
+      a.play().catch(() => {});
+      previewStopTimerRef.current = setTimeout(() => {
+        if (previewAudioRef.current === a) stopPreview();
+      }, PREVIEW_SECONDS * 1000);
+    });
     a.addEventListener('ended', () => {
       if (previewAudioRef.current === a) stopPreview();
     });
