@@ -34,7 +34,10 @@ const ACTION_TYPE = {
   6: 'SWAP',
 };
 
-// ── Seat assignment: clockwise from human's right ────────────────
+// ── Seat assignment ──────────────────────────────────────────────
+// Turn order goes to the human's RIGHT first. The board grid is RTL, so the
+// "left" grid-area renders on the visual right and vice-versa — hence opp[0]
+// (the next player) is placed in the `left` slot so it appears on the right.
 function assignSeats(players, humanId) {
   const humanIdx = players.findIndex(p => p.id === humanId);
   const opp = [];
@@ -43,8 +46,8 @@ function assignSeats(players, humanId) {
   }
   if (opp.length === 0) return {};
   if (opp.length === 1) return { top: opp[0] };
-  if (opp.length === 2) return { right: opp[0], left: opp[1] };
-  return { right: opp[0], top: opp[1], left: opp[2] };
+  if (opp.length === 2) return { left: opp[0], right: opp[1] };
+  return { left: opp[0], top: opp[1], right: opp[2] };
 }
 
 // ── Player portrait using card-face avatar ───────────────────────

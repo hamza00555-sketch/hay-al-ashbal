@@ -64,7 +64,7 @@ const STEPS = [
     id: 'SELECT_CARD',
     chapter: 1,
     bubble: {
-      text: 'اضغط على البطاقة اليسرى لتختارها 👆',
+      text: 'اضغط على البطاقة المُضيئة لتختارها 👆',
       pos: 'bottom',
     },
     spot: 'hand-card',
