@@ -139,6 +139,7 @@
 }
 .settingsBtn:hover  { background: #fff; transform: rotate(30deg); }
 .settingsBtn:active { transform: scale(0.93); }
+.settingsBtnIcon { width: 26px; height: 26px; object-fit: contain; display: block; }
 
 .settingsPanel {
   position: fixed;

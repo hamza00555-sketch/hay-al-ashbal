@@ -942,7 +942,10 @@ export default function GamePage({
       <button
         className={styles.settingsBtn}
         onClick={e => { e.stopPropagation(); SFX.buttonClick(); setShowSettings(s => !s); }}
-      >⚙️</button>
+        aria-label="الإعدادات"
+      >
+        <img src="/icons/i-settings.webp" alt="" className={styles.settingsBtnIcon} />
+      </button>
       {showSettings && (
         <div className={styles.settingsPanel} onClick={e => e.stopPropagation()}>
           <button className={styles.settingItem} onClick={() => { toggleMusic(); setShowSettings(false); }}>
