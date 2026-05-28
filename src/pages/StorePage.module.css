@@ -16,7 +16,7 @@
 .bgOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,250,235,0.16) 55%, rgba(255,247,225,0.3) 100%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(247,243,232,0.48) 55%, rgba(245,240,225,0.6) 100%);
   pointer-events: none;
   z-index: 0;
 }
@@ -28,55 +28,56 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
-  padding-top: max(env(safe-area-inset-top, 12px), 12px);
+  padding: 10px 14px;
+  padding-top: max(env(safe-area-inset-top, 10px), 10px);
   gap: 10px;
-  background: linear-gradient(180deg, #6fbef2 0%, #93d3f8 100%);
-  border-bottom: 3px solid #ffffff;
-  box-shadow: 0 4px 12px rgba(40,90,150,0.3);
+  background: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.55) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 2px 10px rgba(40,90,150,0.08);
 }
 .back {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 900;
   color: #fff;
-  background: linear-gradient(180deg, #ffb347, #f08a1d);
-  border: 2px solid #fff;
+  background: linear-gradient(180deg, #ffba5e, #f59e2a);
+  border: none;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 4px 0 #c96f12, 0 6px 10px rgba(0,0,0,0.18);
-  padding-bottom: 4px;
+  box-shadow: 0 3px 8px rgba(220,140,30,0.3);
+  padding-bottom: 3px;
   transition: transform 0.1s;
 }
-.back:active { transform: translateY(2px); box-shadow: 0 2px 0 #c96f12, 0 3px 6px rgba(0,0,0,0.18); }
+.back:active { transform: translateY(1px); box-shadow: 0 1px 4px rgba(220,140,30,0.25); }
 .title {
   flex: 1;
   text-align: center;
-  font-size: 3rem;
+  font-size: 1.45rem;
   font-weight: 900;
-  color: #fff;
+  color: #1f4f86;
   margin: 0;
-  text-shadow: 0 3px 0 #2f6db5, 0 5px 9px rgba(0,0,0,0.28), 0 0 3px #2f6db5;
-  -webkit-text-stroke: 1.5px #2f6db5;
+  letter-spacing: 0.5px;
 }
 .coinBadge {
   display: flex;
   align-items: center;
-  gap: 7px;
-  background: linear-gradient(180deg, #2f3d5c, #1e2a44);
-  border: 2px solid #fff;
-  border-radius: 26px;
-  padding: 5px 14px 5px 8px;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.18);
+  gap: 6px;
+  background: #fff;
+  border: 1.5px solid rgba(240,180,40,0.5);
+  border-radius: 22px;
+  padding: 4px 12px 4px 6px;
+  box-shadow: 0 2px 6px rgba(40,90,150,0.12);
 }
-.coinBadge img { width: 40px; height: 40px; }
-.coinAmt { font-size: 1.25rem; font-weight: 900; color: #ffd83d; }
+.coinBadge img { width: 28px; height: 28px; }
+.coinAmt { font-size: 1rem; font-weight: 900; color: #c97a10; }
 
 /* ── Scroll area ── */
 .scroll {
@@ -85,96 +86,87 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 6px 14px calc(env(safe-area-inset-bottom, 0px) + 22px);
+  padding: 14px 16px calc(env(safe-area-inset-bottom, 0px) + 28px);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
 /* ── Daily reward card ── */
 .dailyCard {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: linear-gradient(180deg, #ffffff, #f3f8ff);
-  border: 2px solid #fff;
-  border-radius: 22px;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 20px;
   padding: 12px 14px;
-  box-shadow: 0 4px 0 rgba(120,150,200,0.25), 0 8px 18px rgba(80,110,160,0.18);
+  box-shadow: 0 4px 14px rgba(70,100,140,0.1);
 }
-.dailyGift { width: 82px; height: 82px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.18)); }
-.dailyCard > img:not(.dailyGift) { width: 52px; height: 52px; }
-.dailyMain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.dailyTitle { font-size: 0.85rem; font-weight: 700; color: #5a7196; text-align: center; }
+.dailyGift { width: 54px; height: 54px; object-fit: contain; flex-shrink: 0; }
+.dailyCard > img:not(.dailyGift) { width: 32px; height: 32px; }
+.dailyMain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.dailyTitle { font-size: 0.78rem; font-weight: 700; color: #6b7e9b; }
 .dailyAmount {
   display: flex;
   align-items: baseline;
-  justify-content: center;
   gap: 6px;
 }
-.dailyNow { font-size: 1.5rem; font-weight: 900; color: #f0951d; line-height: 1; }
-.dailySep { font-size: 1rem; font-weight: 900; color: #9fb0cc; }
+.dailyNow { font-size: 1.25rem; font-weight: 900; color: #1f4f86; line-height: 1; }
+.dailySep { font-size: 0.9rem; font-weight: 700; color: #9fb0cc; }
 .dailyTrack {
   position: relative;
-  height: 12px;
-  background: #e3ebf6;
-  border-radius: 7px;
+  height: 8px;
+  background: #eef2f7;
+  border-radius: 5px;
   overflow: hidden;
-  box-shadow: inset 0 2px 3px rgba(80,110,160,0.25);
 }
 .dailyFill {
   height: 100%;
-  border-radius: 7px;
-  background: linear-gradient(90deg, #ffd23d, #ffae21);
-  box-shadow: 0 0 8px rgba(255,180,40,0.6);
+  border-radius: 5px;
+  background: linear-gradient(90deg, #ffd23d, #f5a000);
   transition: width 0.4s ease;
 }
 
 .dailyPill {
   align-self: center;
-  margin-top: -6px;
-  background: linear-gradient(180deg, #fff6db, #ffe9ad);
-  border: 2px solid #fff;
-  border-radius: 16px;
-  padding: 6px 16px;
-  font-size: 0.82rem;
-  font-weight: 900;
-  color: #c97a10;
-  box-shadow: 0 3px 0 rgba(200,150,40,0.25), 0 5px 10px rgba(160,120,40,0.18);
+  margin-top: 2px;
+  background: rgba(255,247,225,0.85);
+  border-radius: 12px;
+  padding: 5px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #b5780f;
 }
 
-/* ── Pack cards ── */
+/* ── Pack cards (unified) ── */
 .packCard {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  border-radius: 24px;
-  padding: 12px;
-  border: 3px solid #fff;
+  gap: 10px;
+  border-radius: 22px;
+  padding: 14px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(70,100,140,0.12);
 }
 .packBasic {
-  background: linear-gradient(160deg, #e6f6ff 0%, #c4e9ff 100%);
-  box-shadow: 0 5px 0 #8fc7ee, 0 10px 20px rgba(70,140,200,0.25);
+  background: linear-gradient(180deg, #ffffff 0%, #eaf4fd 100%);
 }
 .packLegendary {
-  background: linear-gradient(160deg, #fff7e0 0%, #ffe6a8 100%);
-  box-shadow: 0 5px 0 #e7b54e, 0 10px 22px rgba(200,150,40,0.3);
-  margin-top: 6px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  background: linear-gradient(180deg, #fffaeb 0%, #fff1cf 100%);
+  box-shadow: 0 6px 20px rgba(200,150,40,0.18);
 }
-.packLegendary .packBody { gap: 3px; }
+.packLegendary .packBody { gap: 4px; }
 
 .bestValue {
   position: absolute;
-  bottom: -14px;
-  left: -10px;
-  width: 132px;
+  bottom: -10px;
+  left: -6px;
+  width: 108px;
   height: auto;
   z-index: 4;
   pointer-events: none;
-  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.22));
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.14));
   transform: rotate(-4deg);
 }
 
@@ -201,137 +193,177 @@
   min-width: 0;
 }
 .packName {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 900;
   color: #1f4f86;
-  line-height: 1;
+  line-height: 1.1;
 }
 .packNameLegendary {
-  color: #c97a10;
-  text-shadow: 0 1px 0 #fff;
+  color: #b5780f;
 }
 .packSub {
   font-size: 0.78rem;
-  font-weight: 700;
-  color: #5a7196;
-  line-height: 1.3;
+  font-weight: 500;
+  color: #7a8aa6;
+  line-height: 1.4;
 }
 
 .tagRow { display: flex; flex-wrap: wrap; gap: 6px; }
 .rarityTag {
   align-self: flex-start;
-  font-size: 0.72rem;
-  font-weight: 900;
+  font-size: 0.7rem;
+  font-weight: 700;
   color: var(--tag, #5a7196);
-  background: color-mix(in srgb, var(--tag, #5a7196) 16%, #fff);
-  border: 1.5px solid color-mix(in srgb, var(--tag, #5a7196) 45%, #fff);
-  border-radius: 12px;
-  padding: 3px 12px;
+  background: color-mix(in srgb, var(--tag, #5a7196) 12%, #fff);
+  border-radius: 10px;
+  padding: 2px 10px;
 }
 
 /* ── Pity tracker ── */
-.pityRow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.pityDots { display: flex; gap: 5px; }
+.pityRow { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.pityDots { display: flex; gap: 4px; }
 .pityDot {
-  width: 12px;
-  height: 12px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: #fff;
-  border: 2px solid #e2b864;
-  box-shadow: inset 0 1px 2px rgba(180,140,40,0.3);
-  transition: all 0.2s;
+  background: #f0e3c3;
+  transition: background 0.2s;
 }
 .pityDotFilled {
-  background: linear-gradient(180deg, #ffd83d, #ffab1f);
-  border-color: #e7960f;
-  box-shadow: 0 0 7px rgba(255,180,40,0.8);
+  background: #f5a000;
 }
 .pityDotPity {
-  background: linear-gradient(180deg, #ffd83d, #ffab1f);
-  border-color: #e7960f;
-  animation: pityPulse 1.2s ease-in-out infinite;
+  background: #f5a000;
+  animation: pityPulse 1.4s ease-in-out infinite;
 }
 @keyframes pityPulse {
-  0%, 100% { box-shadow: 0 0 4px 0 rgba(255,180,40,0.9); }
-  50%       { box-shadow: 0 0 14px 4px rgba(255,180,40,0.5); }
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1; }
 }
 .pityLabel {
-  font-size: 0.74rem;
-  color: #b5780f;
-  font-weight: 900;
+  font-size: 0.72rem;
+  color: #a87208;
+  font-weight: 700;
 }
 
 /* ── Price buttons ── */
 .priceBtn {
   align-self: flex-start;
-  margin-top: 2px;
+  margin-top: 4px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 2px solid #fff;
-  border-radius: 16px;
-  padding: 8px 20px;
+  border: none;
+  border-radius: 14px;
+  padding: 8px 18px;
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 1.15rem;
+  font-size: 1.02rem;
   font-weight: 900;
   color: #fff;
   cursor: pointer;
-  transition: transform 0.1s;
+  transition: transform 0.1s, box-shadow 0.15s;
   white-space: nowrap;
 }
 .priceBtnBasic {
   background: linear-gradient(180deg, #4aa3f0, #1f74d4);
-  box-shadow: 0 4px 0 #1657a3, 0 6px 10px rgba(30,90,160,0.3);
+  box-shadow: 0 3px 10px rgba(30,90,160,0.22);
 }
 .priceBtnLegendary {
   background: linear-gradient(180deg, #ffc330, #f59412);
-  color: #7a4a06;
-  box-shadow: 0 4px 0 #d3790d, 0 6px 10px rgba(200,130,20,0.35);
+  color: #6e3f04;
+  box-shadow: 0 3px 10px rgba(200,130,20,0.25);
 }
-.priceBtn:active { transform: translateY(3px); }
-.priceBtnBasic:active     { box-shadow: 0 1px 0 #1657a3, 0 2px 5px rgba(30,90,160,0.3); }
-.priceBtnLegendary:active { box-shadow: 0 1px 0 #d3790d, 0 2px 5px rgba(200,130,20,0.35); }
+.priceBtn:active { transform: translateY(1px); }
 .priceBtnOff {
-  filter: grayscale(0.5);
+  filter: grayscale(0.4);
   opacity: 0.55;
   cursor: not-allowed;
   transform: none !important;
 }
 
-/* ── Info image cards ── */
-.infoCard {
-  width: 100%;
-  height: auto;
-  border-radius: 20px;
-  display: block;
-  filter: drop-shadow(0 6px 14px rgba(80,110,160,0.22));
+/* ── Native info sections (محتويات محتملة / كيف تكسب) ── */
+.infoSection {
+  background: rgba(255,255,255,0.92);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 3px 12px rgba(70,100,140,0.08);
+}
+.infoTitle {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #1f4f86;
+  margin: 0 0 10px;
+}
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.infoChip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  background: #f4f8fd;
+  border-radius: 12px;
+}
+.infoChipIcon { font-size: 1.5rem; line-height: 1; }
+.infoChipLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #5a7196;
 }
 
-/* ── Coming soon banner ── */
-.soonBanner {
+.earnList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.earnRow {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(180deg, #fff3c9, #ffe093);
-  border: 2px solid #fff;
-  border-radius: 20px;
-  padding: 12px 14px;
-  box-shadow: 0 4px 0 #e7b54e, 0 8px 16px rgba(200,150,40,0.22);
+  padding: 10px 12px;
+  background: #f4f8fd;
+  border-radius: 12px;
 }
+.earnIcon {
+  font-size: 1.4rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.earnText { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.earnText strong { font-family: 'Zanjabeel', sans-serif; font-size: 0.92rem; font-weight: 900; color: #1f4f86; }
+.earnText span   { font-family: 'Zanjabeel', sans-serif; font-size: 0.74rem; font-weight: 500; color: #7a8aa6; line-height: 1.35; }
+
+/* ── Coming soon (slim notice) ── */
+.soonBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,247,225,0.85);
+  border-radius: 16px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(200,150,40,0.1);
+}
+.soonIcon { font-size: 1.4rem; flex-shrink: 0; }
 .soonTag {
   flex-shrink: 0;
-  background: linear-gradient(180deg, #fff, #ffedbf);
-  border: 2px solid #f0bb4a;
-  border-radius: 12px;
-  padding: 6px 12px;
-  font-size: 0.82rem;
+  background: #fff;
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
   font-weight: 900;
-  color: #c97a10;
-  box-shadow: 0 2px 4px rgba(200,150,40,0.25);
+  color: #b5780f;
 }
-.soonText { display: flex; flex-direction: column; gap: 2px; }
-.soonText strong { font-size: 0.95rem; font-weight: 900; color: #a8650c; }
-.soonText span   { font-size: 0.74rem; font-weight: 700; color: #b5780f; }
+.soonText { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.soonText strong { font-size: 0.86rem; font-weight: 900; color: #8a570a; }
+.soonText span   { font-size: 0.7rem; font-weight: 500; color: #a87208; }
 
 /* ── Pack open overlay ── */
 .openOverlay {
@@ -561,75 +593,73 @@
   to   { transform: translateX(-50%) translateY(0);   opacity: 1; }
 }
 
-/* ── Music store section ── */
+/* ── Music section (secondary "إضافات") ── */
 .musicSection {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px;
-  background: linear-gradient(160deg, #ffffff 0%, #f0f6ff 100%);
-  border: 3px solid #fff;
-  border-radius: 22px;
-  box-shadow: 0 5px 0 #b8c8e0, 0 10px 18px rgba(80,110,160,0.18);
+  gap: 8px;
+  padding: 12px 14px 14px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 18px;
+  box-shadow: 0 3px 10px rgba(70,100,140,0.08);
 }
 .musicHeading {
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #1f4f86;
-  margin: 0 0 4px;
-  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #7a8aa6;
+  margin: 0 2px 4px;
 }
 .musicCard {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: linear-gradient(180deg, #fff, #eef4fc);
-  border: 2px solid #fff;
-  border-radius: 16px;
-  padding: 10px 12px;
-  box-shadow: 0 3px 0 #cdd9eb, 0 5px 10px rgba(80,110,160,0.12);
+  gap: 11px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 8px 10px;
+  box-shadow: 0 2px 6px rgba(70,100,140,0.06);
 }
 .musicPlay {
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: none;
   background: linear-gradient(180deg, #4aa3f0, #1f74d4);
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 900;
   cursor: pointer;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 3px 0 #1657a3, 0 5px 10px rgba(30,90,160,0.3);
+  box-shadow: 0 2px 6px rgba(30,90,160,0.22);
   transition: transform 0.1s;
 }
-.musicPlay:active { transform: translateY(2px); box-shadow: 0 1px 0 #1657a3; }
+.musicPlay:active { transform: translateY(1px); }
 .musicBody {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 .musicName {
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 900;
   color: #1f4f86;
 }
 .musicSub {
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #5a7196;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #7a8aa6;
   line-height: 1.3;
 }
 .priceBtnEquipped {
   background: linear-gradient(180deg, #6dd49d, #2da46c);
   color: #fff;
-  box-shadow: 0 4px 0 #1f7d4f, 0 6px 10px rgba(30,140,80,0.3);
+  box-shadow: 0 3px 10px rgba(30,140,80,0.22);
 }
+.musicCard .priceBtn { align-self: center; margin-top: 0; padding: 7px 14px; font-size: 0.92rem; }

@@ -226,7 +226,6 @@ export default function StorePage({ onBack }) {
           <div className={styles.packBody}>
             <span className={styles.packName}>{PACK_DEFS.basic.name}</span>
             <span className={styles.packSub}>{PACK_DEFS.basic.subtitle}</span>
-            <span className={styles.rarityTag} style={{ '--tag': RARITY_CONFIG.common.color }}>شائع</span>
             <button
               className={`${styles.priceBtn} ${styles.priceBtnBasic} ${!canBasic ? styles.priceBtnOff : ''}`}
               onClick={() => handleOpenPack('basic')}
@@ -244,11 +243,7 @@ export default function StorePage({ onBack }) {
           </div>
           <div className={styles.packBody}>
             <span className={`${styles.packName} ${styles.packNameLegendary}`}>{PACK_DEFS.legendary.name}</span>
-            <span className={styles.packSub}>٢ شخصية + إطار عشوائي</span>
-            <div className={styles.tagRow}>
-              <span className={styles.rarityTag} style={{ '--tag': RARITY_CONFIG.legendary.color }}>فرصة أسطوري</span>
-              <span className={styles.rarityTag} style={{ '--tag': RARITY_CONFIG.rare.color }}>نادر مضمون</span>
-            </div>
+            <span className={styles.packSub}>٢ شخصية + إطار — أسطوري مضمون كل ٤</span>
             <div className={styles.pityRow}>
               <div className={styles.pityDots}>
                 {[0, 1, 2, 3].map(i => (
@@ -273,14 +268,52 @@ export default function StorePage({ onBack }) {
           </div>
         </div>
 
-        {/* ── Music store ── */}
+        {/* ── Possible contents (native) ── */}
+        <section className={styles.infoSection}>
+          <h3 className={styles.infoTitle}>محتويات محتملة</h3>
+          <div className={styles.infoGrid}>
+            <div className={styles.infoChip}><span className={styles.infoChipIcon}>👤</span><span className={styles.infoChipLabel}>شخصية</span></div>
+            <div className={styles.infoChip}><span className={styles.infoChipIcon}>🖼️</span><span className={styles.infoChipLabel}>إطار</span></div>
+            <div className={styles.infoChip}><span className={styles.infoChipIcon}>💰</span><span className={styles.infoChipLabel}>عملات</span></div>
+            <div className={styles.infoChip}><span className={styles.infoChipIcon}>📦</span><span className={styles.infoChipLabel}>باك نادر</span></div>
+          </div>
+        </section>
+
+        {/* ── How to earn coins (native) ── */}
+        <section className={styles.infoSection}>
+          <h3 className={styles.infoTitle}>كيف تكسب العملات؟</h3>
+          <ul className={styles.earnList}>
+            <li className={styles.earnRow}>
+              <span className={styles.earnIcon}>📅</span>
+              <div className={styles.earnText}>
+                <strong>اللعب اليومي</strong>
+                <span>العب كل يوم لتحصل على عملات</span>
+              </div>
+            </li>
+            <li className={styles.earnRow}>
+              <span className={styles.earnIcon}>✅</span>
+              <div className={styles.earnText}>
+                <strong>إكمال المهام</strong>
+                <span>أنجز المهام واربح عملات إضافية</span>
+              </div>
+            </li>
+            <li className={styles.earnRow}>
+              <span className={styles.earnIcon}>🎁</span>
+              <div className={styles.earnText}>
+                <strong>المكافآت اليومية</strong>
+                <span>سجّل دخولك يومياً لمكافآت</span>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── إضافات: قسم الموسيقى الثانوي ── */}
         <div className={styles.musicSection}>
-          <h3 className={styles.musicHeading}>🎵 الموسيقى</h3>
+          <h3 className={styles.musicHeading}>🎵 إضافات</h3>
           {MUSIC_ITEMS.map(item => {
             const owned     = (profile.inventory ?? []).includes(item.id);
             const equipped  = profile.menuTrackId === item.id;
             const playing   = previewingId === item.id;
-            const rc        = RARITY_CONFIG[item.rarity];
             const canAfford = (profile.coins ?? 0) >= item.price;
             return (
               <div key={item.id} className={styles.musicCard}>
@@ -294,10 +327,6 @@ export default function StorePage({ onBack }) {
                 <div className={styles.musicBody}>
                   <span className={styles.musicName}>{item.name}</span>
                   <span className={styles.musicSub}>{item.subtitle}</span>
-                  <span
-                    className={styles.rarityTag}
-                    style={{ '--tag': rc.color }}
-                  >{rc.label}</span>
                 </div>
                 {owned ? (
                   <button
@@ -319,17 +348,14 @@ export default function StorePage({ onBack }) {
           })}
         </div>
 
-        {/* ── Info image cards ── */}
-        <img src="/store/contents.webp" alt="محتويات محتملة" className={styles.infoCard} />
-        <img src="/store/how-to-earn.webp" alt="كيف تكسب العملات" className={styles.infoCard} />
-
-        {/* ── Coming soon banner ── */}
+        {/* ── Coming soon (light notice) ── */}
         <div className={styles.soonBanner}>
-          <span className={styles.soonTag}>قريباً</span>
+          <span className={styles.soonIcon}>🎁</span>
           <div className={styles.soonText}>
-            <strong>عروض خاصة كل أسبوع!</strong>
+            <strong>عروض خاصة كل أسبوع</strong>
             <span>تابع المتجر ولا تفوتك العروض</span>
           </div>
+          <span className={styles.soonTag}>قريباً</span>
         </div>
 
       </div>
