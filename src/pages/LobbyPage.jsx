@@ -4,11 +4,21 @@ import { SFX } from '../utils/sounds';
 import styles from './LobbyPage.module.css';
 
 const MODES = [
-  { id: 'passplay', label: 'Pass & Play', desc: 'لاعبين على نفس الجوال', icon: '/icons/i-passplay.webp' },
-  { id: 'vsai', label: 'ضد AI', desc: 'ألعب وحدك ضد الذكاء الاصطناعي', icon: '/icons/i-vsai.webp' },
+  {
+    id: 'passplay',
+    label: 'لعب جماعي',
+    desc: 'العبوا بالتناوب على جوال واحد — مع أصدقائك، وتقدر تضيف خصوم ذكاء اصطناعي لتكملة الطاولة',
+    icon: '/icons/i-vsai.webp',
+  },
+  {
+    id: 'vsai',
+    label: 'ضد الذكاء',
+    desc: 'تحدٍّ فردي ضد خصوم يديرهم الذكاء الاصطناعي، باختيارك للعدد ومستوى الصعوبة',
+    icon: '/icons/i-passplay.webp',
+  },
 ];
 
-const AI_NAMES = ['خالد', 'سارة', 'علي'];
+const AI_NAMES = ['خالد', 'سارة', 'علي', 'نورة', 'ريان'];
 
 const DIFFICULTIES = [
   { id: 'easy',   label: 'سهل',   desc: 'للمبتدئين' },
@@ -23,12 +33,13 @@ export default function LobbyPage({ onBack, onStartGame }) {
   const [tokensToWin, setTokensToWin] = useState(3);
   const savedName = loadProfile().name?.trim() || 'اللاعب 1';
   const [players, setPlayers] = useState([
-    { name: savedName },
-    { name: 'اللاعب 2' },
+    { name: savedName, isAI: false },
+    { name: 'اللاعب 2', isAI: false },
   ]);
 
   const minPlayers = mode === 'vsai' ? 1 : 2;
   const maxPlayers = mode === 'vsai' ? 1 : 6;
+  const hasAIInPassplay = mode === 'passplay' && players.some(p => p.isAI);
 
   function setPlayerName(index, name) {
     setPlayers(prev => prev.map((p, i) => i === index ? { ...p, name } : p));
@@ -36,7 +47,16 @@ export default function LobbyPage({ onBack, onStartGame }) {
 
   function addPlayer() {
     if (players.length < maxPlayers) {
-      setPlayers(prev => [...prev, { name: `اللاعب ${prev.length + 1}` }]);
+      const humanCount = players.filter(p => !p.isAI).length;
+      setPlayers(prev => [...prev, { name: `اللاعب ${humanCount + 1}`, isAI: false }]);
+    }
+  }
+
+  function addAI() {
+    if (players.length < maxPlayers) {
+      const aiCountSoFar = players.filter(p => p.isAI).length;
+      const name = AI_NAMES[aiCountSoFar % AI_NAMES.length];
+      setPlayers(prev => [...prev, { name, isAI: true }]);
     }
   }
 
@@ -50,9 +70,9 @@ export default function LobbyPage({ onBack, onStartGame }) {
     setMode(newMode);
     const n = loadProfile().name?.trim() || 'اللاعب 1';
     if (newMode === 'vsai') {
-      setPlayers([{ name: n }]);
+      setPlayers([{ name: n, isAI: false }]);
     } else {
-      setPlayers([{ name: n }, { name: 'اللاعب 2' }]);
+      setPlayers([{ name: n, isAI: false }, { name: 'اللاعب 2', isAI: false }]);
     }
   }
 
@@ -71,11 +91,14 @@ export default function LobbyPage({ onBack, onStartGame }) {
         ...aiPlayers,
       ];
     } else {
-      finalPlayers = players.map((p, i) => ({
-        name: p.name.trim() || 'لاعب',
-        isAI: false,
-        profile: i === 0 ? humanProfile : getAIProfile(i - 1),
-      }));
+      let avatarIdx = 0;
+      finalPlayers = players.map((p, i) => {
+        if (p.isAI) {
+          return { name: p.name, isAI: true, difficulty, profile: getAIProfile(avatarIdx++) };
+        }
+        const profile = i === 0 ? humanProfile : getAIProfile(avatarIdx++);
+        return { name: p.name.trim() || 'لاعب', isAI: false, profile };
+      });
     }
     onStartGame({ mode, players: finalPlayers, tokensToWin, difficulty });
   }
@@ -112,24 +135,54 @@ export default function LobbyPage({ onBack, onStartGame }) {
           <div className={styles.playerList}>
             {players.map((p, i) => (
               <div key={i} className={styles.playerRow}>
-                <input
-                  className={styles.input}
-                  value={p.name}
-                  onChange={e => setPlayerName(i, e.target.value)}
-                  maxLength={16}
-                  dir="rtl"
-                />
-                {players.length > minPlayers && (
+                {p.isAI ? (
+                  <div className={styles.aiRow}>
+                    <span className={styles.aiBadge}>🤖 ذكاء اصطناعي</span>
+                    <span className={styles.aiName}>{p.name}</span>
+                  </div>
+                ) : (
+                  <input
+                    className={styles.input}
+                    value={p.name}
+                    onChange={e => setPlayerName(i, e.target.value)}
+                    maxLength={16}
+                    dir="rtl"
+                  />
+                )}
+                {i > 0 && players.length > minPlayers && (
                   <button className={styles.removeBtn} onClick={() => { SFX.buttonClick(); removePlayer(i); }}>✕</button>
                 )}
               </div>
             ))}
             {players.length < maxPlayers && (
-              <button className={styles.addBtn} onClick={() => { SFX.cardSelect(); addPlayer(); }}>
-                + أضف لاعب
-              </button>
+              <div className={styles.addRow}>
+                <button className={styles.addBtn} onClick={() => { SFX.cardSelect(); addPlayer(); }}>
+                  + أضف لاعب
+                </button>
+                <button className={styles.addBtnAi} onClick={() => { SFX.cardSelect(); addAI(); }}>
+                  + أضف ذكاء اصطناعي
+                </button>
+              </div>
             )}
           </div>
+
+          {hasAIInPassplay && (
+            <>
+              <p className={styles.label} style={{ marginTop: '14px' }}>مستوى صعوبة الذكاء</p>
+              <div className={styles.countRow}>
+                {DIFFICULTIES.map(d => (
+                  <button
+                    key={d.id}
+                    className={`${styles.countBtn} ${difficulty === d.id ? styles.countActive : ''}`}
+                    onClick={() => { SFX.cardSelect(); setDifficulty(d.id); }}
+                  >
+                    <span className={styles.diffLabel}>{d.label}</span>
+                    <span className={styles.countSub}>{d.desc}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -159,7 +212,7 @@ export default function LobbyPage({ onBack, onStartGame }) {
                 >
                   <span className={styles.countNum}>{n}</span>
                   <span className={styles.countSub}>
-                    {n === 1 ? AI_NAMES[0] : n === 2 ? `${AI_NAMES[0]}، ${AI_NAMES[1]}` : AI_NAMES.join('، ')}
+                    {n === 1 ? AI_NAMES[0] : n === 2 ? `${AI_NAMES[0]}، ${AI_NAMES[1]}` : AI_NAMES.slice(0, 3).join('، ')}
                   </span>
                 </button>
               ))}

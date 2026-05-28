@@ -84,9 +84,11 @@
 }
 .modeDesc {
   font-family: 'Zanjabeel', sans-serif;
-  font-size: 0.65rem;
-  color: #2d3e52;
+  font-size: 0.72rem;
+  color: #3a4e63;
   text-align: center;
+  line-height: 1.45;
+  margin-top: 2px;
 }
 
 .playerList {
@@ -146,6 +148,53 @@
 .addBtn:hover {
   border-color: #5682B2;
   background: rgba(86,130,178,0.05);
+}
+
+.addRow {
+  display: flex;
+  gap: 8px;
+}
+.addRow .addBtn { flex: 1; }
+.addBtnAi {
+  flex: 1;
+  background: rgba(120,90,200,0.06);
+  border: 1.5px dashed rgba(120,90,200,0.4);
+  border-radius: 12px;
+  color: #6a4ec0;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.9rem;
+  padding: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+.addBtnAi:hover {
+  border-color: #6a4ec0;
+  background: rgba(120,90,200,0.1);
+}
+
+.aiRow {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: linear-gradient(180deg, #f3eeff, #e9e0ff);
+  border: 1.5px solid rgba(120,90,200,0.3);
+  border-radius: 12px;
+  padding: 11px 14px;
+}
+.aiBadge {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #6a4ec0;
+}
+.aiName {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1F3D5A;
 }
 
 .countRow {
