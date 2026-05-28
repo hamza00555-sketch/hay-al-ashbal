@@ -3,15 +3,50 @@ import {
   AVATAR_IMAGE_IDS, FRAME_COLORS,
   loadProfile, saveProfile,
 } from '../utils/playerProfile';
+import { redeemCode } from '../utils/redeemCodes';
 import { STORE_ITEMS, RARITY_CONFIG } from '../utils/storeData';
 import PlayerAvatar from '../components/PlayerAvatar';
 import { SFX, getMusicVol, getSFXVol, setMusicVol, setSFXVol } from '../utils/sounds';
 import styles from './SettingsPage.module.css';
 
+function formatDate(ms) {
+  if (!ms) return '—';
+  try {
+    return new Date(ms).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' });
+  } catch {
+    return '—';
+  }
+}
+
+function winRate(wins, played) {
+  if (!played) return '—';
+  return Math.round((wins / played) * 100) + '%';
+}
+
 export default function SettingsPage({ onBack }) {
   const [profile,   setProfile]   = useState(() => loadProfile());
   const [musicVol,  setMusicVolState]  = useState(() => getMusicVol());
   const [sfxVol,    setSFXVolState]    = useState(() => getSFXVol());
+  const [codeInput, setCodeInput]    = useState('');
+  const [codeMsg,   setCodeMsg]      = useState(null);  // { type:'ok'|'err', text }
+
+  function handleRedeem() {
+    if (!codeInput.trim()) return;
+    const res = redeemCode(codeInput);
+    if (res.ok) {
+      SFX.cardSelect();
+      setProfile(loadProfile());
+      setCodeMsg({ type: 'ok', text: `حصلت على ${res.coins.toLocaleString('ar-SA')} عملة! (${res.label})` });
+      setCodeInput('');
+    } else {
+      const text =
+        res.reason === 'used'    ? 'هذا الكود مستخدم من قبل'
+      : res.reason === 'invalid' ? 'كود غير صحيح'
+      : res.reason === 'empty'   ? 'اكتب الكود أولاً'
+      :                            'تعذر استخدام الكود';
+      setCodeMsg({ type: 'err', text });
+    }
+  }
 
   const inventory = profile.inventory ?? [];
 
@@ -66,6 +101,43 @@ export default function SettingsPage({ onBack }) {
           value={profile.name ?? ''}
           onChange={e => update('name', e.target.value)}
         />
+      </section>
+
+      {/* ── إحصائيات اللاعب ── */}
+      <section className={styles.section}>
+        <p className={styles.label}>إحصائياتك</p>
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <span className={styles.statValue}>{(profile.stats?.gamesPlayed ?? 0).toLocaleString('ar-SA')}</span>
+            <span className={styles.statLabel}>مباريات</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statValue} style={{ color: '#22a060' }}>
+              {(profile.stats?.wins ?? 0).toLocaleString('ar-SA')}
+            </span>
+            <span className={styles.statLabel}>انتصارات</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statValue} style={{ color: '#d0556b' }}>
+              {(profile.stats?.losses ?? 0).toLocaleString('ar-SA')}
+            </span>
+            <span className={styles.statLabel}>خسائر</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statValue}>
+              {winRate(profile.stats?.wins ?? 0, profile.stats?.gamesPlayed ?? 0)}
+            </span>
+            <span className={styles.statLabel}>نسبة الفوز</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statValue}>{(profile.stats?.roundsWon ?? 0).toLocaleString('ar-SA')}</span>
+            <span className={styles.statLabel}>جولات فائزة</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statValueSm}>{formatDate(profile.registeredAt)}</span>
+            <span className={styles.statLabel}>تاريخ التسجيل</span>
+          </div>
+        </div>
       </section>
 
       {/* ── الشخصيات الافتراضية ── */}
@@ -235,6 +307,35 @@ export default function SettingsPage({ onBack }) {
             </button>
           ))}
         </div>
+      </section>
+
+      {/* ── استبدال كود ── */}
+      <section className={styles.section}>
+        <p className={styles.label}>استبدال كود</p>
+        <p className={styles.emptyHint}>أدخل كود مكافأة لتحصل على عملات مجانية</p>
+        <div className={styles.codeRow}>
+          <input
+            className={styles.codeInput}
+            type="text"
+            placeholder="ASHBAL"
+            maxLength={20}
+            value={codeInput}
+            onChange={e => { setCodeInput(e.target.value.toUpperCase()); setCodeMsg(null); }}
+            onKeyDown={e => { if (e.key === 'Enter') handleRedeem(); }}
+          />
+          <button
+            className={styles.codeBtn}
+            onClick={handleRedeem}
+            disabled={!codeInput.trim()}
+          >
+            استبدال
+          </button>
+        </div>
+        {codeMsg && (
+          <p className={codeMsg.type === 'ok' ? styles.codeMsgOk : styles.codeMsgErr}>
+            {codeMsg.text}
+          </p>
+        )}
       </section>
     </div>
   );

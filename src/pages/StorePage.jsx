@@ -3,7 +3,7 @@ import { PACK_DEFS, getLegendaryInfo, openPack } from '../utils/packSystem';
 import { RARITY_CONFIG, STORE_ITEMS, MUSIC_ITEMS } from '../utils/storeData';
 import { loadProfile, saveProfile } from '../utils/playerProfile';
 import { getDailyProgress } from '../utils/economy';
-import { SFX, getMusicVol, stopMenuMusic, startMenuMusic, isMenuMusicPlaying } from '../utils/sounds';
+import { SFX, getMusicVol, stopMenuMusic, startMenuMusic, isMenuMusicPlaying, duckMenuMusic, unduckMenuMusic } from '../utils/sounds';
 import CoinIcon from '../components/CoinIcon';
 import styles from './StorePage.module.css';
 
@@ -45,6 +45,7 @@ export default function StorePage({ onBack }) {
       clearTimeout(previewStopTimerRef.current);
       previewStopTimerRef.current = null;
     }
+    unduckMenuMusic(0);
   }, []);
 
   const daily         = getDailyProgress();
@@ -104,10 +105,26 @@ export default function StorePage({ onBack }) {
       clearTimeout(previewStopTimerRef.current);
       previewStopTimerRef.current = null;
     }
-    if (previewAudioRef.current) {
-      previewAudioRef.current.pause();
+    const a = previewAudioRef.current;
+    if (a) {
+      // Fade out over ~450ms then pause, so it doesn't cut off abruptly.
+      const startVol = a.volume;
+      const FADE_MS = 450;
+      const STEP_MS = 30;
+      const steps = Math.max(1, Math.floor(FADE_MS / STEP_MS));
+      let i = 0;
+      const fader = setInterval(() => {
+        i++;
+        const next = startVol * (1 - i / steps);
+        try { a.volume = Math.max(0, next); } catch {}
+        if (i >= steps) {
+          clearInterval(fader);
+          try { a.pause(); } catch {}
+        }
+      }, STEP_MS);
       previewAudioRef.current = null;
     }
+    unduckMenuMusic(500);
     setPreviewingId(null);
   }
 
@@ -118,7 +135,8 @@ export default function StorePage({ onBack }) {
     }
     stopPreview();
     const a = new Audio(item.file);
-    a.volume = Math.max(0.1, Math.min(1, getMusicVol() * 0.85));
+    const targetVol = Math.max(0.1, Math.min(1, getMusicVol() * 0.85));
+    a.volume = 0;
     const PREVIEW_SECONDS = 10;
     a.addEventListener('loadedmetadata', () => {
       // Start from the middle of the song.
@@ -126,6 +144,19 @@ export default function StorePage({ onBack }) {
       const start = Math.max(0, dur / 2);
       try { a.currentTime = start; } catch {}
       a.play().catch(() => {});
+      // Duck the menu music while preview plays.
+      duckMenuMusic(0.18, 250);
+      // Fade-in preview volume from 0 → target over ~600ms.
+      const FADE_MS = 600;
+      const STEP_MS = 30;
+      const steps = Math.max(1, Math.floor(FADE_MS / STEP_MS));
+      let i = 0;
+      const fader = setInterval(() => {
+        i++;
+        const next = targetVol * (i / steps);
+        try { a.volume = Math.min(targetVol, next); } catch {}
+        if (i >= steps) clearInterval(fader);
+      }, STEP_MS);
       previewStopTimerRef.current = setTimeout(() => {
         if (previewAudioRef.current === a) stopPreview();
       }, PREVIEW_SECONDS * 1000);

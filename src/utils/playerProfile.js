@@ -25,6 +25,15 @@ export const DEFAULT_PROFILE = {
   packs:        {},
   turnSpeed:    'normal',  // 'slow' | 'normal' | 'fast'
   menuTrackId:  null,      // ID of an equipped store music track (overrides default menu music)
+  registeredAt: null,      // ms timestamp of first profile creation
+  stats: {
+    gamesPlayed:  0,
+    wins:         0,
+    losses:       0,
+    roundsWon:    0,
+    lastPlayedAt: null,
+  },
+  redeemedCodes: [],       // list of code IDs already used by this player
 };
 
 // Multiplier applied to AI-turn auto-advance durations during play.
@@ -36,17 +45,45 @@ export function getTurnSpeedFactor() {
 }
 
 export function loadProfile() {
+  let p;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
-  } catch {}
-  return { ...DEFAULT_PROFILE };
+    p = raw ? { ...DEFAULT_PROFILE, ...JSON.parse(raw) } : { ...DEFAULT_PROFILE };
+  } catch {
+    p = { ...DEFAULT_PROFILE };
+  }
+  // Merge nested defaults so older saved profiles get new fields.
+  p.stats = { ...DEFAULT_PROFILE.stats, ...(p.stats ?? {}) };
+  p.redeemedCodes = Array.isArray(p.redeemedCodes) ? p.redeemedCodes : [];
+  if (!p.registeredAt) {
+    p.registeredAt = Date.now();
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch {}
+  }
+  return p;
 }
 
 export function saveProfile(profile) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
   } catch {}
+}
+
+// Record a finished match in the profile stats.
+export function recordMatchResult({ won }) {
+  const p = loadProfile();
+  const stats = { ...p.stats };
+  stats.gamesPlayed = (stats.gamesPlayed ?? 0) + 1;
+  if (won) stats.wins   = (stats.wins ?? 0)   + 1;
+  else     stats.losses = (stats.losses ?? 0) + 1;
+  stats.lastPlayedAt = Date.now();
+  saveProfile({ ...p, stats });
+}
+
+// Record one round win (called per round, not per match).
+export function recordRoundWin() {
+  const p = loadProfile();
+  const stats = { ...p.stats, roundsWon: (p.stats?.roundsWon ?? 0) + 1 };
+  saveProfile({ ...p, stats });
 }
 
 const AI_MALE_IDS = [

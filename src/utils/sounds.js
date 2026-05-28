@@ -385,6 +385,27 @@ export async function startMenuMusic() {
 export function stopMenuMusic() { _stopMenuMusicFade(0); }
 export function isMenuMusicPlaying() { return _menuPlaying; }
 
+// Temporarily lower the menu-music gain so a preview can be heard over it.
+// `level` is a 0..1 multiplier applied to the normal menu gain.
+export function duckMenuMusic(level = 0.18, fadeMs = 250) {
+  if (!_menuGain || !_ctx) return;
+  const target = Math.max(0.0001, 0.55 * _musicVol * level);
+  const t = _ctx.currentTime;
+  _menuGain.gain.cancelScheduledValues(t);
+  _menuGain.gain.setValueAtTime(_menuGain.gain.value, t);
+  _menuGain.gain.linearRampToValueAtTime(target, t + fadeMs / 1000);
+}
+
+// Restore menu music to full volume.
+export function unduckMenuMusic(fadeMs = 350) {
+  if (!_menuGain || !_ctx) return;
+  const target = 0.55 * _musicVol;
+  const t = _ctx.currentTime;
+  _menuGain.gain.cancelScheduledValues(t);
+  _menuGain.gain.setValueAtTime(_menuGain.gain.value, t);
+  _menuGain.gain.linearRampToValueAtTime(target, t + fadeMs / 1000);
+}
+
 // ── Game music ────────────────────────────────────────────────────
 
 let _musicPlaying = false;

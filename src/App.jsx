@@ -18,7 +18,7 @@ import { startMenuMusic, stopMenuMusic, stopMusic } from './utils/sounds';
 import { createInitialState } from './engine/gameEngine';
 import { listenRoom, sanitizeGs, writeRoundStart } from './services/gameRoom';
 import { calcMatchReward, applyMatchReward } from './utils/economy';
-import { loadProfile, saveProfile } from './utils/playerProfile';
+import { loadProfile, saveProfile, recordMatchResult, recordRoundWin } from './utils/playerProfile';
 
 export default function App() {
   const [screen,       setScreen]       = useState('menu');
@@ -113,8 +113,13 @@ export default function App() {
       }
     }
 
+    // Track stats: every round won by the human counts; every match end counts.
+    if (result.winner && result.winner.id === 0) recordRoundWin();
+
     const matchWon = result.winner && (newTokens[result.winner.id] ?? 0) >= twn;
     if (matchWon) {
+      // Match-level stats only recorded when a full match ends (vsai/passplay).
+      recordMatchResult({ won: result.winner.id === 0 });
       setFinalResult({ ...result, tokens: newTokens, tokensToWin: twn, coinsEarned, rewardBreakdown });
       setScreen('result');
     } else {
