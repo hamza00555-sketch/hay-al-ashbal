@@ -288,3 +288,38 @@
   min-width: 34px;
   text-align: center;
 }
+
+/* ── سرعة عرض دور الذكاء ── */
+.speedRow {
+  display: flex;
+  gap: 10px;
+}
+.speedBtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255,255,255,0.7);
+  border: 1.5px solid rgba(86,130,178,0.2);
+  border-radius: 14px;
+  padding: 12px 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.speedActive {
+  border-color: #5682B2;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(86,130,178,0.2);
+}
+.speedLabel {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #1F3D5A;
+}
+.speedDesc {
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.66rem;
+  color: #5682B2;
+}

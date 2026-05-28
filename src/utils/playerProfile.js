@@ -23,7 +23,16 @@ export const DEFAULT_PROFILE = {
   coins:        0,
   inventory:    [],
   packs:        {},
+  turnSpeed:    'normal',  // 'slow' | 'normal' | 'fast'
 };
+
+// Multiplier applied to AI-turn auto-advance durations during play.
+export const TURN_SPEED_FACTORS = { slow: 1.5, normal: 1, fast: 0.55 };
+
+export function getTurnSpeedFactor() {
+  const speed = loadProfile().turnSpeed ?? 'normal';
+  return TURN_SPEED_FACTORS[speed] ?? 1;
+}
 
 export function loadProfile() {
   try {

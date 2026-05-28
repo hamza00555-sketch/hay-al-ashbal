@@ -211,6 +211,31 @@ export default function SettingsPage({ onBack }) {
           <span className={styles.volPct}>{Math.round(sfxVol * 100)}%</span>
         </div>
       </section>
+
+      {/* ── سرعة التبويبات أثناء دور الذكاء ── */}
+      <section className={styles.section}>
+        <p className={styles.label}>سرعة عرض دور الذكاء</p>
+        <p className={styles.emptyHint}>تحكّم بسرعة ظهور تبويبات دور الذكاء أثناء اللعب لتلحق تقرأها</p>
+        <div className={styles.speedRow}>
+          {[
+            { id: 'slow',   label: 'بطيء', desc: 'وقت أطول للقراءة' },
+            { id: 'normal', label: 'عادي', desc: 'متوازن' },
+            { id: 'fast',   label: 'سريع', desc: 'لعب أسرع' },
+          ].map(s => (
+            <button
+              key={s.id}
+              className={[
+                styles.speedBtn,
+                (profile.turnSpeed ?? 'normal') === s.id ? styles.speedActive : '',
+              ].join(' ')}
+              onClick={() => { SFX.cardSelect(); update('turnSpeed', s.id); }}
+            >
+              <span className={styles.speedLabel}>{s.label}</span>
+              <span className={styles.speedDesc}>{s.desc}</span>
+            </button>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

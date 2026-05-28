@@ -23,6 +23,7 @@ import DiscardPile from '../components/DiscardPile';
 import GuideDrawer from '../components/GuideDrawer';
 import PlayerAvatar from '../components/PlayerAvatar';
 import { SFX, startMusic, stopMusic, haptic } from '../utils/sounds';
+import { getTurnSpeedFactor } from '../utils/playerProfile';
 import styles from './GamePage.module.css';
 
 const ACTION_TYPE = {
@@ -187,6 +188,7 @@ export default function GamePage({
   initialGs = null,
 }) {
   const [gs, setGs] = useState(() => initialGs ?? createInitialState(config.players));
+  const turnSpeedFactor = useMemo(() => getTurnSpeedFactor(), []);
 
   const [focusedSource, setFocusedSource] = useState(null);
   const [showAction, setShowAction]       = useState(false);
@@ -323,7 +325,7 @@ export default function GamePage({
       // Capture seq so this timer is a no-op if kickQueue was called manually (e.g., "تخطى" button)
       narrativeTimer.current = setTimeout(() => {
         if (kickSeqRef.current === mySeq) kickQueue();
-      }, next.durationMs);
+      }, next.durationMs * turnSpeedFactor);
     }
   }
 
@@ -538,10 +540,10 @@ export default function GamePage({
     clearTimeout(bannerTimer.current);
     bannerTimer.current = setTimeout(() => setTurnBanner(null), 2200);
 
-    // AI turns: auto-dismiss after 1.6s
+    // AI turns: auto-dismiss the turn announcement (scaled by the player's chosen speed)
     if (cp.isAI) {
       clearTimeout(announceTimer.current);
-      announceTimer.current = setTimeout(() => setTurnAnnounce(null), 1600);
+      announceTimer.current = setTimeout(() => setTurnAnnounce(null), 1600 * turnSpeedFactor);
     }
   }, [gs.currentPlayerIndex, gs.phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
