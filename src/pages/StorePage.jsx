@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { PACK_DEFS, getLegendaryInfo, openPack } from '../utils/packSystem';
 import { RARITY_CONFIG, STORE_ITEMS, MUSIC_ITEMS } from '../utils/storeData';
 import { loadProfile, saveProfile } from '../utils/playerProfile';
+import { redeemCode } from '../utils/redeemCodes';
 import { getDailyProgress } from '../utils/economy';
 import { SFX, getMusicVol, stopMenuMusic, startMenuMusic, isMenuMusicPlaying, duckMenuMusic, unduckMenuMusic } from '../utils/sounds';
 import CoinIcon from '../components/CoinIcon';
@@ -32,8 +33,28 @@ export default function StorePage({ onBack }) {
   const [phase,   setPhase]   = useState('idle');
   const [toast,   setToast]   = useState(null);
   const [previewingId, setPreviewingId] = useState(null);
+  const [codeInput, setCodeInput] = useState('');
+  const [codeMsg,   setCodeMsg]   = useState(null);
   const previewAudioRef = useRef(null);
   const previewStopTimerRef = useRef(null);
+
+  function handleRedeem() {
+    if (!codeInput.trim()) return;
+    const res = redeemCode(codeInput);
+    if (res.ok) {
+      SFX.cardSelect();
+      setProfile(loadProfile());
+      setCodeMsg({ type: 'ok', text: `حصلت على ${res.coins.toLocaleString('ar-SA')} عملة! (${res.label})` });
+      setCodeInput('');
+    } else {
+      const text =
+        res.reason === 'used'    ? 'هذا الكود مستخدم من قبل'
+      : res.reason === 'invalid' ? 'كود غير صحيح'
+      : res.reason === 'empty'   ? 'اكتب الكود أولاً'
+      :                            'تعذر استخدام الكود';
+      setCodeMsg({ type: 'err', text });
+    }
+  }
 
   // Stop any preview audio when leaving the store.
   useEffect(() => () => {
@@ -411,6 +432,40 @@ export default function StorePage({ onBack }) {
             <span>تابع المتجر ولا تفوتك العروض</span>
           </div>
           <span className={styles.soonTag}>قريباً</span>
+        </div>
+
+        {/* ── استبدال كود ── */}
+        <div className={styles.codeSection}>
+          <div className={styles.codeHead}>
+            <span className={styles.codeIcon}>🎟️</span>
+            <div className={styles.codeHeadText}>
+              <strong>استبدال كود</strong>
+              <span>أدخل كود مكافأة لتحصل على عملات مجانية</span>
+            </div>
+          </div>
+          <div className={styles.codeRow}>
+            <input
+              className={styles.codeInput}
+              type="text"
+              placeholder="ASHBAL"
+              maxLength={20}
+              value={codeInput}
+              onChange={e => { setCodeInput(e.target.value.toUpperCase()); setCodeMsg(null); }}
+              onKeyDown={e => { if (e.key === 'Enter') handleRedeem(); }}
+            />
+            <button
+              className={styles.codeBtn}
+              onClick={handleRedeem}
+              disabled={!codeInput.trim()}
+            >
+              استبدال
+            </button>
+          </div>
+          {codeMsg && (
+            <p className={codeMsg.type === 'ok' ? styles.codeMsgOk : styles.codeMsgErr}>
+              {codeMsg.text}
+            </p>
+          )}
         </div>
 
       </div>

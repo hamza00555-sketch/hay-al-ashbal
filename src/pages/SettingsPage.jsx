@@ -3,7 +3,6 @@ import {
   FRAME_COLORS,
   loadProfile, saveProfile,
 } from '../utils/playerProfile';
-import { redeemCode } from '../utils/redeemCodes';
 import { STORE_ITEMS, RARITY_CONFIG } from '../utils/storeData';
 import PlayerAvatar from '../components/PlayerAvatar';
 import { SFX, getMusicVol, getSFXVol, setMusicVol, setSFXVol } from '../utils/sounds';
@@ -27,27 +26,6 @@ export default function SettingsPage({ onBack }) {
   const [profile,   setProfile]   = useState(() => loadProfile());
   const [musicVol,  setMusicVolState]  = useState(() => getMusicVol());
   const [sfxVol,    setSFXVolState]    = useState(() => getSFXVol());
-  const [codeInput, setCodeInput]    = useState('');
-  const [codeMsg,   setCodeMsg]      = useState(null);  // { type:'ok'|'err', text }
-
-  function handleRedeem() {
-    if (!codeInput.trim()) return;
-    const res = redeemCode(codeInput);
-    if (res.ok) {
-      SFX.cardSelect();
-      setProfile(loadProfile());
-      setCodeMsg({ type: 'ok', text: `حصلت على ${res.coins.toLocaleString('ar-SA')} عملة! (${res.label})` });
-      setCodeInput('');
-    } else {
-      const text =
-        res.reason === 'used'    ? 'هذا الكود مستخدم من قبل'
-      : res.reason === 'invalid' ? 'كود غير صحيح'
-      : res.reason === 'empty'   ? 'اكتب الكود أولاً'
-      :                            'تعذر استخدام الكود';
-      setCodeMsg({ type: 'err', text });
-    }
-  }
-
   const inventory = profile.inventory ?? [];
 
   const ownedAvatars = STORE_ITEMS.filter(
@@ -285,34 +263,6 @@ export default function SettingsPage({ onBack }) {
         </div>
       </section>
 
-      {/* ── استبدال كود ── */}
-      <section className={styles.section}>
-        <p className={styles.label}>استبدال كود</p>
-        <p className={styles.emptyHint}>أدخل كود مكافأة لتحصل على عملات مجانية</p>
-        <div className={styles.codeRow}>
-          <input
-            className={styles.codeInput}
-            type="text"
-            placeholder="ASHBAL"
-            maxLength={20}
-            value={codeInput}
-            onChange={e => { setCodeInput(e.target.value.toUpperCase()); setCodeMsg(null); }}
-            onKeyDown={e => { if (e.key === 'Enter') handleRedeem(); }}
-          />
-          <button
-            className={styles.codeBtn}
-            onClick={handleRedeem}
-            disabled={!codeInput.trim()}
-          >
-            استبدال
-          </button>
-        </div>
-        {codeMsg && (
-          <p className={codeMsg.type === 'ok' ? styles.codeMsgOk : styles.codeMsgErr}>
-            {codeMsg.text}
-          </p>
-        )}
-      </section>
     </div>
   );
 }
