@@ -23,7 +23,7 @@ import DiscardPile from '../components/DiscardPile';
 import GuideDrawer from '../components/GuideDrawer';
 import PlayerAvatar from '../components/PlayerAvatar';
 import { SFX, startMusic, stopMusic, haptic } from '../utils/sounds';
-import { getTurnSpeedFactor } from '../utils/playerProfile';
+import { loadProfile, saveProfile, TURN_SPEED_FACTORS } from '../utils/playerProfile';
 import styles from './GamePage.module.css';
 
 const ACTION_TYPE = {
@@ -188,7 +188,15 @@ export default function GamePage({
   initialGs = null,
 }) {
   const [gs, setGs] = useState(() => initialGs ?? createInitialState(config.players));
-  const turnSpeedFactor = useMemo(() => getTurnSpeedFactor(), []);
+  const [turnSpeed, setTurnSpeed] = useState(() => loadProfile().turnSpeed ?? 'normal');
+  const turnSpeedFactorRef = useRef(TURN_SPEED_FACTORS[turnSpeed] ?? 1);
+  useEffect(() => { turnSpeedFactorRef.current = TURN_SPEED_FACTORS[turnSpeed] ?? 1; }, [turnSpeed]);
+  function changeTurnSpeed(s) {
+    setTurnSpeed(s);
+    const next = { ...loadProfile(), turnSpeed: s };
+    saveProfile(next);
+    SFX.cardSelect();
+  }
 
   const [focusedSource, setFocusedSource] = useState(null);
   const [showAction, setShowAction]       = useState(false);
@@ -325,7 +333,7 @@ export default function GamePage({
       // Capture seq so this timer is a no-op if kickQueue was called manually (e.g., "تخطى" button)
       narrativeTimer.current = setTimeout(() => {
         if (kickSeqRef.current === mySeq) kickQueue();
-      }, next.durationMs * turnSpeedFactor);
+      }, next.durationMs * turnSpeedFactorRef.current);
     }
   }
 
@@ -543,7 +551,7 @@ export default function GamePage({
     // AI turns: auto-dismiss the turn announcement (scaled by the player's chosen speed)
     if (cp.isAI) {
       clearTimeout(announceTimer.current);
-      announceTimer.current = setTimeout(() => setTurnAnnounce(null), 1600 * turnSpeedFactor);
+      announceTimer.current = setTimeout(() => setTurnAnnounce(null), 1600 * turnSpeedFactorRef.current);
     }
   }, [gs.currentPlayerIndex, gs.phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -956,6 +964,24 @@ export default function GamePage({
             <span className={styles.settingIcon}>📖</span>
             <span>دليل البطاقات</span>
           </button>
+          <div className={styles.speedSetting}>
+            <span className={styles.speedSettingLabel}>⚡ سرعة دور الذكاء</span>
+            <div className={styles.speedSettingRow}>
+              {[
+                { id: 'slow',   label: 'بطيء' },
+                { id: 'normal', label: 'عادي' },
+                { id: 'fast',   label: 'سريع' },
+              ].map(s => (
+                <button
+                  key={s.id}
+                  className={`${styles.speedChip} ${turnSpeed === s.id ? styles.speedChipActive : ''}`}
+                  onClick={() => changeTurnSpeed(s.id)}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
           {onQuit && (
             <button className={`${styles.settingItem} ${styles.settingQuit}`} onClick={() => { SFX.buttonClick(); stopMusic(); setShowSettings(false); onQuit(); }}>
               <span className={styles.settingIcon}>🚪</span>
