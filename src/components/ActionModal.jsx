@@ -41,7 +41,8 @@ function TargetModal({ prompt, players, currentPlayerId, onResolve, allowSelf = 
 function GuessModal({ players, currentPlayerId, onResolve }) {
   const guessableCards = UNIQUE_CARDS.filter(c => c.id !== 1);
   const targets = players.filter(p => !p.isEliminated && !p.isProtected && p.id !== currentPlayerId);
-  const [targetId, setTargetId] = useState(targets[0]?.id ?? null);
+  // Auto-pick the only opponent; otherwise wait for a choice (step 1).
+  const [targetId, setTargetId] = useState(targets.length === 1 ? targets[0].id : null);
 
   if (targets.length === 0) {
     return (
@@ -54,33 +55,45 @@ function GuessModal({ players, currentPlayerId, onResolve }) {
     );
   }
 
+  // ── Step 1: choose the player (cards hidden) ──
+  if (targetId == null) {
+    return (
+      <div className={styles.overlay}>
+        <div className={styles.modal}>
+          <p className={styles.prompt}>اختر اللاعب اللي تبي تخمّن كرته</p>
+          <div className={styles.targets}>
+            {targets.map(p => (
+              <button key={p.id} className={styles.targetBtn} onClick={() => setTargetId(p.id)}>
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Step 2: choose the guessed card ──
+  const target = targets.find(p => p.id === targetId);
+  const canGoBack = targets.length > 1;
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
-        <p className={styles.prompt}>اختر لاعب وخمّن كرته</p>
-        <div className={styles.targets}>
-          {targets.map(p => (
-            <button
-              key={p.id}
-              className={`${styles.targetBtn} ${targetId === p.id ? styles.active : ''}`}
-              onClick={() => setTargetId(p.id)}
-            >
-              {p.name}
-            </button>
-          ))}
-        </div>
-        <p className={styles.subPrompt}>أي شخصية معه؟</p>
+        <p className={styles.prompt}>أي شخصية مع {target?.name}؟</p>
         <div className={styles.cardGrid}>
           {guessableCards.map(card => (
             <div
               key={card.id}
               className={styles.guessCard}
-              onClick={() => targetId != null && onResolve({ targetId, guessedCardId: card.id })}
+              onClick={() => onResolve({ targetId, guessedCardId: card.id })}
             >
               <CardFace card={card} size="small" />
             </div>
           ))}
         </div>
+        {canGoBack && (
+          <button className={styles.btnGhost} onClick={() => setTargetId(null)}>‹ تغيير اللاعب</button>
+        )}
       </div>
     </div>
   );

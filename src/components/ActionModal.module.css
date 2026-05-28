@@ -94,6 +94,20 @@
 }
 .btn:hover { opacity: 0.92; }
 
+.btnGhost {
+  background: none;
+  border: none;
+  color: #5682B2;
+  font-family: 'Zanjabeel', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 10px 14px;
+  margin-top: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.btnGhost:hover { color: #3a6ba0; }
+
 .noTarget {
   font-family: 'Zanjabeel', sans-serif;
   color: #2d3e52;
