@@ -72,13 +72,13 @@ export const MUSIC_ITEMS = [
     file:     '/music/anshooda.mp3',
   },
   {
-    id:       'mu_zayna',
+    id:       'mu_noori',
     type:     'music',
     rarity:   'rare',
     price:    2000,
-    name:     'زينة ونحول',
-    subtitle: 'مقدمة مسلسل زينة ونحول',
-    file:     '/music/zayna.mp3',
+    name:     'نوري',
+    subtitle: 'أغنية شخصية نوري ⭐ — صاحبة البطاقة ٨ "نجمة الحي"',
+    file:     '/music/noori.mp3',
   },
   {
     id:       'mu_anthem',
