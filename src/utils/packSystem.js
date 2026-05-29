@@ -58,22 +58,17 @@ function weightedPick(rarities, weights) {
   return rarities[rarities.length - 1];
 }
 
-const COMP_RATES = { common: 0.2, rare: 0.3, epic: 0.4, legendary: 0.5 };
-
 function drawItem(pool, owned) {
   if (pool.length === 0) return null;
   const unowned = pool.filter(i => !owned.includes(i.id));
   const source = unowned.length > 0 ? unowned : pool;
   const item = source[Math.floor(Math.random() * source.length)];
   const isDuplicate = owned.includes(item.id);
-  const coinsCompensation = isDuplicate
-    ? Math.round(item.price * (COMP_RATES[item.rarity] ?? 0.2))
-    : 0;
-  return { item, isDuplicate, coinsCompensation };
+  return { item, isDuplicate };
 }
 
 // Returns { items: [av1, av2, frame], newPacksState }
-// Each slot: { item, isDuplicate, coinsCompensation }
+// Each slot: { item, isDuplicate }
 export function openPack(packId, profile) {
   const pack = PACK_DEFS[packId];
   const owned = profile.inventory ?? [];

@@ -88,15 +88,14 @@ export default function StorePage({ onBack }) {
     const res = openPack(packId, profile);
     if (!res || res.items.length === 0) return;
 
-    // Update inventory and coins
-    const totalComp = res.items.reduce((s, r) => s + r.coinsCompensation, 0);
+    // Update inventory and deduct pack price
     const newInv = [...(profile.inventory ?? [])];
     res.items.forEach(r => {
       if (!r.isDuplicate && !newInv.includes(r.item.id)) newInv.push(r.item.id);
     });
     const next = {
       ...profile,
-      coins:     (profile.coins ?? 0) - price + totalComp,
+      coins:     (profile.coins ?? 0) - price,
       inventory: newInv,
       packs:     res.newPacksState,
     };
@@ -488,7 +487,7 @@ export default function StorePage({ onBack }) {
 
                 <div className={styles.itemsRow}>
                   {results.map((slot, idx) => {
-                    const { item, isDuplicate, coinsCompensation } = slot;
+                    const { item, isDuplicate } = slot;
                     const rc = RARITY_CONFIG[item.rarity];
                     const equipped = isEquipped(item);
                     return (
@@ -507,7 +506,7 @@ export default function StorePage({ onBack }) {
                         </div>
                         <span className={styles.itemName}>{item.name}</span>
                         {isDuplicate ? (
-                          <span className={styles.dupTag}>+{coinsCompensation} <CoinIcon size="sm" /></span>
+                          <span className={styles.dupTag}>مكرر</span>
                         ) : equipped ? (
                           <span className={styles.equippedTag}>✓ مجهز</span>
                         ) : (
